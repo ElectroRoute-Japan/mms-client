@@ -1,0 +1,99 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0 # Use the ref you want to point at
+    hooks:
+      # Git style
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+      - id: check-merge-conflict
+      - id: check-vcs-permalinks
+      - id: forbid-new-submodules
+
+      # Common errors
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-executables-have-shebangs
+      - id: check-docstring-first
+
+      # Cross platform
+      - id: check-case-conflict
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.23.3
+    hooks:
+      - id: check-github-workflows
+
+  - repo: https://github.com/python-poetry/poetry
+    rev: "1.5.1"
+    hooks:
+      # - id: poetry-lock
+      - id: poetry-check
+
+  # Code formatter
+  - repo: https://github.com/ambv/black
+    rev: "24.2.0"
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  # Code formatter
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        description: isort is a tool for ordering imports
+
+  # Code (doc) formatter
+  - repo: https://github.com/myint/docformatter
+    rev: v1.3.1
+    hooks:
+      - id: docformatter
+        name: docformatter
+        description: "Formats docstrings to follow PEP 257."
+        entry: docformatter
+        args: [--in-place, --wrap-summaries, "120", --wrap-description, "120"]
+        language: python
+        types: [python]
+
+  # Lint
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        name: pydocstyle
+        description: pydocstyle is a static analysis tool for checking compliance with Python docstring conventions.
+        entry: pydocstyle
+        language: python
+        types: [python]
+
+  # Lint
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: poetry run pylint
+        language: system
+        types: [python]
+        require_serial: true
+        exclude: ^docs/
+
+  # Type checking.  Use local version to pickup local dependencies
+  - repo: local
+    hooks:
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy --non-interactive --install-types
+        language: system
+        types: [python]
+        require_serial: true
+        exclude: ^tests/
+
+  # Calculating cyclomatic complexity
+  - repo: https://github.com/yunojuno/pre-commit-xenon
+    rev: v0.1
+    hooks:
+      - id: xenon
+        args: ["--max-absolute=B", "--max-modules=B", "--max-average=A"]
+        exclude: ^(bin/)

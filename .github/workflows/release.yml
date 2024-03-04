@@ -1,0 +1,45 @@
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+  security-events: write
+
+jobs:
+  version-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: WyriHaximus/github-action-get-previous-tag@v1
+        id: get-tag
+        with:
+          fallback: "v0.0.0"
+      - name: Verify Version Up
+        run: |
+          chmod +x ./version_check.sh
+          ./version_check.sh ${{ steps.get-tag.outputs.tag }}
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.5.1"
+      - id: poetry-version
+        run: poetry --version
+      - id: install-dependencies
+        run: poetry install
+      - uses: pre-commit/action@v3.0.0
+      - name: Unit Tests
+        run: poetry run pytest -n auto
