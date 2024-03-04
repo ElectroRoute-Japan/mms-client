@@ -574,6 +574,17 @@ snowballstemmer = ">=2.2.0"
 toml = ["tomli (>=1.2.3)"]
 
 [[package]]
+name = "pyfakefs"
+version = "5.3.5"
+description = "pyfakefs implements a fake file system that mocks the Python file system modules."
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "pyfakefs-5.3.5-py3-none-any.whl", hash = "sha256:751015c1de94e1390128c82b48cdedc3f088bbdbe4bc713c79d02a27f0f61e69"},
+    {file = "pyfakefs-5.3.5.tar.gz", hash = "sha256:7cdc500b35a214cb7a614e1940543acc6650e69a94ac76e30f33c9373bd9cf90"},
+]
+
+[[package]]
 name = "pylint"
 version = "3.1.0"
 description = "python code static checker"
@@ -890,4 +901,4 @@ requests = ">=2.0,<3.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "98fb03fcdf549e81dd715ff511dd99ef19e95f04411855c883158b55ce9a46b5"
+content-hash = "1cba9da1dce2112c24b26944775b984df716ce6b2ba29f000dbd93d2a14350cd"
