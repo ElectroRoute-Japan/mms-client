@@ -18,6 +18,68 @@ pylint = "^3.1.0"
 xenon = "^0.9.1"
 pydocstyle = "^6.3.0"
 pre-commit = "^3.6.2"
+pytest = "^8.1.0"
+pytest-xdist = "^3.5.0"
+pytest-cov = "^4.1.0"
+pytest-mock = "^3.12.0"
+
+[tool.black]
+line-length = 120
+
+[tool.isort]
+force_single_line = true
+line_length = 120
+
+[tool.mypy]
+exclude = [
+  '^tests/'
+]
+scripts_are_modules = true
+
+[[tool.mypy.overrides]]
+module = [
+  'shared.*',
+  'dagster_datadog.resources',
+  'boto3_type_annotations.s3'
+]
+ignore_missing_imports = true
+
+[tool.pydocstyle]
+match = '((?!test).)*\.py'
+inherit = false
+ignore = ["D200", "D203", "D213", "D406", "D407", "D413", "D104"]
+
+[tool.pylint.main]
+# See https://pylint.readthedocs.io/en/latest/user_guide/configuration/all-options.html for supported configuration
+disable = [
+  # This is already covered by Pydocstyle
+  "missing-function-docstring",
+  # Disable warning for using f string in the logging
+  "logging-fstring-interpolation",
+  # We plan to extend classes in the future
+  "too-few-public-methods",
+  # This check was too aggressive, complaining about similarities in docstrings
+  "duplicate-code",
+]
+max-line-length = 120
+max-args = 10
+ignore = ["docs", "tests"]
+source-roots = ["orchestration", "jobs"]
+recursive = "true"
+
+[tool.pylint.MASTER]
+ignore-paths = '^tests/.*$'
+
+[tool.pytest.ini_options]
+addopts = "-n auto --cov=orchestration --cov=jobs"
+testpaths = ["tests"]
+filterwarnings = "ignore::DeprecationWarning"
+
+[tool.coverage.run]
+omit = ["*/__init__.py"]
+
+[tool.coverage.report]
+fail_under = 100
 
 [build-system]
 requires = ["poetry-core"]
