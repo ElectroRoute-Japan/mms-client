@@ -41,5 +41,5 @@ jobs:
       - id: install-dependencies
         run: poetry install
       - uses: pre-commit/action@v3.0.0
-      - id: unit-tests
-        run: make test
+      - name: Unit Tests
+        run: poetry run pytest -n auto

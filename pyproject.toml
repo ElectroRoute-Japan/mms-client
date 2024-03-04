@@ -1,10 +1,10 @@
 [tool.poetry]
-name = "mms-client"
+name = "mms_client"
 version = "v0.1.0"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
-packages = [{ include = "src" }]
+packages = [{ include = "mms_client", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -64,14 +64,14 @@ disable = [
 max-line-length = 120
 max-args = 10
 ignore = ["docs", "tests"]
-source-roots = ["orchestration", "jobs"]
+source-roots = ["src/mms_client"]
 recursive = "true"
 
 [tool.pylint.MASTER]
 ignore-paths = '^tests/.*$'
 
 [tool.pytest.ini_options]
-addopts = "-n auto --cov=orchestration --cov=jobs"
+addopts = "-n auto --cov=src/mms_client"
 testpaths = ["tests"]
 filterwarnings = "ignore::DeprecationWarning"
 
