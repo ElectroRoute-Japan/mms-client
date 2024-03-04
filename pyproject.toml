@@ -4,12 +4,11 @@ version = "v0.1.0"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
-packages = [{include = "mms_client"}]
+packages = [{ include = "mms_client", from = "src" }]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 requests = "^2.31.0"
-
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
