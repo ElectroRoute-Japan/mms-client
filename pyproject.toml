@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mms_client"
-version = "v0.1.0"
+version = "v0.2.0"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
@@ -22,6 +22,8 @@ pytest = "^8.1.0"
 pytest-xdist = "^3.5.0"
 pytest-cov = "^4.1.0"
 pytest-mock = "^3.12.0"
+mock = "^5.1.0"
+pyfakefs = "^5.3.5"
 
 [tool.black]
 line-length = 120
