@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.0">
+
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+              +-----------------------------------------------+
+              |                                               |
+              |               COPYRIGHT (c) 2021              |
+              |                                               |
+              |                                               |
+              |                                               |
+              |               All rights reserved             |
+              |                                               |
+              +-----------------------------------------------+
+
+      This is the XML schema for OMI data submitted/accessed by MO/TSO/BSP.
+
+      History:
+
+      001  2021-03-29 Initial version.
+
+
+      </xs:documentation>
+    </xs:annotation>
+
+    <!-- BEGIN: Common Simple Type Definitions -->
+
+    <xs:simpleType name="ValidationStatusType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="PASSED"/>
+        <xs:enumeration value="WARNING"/>
+        <xs:enumeration value="PASSED_PARTIAL"/>
+        <xs:enumeration value="FAILED"/>
+        <xs:enumeration value="NOT_DONE"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CodeType">
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="50"/>
+        <xs:minLength value="2"/>
+        <xs:pattern value="[a-zA-Z_0-9\-]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TransactionId">
+    <xs:restriction base="xs:string">
+     <xs:maxLength value="10" />
+     <xs:minLength value="8" />
+    </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: Common Simple Type Definitions -->
+
+    <!-- BEGIN: Registration Simple Type Definitions -->
+
+    <xs:simpleType name="ParticipantNameType">
+      <xs:restriction base="xs:string">
+        <xs:length value="4"/>
+        <xs:pattern value="[A-W]([0-9][0-9][1-9]|[0-9][1-9][0-9]|[1-9][0-9][0-9])"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="UserNameType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="12"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ResourceNameType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+        <xs:pattern value="[A-Z0-9_\-]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ResourceShortNameType">
+      <xs:restriction base="JapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ResourceTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="02"/>
+        <xs:enumeration value="03"/>
+        <xs:enumeration value="04"/>
+        <xs:enumeration value="05"/>
+        <xs:enumeration value="06"/>
+        <xs:enumeration value="07"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SystemCodeType">
+      <xs:restriction base="xs:string">
+        <xs:length value="5"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CompanyShortNameType">
+      <xs:restriction base="JapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OperatorCodeType">
+      <xs:restriction base="xs:string">
+        <xs:length value="4"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PriSec1CommandOperationMethodType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="3"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="Sec2Ter1Ter2CommandOperationMethodType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: Registration Simple Type Definitions -->
+
+    <!-- BEGIN: General Simple Type Definitions -->
+
+    <xs:simpleType name="FreeStringType">
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[a-zA-Z0-9 ~!@#$*()_+}{:?`='/.,%;\^\|\-\]\[\\&lt;&gt;&amp;&quot;]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="JapaneseStringType">
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*"/>
+     </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BaselineLoadFileNameType">
+      <xs:restriction base="FreeStringType">
+        <xs:minLength value="31"/>
+        <xs:maxLength value="40"/>
+        <xs:pattern value="W9_[0-9]{4}_[0-9]{8}_[0-9]{2}_[A-Z0-9]{5}_[A-Z0-9_\-]{1,10}\.xml"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AsciiJapaneseStringType">
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[a-zA-Z0-9 ~!@#$*()_+}{:?>`='/.,%;\^\|\-\]\[\\&lt;&amp;&quot;&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DrPatternNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="20"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="InterconEquipmentType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="02"/>
+        <xs:enumeration value="07"/>
+        <xs:enumeration value="08"/>
+        <xs:enumeration value="09"/>
+        <xs:enumeration value="10"/>
+        <xs:enumeration value="11"/>
+        <xs:enumeration value="12"/>
+        <xs:enumeration value="13"/>
+        <xs:enumeration value="15"/>
+        <xs:enumeration value="21"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="StartTimeCodeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="07"/>
+        <xs:enumeration value="13"/>
+        <xs:enumeration value="19"/>
+        <xs:enumeration value="25"/>
+        <xs:enumeration value="31"/>
+        <xs:enumeration value="37"/>
+        <xs:enumeration value="43"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="EndTimeCodeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="06"/>
+        <xs:enumeration value="12"/>
+        <xs:enumeration value="18"/>
+        <xs:enumeration value="24"/>
+        <xs:enumeration value="30"/>
+        <xs:enumeration value="36"/>
+        <xs:enumeration value="42"/>
+        <xs:enumeration value="48"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: General Simple Type Definitions -->
+
+    <!-- BEGIN: Precision Types -->
+
+    <xs:simpleType name="KwPosValue7.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="9999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="KwNegValue7.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="-9999999"/>
+        <xs:maxInclusive value="0"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PriceValue7.2RoundedType">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="10000.00"/>
+        <xs:fractionDigits value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: Precision Types -->
+
+    <!-- BEGIN: JBMS Simple Enumeration Types -->
+
+    <xs:simpleType name="AreaType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="02"/>
+        <xs:enumeration value="03"/>
+        <xs:enumeration value="04"/>
+        <xs:enumeration value="05"/>
+        <xs:enumeration value="06"/>
+        <xs:enumeration value="07"/>
+        <xs:enumeration value="08"/>
+        <xs:enumeration value="09"/>
+        <xs:enumeration value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BaselineTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="0131"/>
+        <xs:enumeration value="0132"/>
+        <xs:enumeration value="0331"/>
+        <xs:enumeration value="0431"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BlackStartRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OverPowerRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RemainingReserveDownRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="3"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RemainingReserveUpRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="3"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="VoltageAdjustmentRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PeakModeRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SystemSecurityPumpRejectFlagType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+        <xs:enumeration value="9"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RejectReasonType">
+      <xs:restriction base="AsciiJapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="50"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="MarketTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="WAM"/>
+        <xs:enumeration value="DAM"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TielineCommodityCategoryType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1000"/>
+        <xs:enumeration value="2100"/>
+        <xs:enumeration value="2200"/>
+        <xs:enumeration value="3100"/>
+        <xs:enumeration value="3200"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OffMarketContractCommodityCategoryType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1000"/>
+        <xs:enumeration value="2100"/>
+        <xs:enumeration value="2200"/>
+        <xs:enumeration value="3100"/>
+        <xs:enumeration value="3200"/>
+        <xs:enumeration value="4000"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OffMarketContractAreaType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="02"/>
+        <xs:enumeration value="03"/>
+        <xs:enumeration value="04"/>
+        <xs:enumeration value="05"/>
+        <xs:enumeration value="06"/>
+        <xs:enumeration value="07"/>
+        <xs:enumeration value="08"/>
+        <xs:enumeration value="09"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DirectionUpDownType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1" />
+        <xs:enumeration value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="StatusType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1" />
+        <xs:enumeration value="0" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="JbmsIdType">
+      <xs:restriction base="xs:string">
+        <xs:length value="18"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SubRequirementTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="PRI"/>
+        <xs:enumeration value="SEC1"/>
+        <xs:enumeration value="SEC2"/>
+        <xs:enumeration value="TER1"/>
+        <xs:enumeration value="PRI-SEC1"/>
+        <xs:enumeration value="PRI-SEC2"/>
+        <xs:enumeration value="PRI-TER1"/>
+        <xs:enumeration value="SEC1-SEC2"/>
+        <xs:enumeration value="SEC1-TER1"/>
+        <xs:enumeration value="SEC2-TER1"/>
+        <xs:enumeration value="PRI-SEC1-SEC2"/>
+        <xs:enumeration value="PRI-SEC1-TER1"/>
+        <xs:enumeration value="PRI-SEC2-TER1"/>
+        <xs:enumeration value="SEC1-SEC2-TER1"/>
+        <xs:enumeration value="PRI-SEC1-SEC2-TER1"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: JBMS Simple Enumeration Types -->
+
+    <!-- BEGIN: Common Attribute Group Definitions -->
+
+    <xs:attributeGroup name="CommonAttributes">
+      <xs:attribute name="Validation" type="ValidationStatusType"
+        use="optional" default="NOT_DONE"/>
+      <xs:attribute name="Success" type="xs:boolean" use="optional"/>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="HeaderAttributes">
+      <xs:attribute name="Date" type="xs:date" use="required" />
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="required" />
+      <xs:attribute name="UserName" type="UserNameType" use="required" />
+    </xs:attributeGroup>
+
+    <!-- END: Common Attribute Group Definitions -->
+
+    <!-- BEGIN: Common Complex Type Definitions -->
+
+    <xs:complexType name="ErrorType">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Code" type="CodeType"
+                        use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="WarningType">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Code" type="CodeType"
+                        use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="InformationType">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Code" type="CodeType"
+                        use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="MessagesType">
+      <xs:sequence>
+        <xs:element name="Error" type="ErrorType"
+                    minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Warning" type="WarningType"
+                    minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Information" type="InformationType"
+                    minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ProcessingStatisticsType">
+      <xs:attribute name="Received" type="xs:int" use="optional" />
+      <xs:attribute name="Valid" type="xs:int" use="optional" />
+      <xs:attribute name="Invalid" type="xs:int" use="optional" />
+      <xs:attribute name="Successful" type="xs:int" use="optional" />
+      <xs:attribute name="Unsuccessful" type="xs:int" use="optional" />
+      <xs:attribute name="ProcessingTimeMs" type="xs:long" use="optional" />
+      <xs:attribute name="TransactionId" type="TransactionId" use="optional" />
+      <xs:attribute name="TimeStamp" type="xs:string" use="optional" />
+      <xs:attribute name="XmlTimeStamp" type="xs:dateTime" use="optional" />
+    </xs:complexType>
+
+    <!-- END: Common Complex Type Definitions -->
+
+    <!-- BEGIN: OMI Data Definitions -->
+
+    <xs:complexType name="BaselineLoadFileType">
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+        minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Name" type="BaselineLoadFileNameType" use="required"/>
+      <xs:attribute name="BaselineType" type="BaselineTypeType" use="required"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="BaselineLoadSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BaselineLoad: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+        <xs:element name="File" type="BaselineLoadFileType"
+          minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="BaselineLoadFileDownloadQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BaselineLoad: File Download Query type.
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+        <xs:element name="File" type="BaselineLoadFileType"
+          minOccurs="1" maxOccurs="10"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="BaselineLoadFileListQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BaselineLoad: Query List of the Files
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="BaselineType" type="BaselineTypeType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="RemainingReserveDataSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          RemainingReserveData: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="optional"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
+      <xs:attribute name="RemainingReserveUp" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="RemainingReserveUpRejectFlag" type="RemainingReserveUpRejectFlagType" use="optional"/>
+      <xs:attribute name="RemainingReserveUpRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attribute name="RemainingReserveDown" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="RemainingReserveDownRejectFlag" type="RemainingReserveDownRejectFlagType" use="optional"/>
+      <xs:attribute name="RemainingReserveDownRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attribute name="VoltageAdjustmentRejectFlag" type="VoltageAdjustmentRejectFlagType" use="optional"/>
+      <xs:attribute name="VoltageAdjustmentRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attribute name="BlackStartRejectFlag" type="BlackStartRejectFlagType" use="optional"/>
+      <xs:attribute name="BlackStartRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attribute name="OverPowerRemainingReserveUp" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="OverPowerRejectFlag" type="OverPowerRejectFlagType" use="optional"/>
+      <xs:attribute name="OverPowerRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attribute name="PeakModeRemainingReserveUp" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="PeakModeRejectFlag" type="PeakModeRejectFlagType" use="optional"/>
+      <xs:attribute name="PeakModeRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attribute name="SystemSecurityPumpRejectFlag" type="SystemSecurityPumpRejectFlagType" use="optional"/>
+      <xs:attribute name="SystemSecurityPumpRejectReason" type="RejectReasonType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="RemainingReserveDataQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          RemainingReserveData: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="TielineDataType">
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+        minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="CommodityCategory" type="TielineCommodityCategoryType" use="required"/>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+      <xs:attribute name="AllocCapacityForward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocCapacityBackward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="DkwForward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="DkwBackward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence1Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence1Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence2Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence2Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence3Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence3Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence4Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="AllocFence4Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw1Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw1Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw2Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw2Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw3Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw3Backward" type="KwNegValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw4Forward" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="FenceDkw4Backward" type="KwNegValue7.0Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="OffMarketContractSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          OffMarketContract: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TielineData" type="TielineDataType"
+          minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="StartTimeCode" type="StartTimeCodeType" use="optional"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTimeCode" type="EndTimeCodeType" use="optional"/>
+      <xs:attribute name="CommodityCategory" type="OffMarketContractCommodityCategoryType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="optional"/>
+      <xs:attribute name="ResourceType" type="ResourceTypeType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="OperatorCode" type="OperatorCodeType" use="optional"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="LinkedArea" type="OffMarketContractAreaType" use="required"/>
+      <xs:attribute name="Area" type="OffMarketContractAreaType" use="optional"/>
+      <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>
+      <xs:attribute name="PrimaryContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="ContractPrice" type="PriceValue7.2RoundedType" use="required"/>
+      <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
+      <xs:attribute name="PriSec1CommandOperationMethod" type="PriSec1CommandOperationMethodType" use="optional"/>
+      <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
+      <xs:attribute name="Status" type="StatusType" use="required"/>
+      <xs:attribute name="JbmsId" type="JbmsIdType" use="optional"/>
+      <xs:attribute name="SubmitterArea" type="OffMarketContractAreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="OffMarketContractQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          OffMarketContract: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="optional"/>
+      <xs:attribute name="Area" type="OffMarketContractAreaType" use="optional"/>
+      <xs:attribute name="LinkedArea" type="OffMarketContractAreaType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="Status" type="StatusType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <!-- END: OMI Data Definitions -->
+
+    <!-- BEGIN: Interface DEFINITIONS -->
+
+    <!-- Submit Types -->
+    <xs:complexType name="MarketSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+        This is used to submit the different Interface Data.
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" />
+        <xs:choice>
+
+          <xs:element name="BaselineLoad" type="BaselineLoadSubmitType"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="RemainingReserveData" type="RemainingReserveDataSubmitType"
+            minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="OffMarketContract" type="OffMarketContractSubmitType"
+            minOccurs="0" maxOccurs="unbounded"/>
+
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="HeaderAttributes" />
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <!-- Query Types -->
+    <xs:complexType name="MarketQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+        This is used to query the different Interface Data.
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" />
+        <xs:choice>
+
+          <xs:element name="BaselineLoadFileListQuery" type="BaselineLoadFileListQueryType"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="BaselineLoadFileDownloadQuery" type="BaselineLoadFileDownloadQueryType"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="RemainingReserveDataQuery" type="RemainingReserveDataQueryType"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="OffMarketContractQuery" type="OffMarketContractQueryType"
+            minOccurs="0" maxOccurs="1"/>
+
+        </xs:choice>
+      </xs:sequence>
+    <xs:attributeGroup ref="HeaderAttributes" />
+    <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="MarketDataListType">
+      <xs:sequence>
+        <xs:element name="ProcessingStatistics" type="ProcessingStatisticsType"
+          minOccurs="0" maxOccurs="1" />
+        <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+        <xs:choice>
+          <xs:element name="MarketSubmit" type="MarketSubmitType"
+           minOccurs="0" maxOccurs="1" />
+          <xs:element name="MarketQuery" type="MarketQueryType" minOccurs="0"
+           maxOccurs="1" />
+       </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="MarketData" type="MarketDataListType" />
+
+    <!-- END: Interface DEFINITIONS -->
+
+</xs:schema>

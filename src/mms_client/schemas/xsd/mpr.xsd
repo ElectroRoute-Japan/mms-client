@@ -1,0 +1,1817 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.0">
+
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+      This is the XML schema for Registration data.
+    </xs:documentation>
+  </xs:annotation>
+
+  <!-- Common Attribute Definitions -->
+  <xs:attributeGroup name="CommonAttributes">
+    <xs:attribute name="Validation" type="ValidationType" use="optional"/>
+    <xs:attribute name="Success" type="xs:boolean" use="optional"/>
+  </xs:attributeGroup>
+
+  <xs:attributeGroup name="CommonApprovalAttributes">
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="required"/>
+    <xs:attribute name="Action" type="ApprovalActionType"
+                  use="required"/>
+  </xs:attributeGroup>
+
+  <!-- Enumeration Simple Type Definitions -->
+  <xs:simpleType name="RegistrationActionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUBMIT"/>
+      <xs:enumeration value="QUERY"/>
+      <xs:enumeration value="APPROVAL"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ValidationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PASSED"/>
+      <xs:enumeration value="WARNING"/>
+      <xs:enumeration value="FAILED"/>
+      <xs:enumeration value="NOT_DONE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResRecordStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="WORKING"/>
+      <xs:enumeration value="SUBMITTED"/>
+      <xs:enumeration value="APPROVED"/>
+      <xs:enumeration value="DECLINED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DrRecordStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="SUBMITTED"/>
+      <xs:enumeration value="DECLINED"/>
+      <xs:enumeration value="APPROVED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ValidityStateType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REGISTERED"/>
+      <xs:enumeration value="DEREGISTERED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DateTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="TRADE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="QueryActionType">
+    <xs:restriction base="xs:string">
+       <xs:enumeration value="NORMAL"/>
+      <xs:enumeration value="LATEST"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ApprovalActionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="DECLINED"/>
+      <xs:enumeration value="APPROVED"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ParticipantTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BALANCING_SERVICE_PROVIDER"/>
+      <xs:enumeration value="MARKET_OPERATOR"/>
+      <xs:enumeration value="TRANSMISSION_SYSTEM_OPERATOR"/>
+     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AreaType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="01"/>
+      <xs:enumeration value="02"/>
+      <xs:enumeration value="03"/>
+      <xs:enumeration value="04"/>
+      <xs:enumeration value="05"/>
+      <xs:enumeration value="06"/>
+      <xs:enumeration value="07"/>
+      <xs:enumeration value="08"/>
+      <xs:enumeration value="09"/>
+      <xs:enumeration value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SubsystemNameType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REGISTRATION"/>
+      <xs:enumeration value="INTERFACE"/>
+      <xs:enumeration value="SWITCHING"/>
+      <xs:enumeration value="REPORT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccessCodeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NO_ACCESS"/>
+      <xs:enumeration value="READ"/>
+      <xs:enumeration value="WRITE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OverrideOptionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="VIOLATION"/>
+      <xs:enumeration value="OVERRIDE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="01"/>
+      <xs:enumeration value="02"/>
+      <xs:enumeration value="03"/>
+      <xs:enumeration value="04"/>
+      <xs:enumeration value="05"/>
+      <xs:enumeration value="06"/>
+      <xs:enumeration value="07"/>
+     </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AttachmentActionType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NEW"/>
+      <xs:enumeration value="UPDATE"/>
+      <xs:enumeration value="NONE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResDocumentTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="RES_EXAMINATION_DATA"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TaxStandardType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccountTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="9"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CommodityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1000"/>
+      <xs:enumeration value="2100"/>
+      <xs:enumeration value="2200"/>
+      <xs:enumeration value="3100"/>
+      <xs:enumeration value="3200"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CommodityCategoryType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="3200"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RemResvUtilizationType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="0"/>
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PriSec1CommandOperationMethodType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="Sec2Ter1Ter2CommandOperationMethodType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SignalTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BaselineSettingMethodType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ContractExistenceType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ContractTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="5"/>
+      <xs:enumeration value="6"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AvailabilityType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ThermalTypeType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="9"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="StartupEventNameType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="5"/>
+      <xs:enumeration value="6"/>
+      <xs:enumeration value="7"/>
+      <xs:enumeration value="8"/>
+      <xs:enumeration value="9"/>
+      <xs:enumeration value="10"/>
+      <xs:enumeration value="11"/>
+      <xs:enumeration value="12"/>
+      <xs:enumeration value="13"/>
+      <xs:enumeration value="14"/>
+      <xs:enumeration value="15"/>
+      <xs:enumeration value="16"/>
+      <xs:enumeration value="17"/>
+      <xs:enumeration value="18"/>
+      <xs:enumeration value="19"/>
+      <xs:enumeration value="20"/>
+      <xs:enumeration value="21"/>
+      <xs:enumeration value="22"/>
+      <xs:enumeration value="23"/>
+      <xs:enumeration value="24"/>
+      <xs:enumeration value="25"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="StopEventNameType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="1"/>
+      <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
+      <xs:enumeration value="4"/>
+      <xs:enumeration value="5"/>
+      <xs:enumeration value="6"/>
+      <xs:enumeration value="7"/>
+      <xs:enumeration value="8"/>
+      <xs:enumeration value="9"/>
+      <xs:enumeration value="10"/>
+      <xs:enumeration value="11"/>
+      <xs:enumeration value="12"/>
+      <xs:enumeration value="13"/>
+      <xs:enumeration value="14"/>
+      <xs:enumeration value="15"/>
+      <xs:enumeration value="16"/>
+      <xs:enumeration value="17"/>
+      <xs:enumeration value="18"/>
+      <xs:enumeration value="19"/>
+      <xs:enumeration value="20"/>
+      <xs:enumeration value="21"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- String Simple Type Definitions -->
+  <xs:simpleType name="AsciiStringType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9 ~!@#$*()_+}{:?>`='/.,%;\^\|\-\]\[\\&lt;&amp;&quot;]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="JapaneseStringType">
+    <xs:restriction base="xs:string">
+     <xs:pattern value="[&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*"/>
+   </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AsciiJapaneseStringType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z0-9 ~!@#$*()_+}{:?>`='/.,%;\^\|\-\]\[\\&lt;&amp;&quot;&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CodeType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+      <xs:pattern value="[a-zA-Z_0-9\-]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ParticipantNameType">
+    <xs:restriction base="xs:string">
+      <xs:length value="4"/>
+      <xs:pattern value="[A-W]([0-9][0-9][1-9]|[0-9][1-9][0-9]|[1-9][0-9][0-9])"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="UserNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="12"/>
+      <xs:pattern value="[A-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="10"/>
+      <xs:pattern value="[A-Z0-9_\-]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="SystemCodeType">
+    <xs:restriction base="xs:string">
+      <xs:length value="5"/>
+      <xs:pattern value="[A-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransactionIdType">
+    <xs:restriction base="xs:string">
+      <xs:length value="8"/>
+      <xs:pattern value="[a-zA-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResFileNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="5"/>
+      <xs:maxLength value="15"/>
+        <xs:pattern value="[a-zA-Z0-9\-_()\.&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*(.xml|.csv|.pdf|.zip)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DrCustomerListFileNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="31"/>
+      <xs:maxLength value="40"/>
+      <xs:pattern value="W9_023[1-2]_[0-9]{8}_[A-Z0-9]{5}_(0[1-9]|1[0-9]|20)_[A-Z0-9_\-]{1,10}.xml"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DrEvaluationFileNameType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="31"/>
+      <xs:maxLength value="40"/>
+        <xs:pattern value="[a-zA-Z0-9\-_()\.&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*(.csv|.pdf|.zip)"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CompanyShortNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CompanyLongNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PhoneType1">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="5"/>
+      <xs:pattern value="[0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PhoneType2">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="4"/>
+      <xs:pattern value="[0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CommentsType">
+    <xs:restriction base="AsciiJapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="128"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="EmailType">
+    <xs:restriction base="AsciiStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BankCodeType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="4"/>
+      <xs:pattern value="[0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BranchCodeType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="3"/>
+      <xs:pattern value="[0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccountNumberType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="7"/>
+      <xs:pattern value="[0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BranchNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="15"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BankNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccountHolderType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccountHolderKatakanaType">
+    <xs:restriction base="xs:string">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="40"/>
+      <xs:pattern value="[&#40;&#41;\&#45;\&#46;&#65393;-&#65439;&#65382;&#48;-&#57;&#65;-&#90;&#32;]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PayeeAddressType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PayeeDivisionNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="OperatorCodeType">
+    <xs:restriction base="xs:string">
+      <xs:length value="4"/>
+      <xs:pattern value="[A-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="InvoiceNumberType">
+    <xs:restriction base="xs:string">
+      <xs:length value="14"/>
+      <xs:pattern value="[a-zA-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PayeePostalCodeType">
+    <xs:restriction base="xs:string">
+      <xs:length value="8"/>
+      <xs:pattern value="[0-9]{3}-[0-9]{4}"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResPatternNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DrPatternNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceShortNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="10"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ResourceLongNameType">
+    <xs:restriction base="JapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="BgCodeType">
+    <xs:restriction base="xs:string">
+      <xs:length value="5"/>
+      <xs:pattern value="[a-zA-Z0-9]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="VenIdType">
+    <xs:restriction base="AsciiStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="64"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MarketContextType">
+    <xs:restriction base="AsciiStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="256"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ModelNameType">
+    <xs:restriction base="AsciiJapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="50"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="InPlantRateType">
+    <xs:restriction base="AsciiJapaneseStringType">
+      <xs:minLength value="1"/>
+      <xs:maxLength value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="HourMinuteSecondType">
+    <xs:restriction base="xs:string">
+      <xs:length value="8"/>
+      <xs:pattern value="[0-9][0-9]:[0-5][0-9]:[0-5][0-9]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="StartupHourMinuteType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="([-][0-9][1-9]:[0-5][0-9]|[-][1-9][0-9]:[0-5][0-9]|[-][0][0]:[0-5][1-9]|[-][0][0]:[1-5][0-9]|[0-9][0-9]:[0-5][0-9])"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="StopHourMinuteType">
+    <xs:restriction base="xs:string">
+     <xs:pattern value="([-][0-9][1-9]:[0-5][0-9]|[-][1-9][0-9]:[0-5][0-9]|[-][0][0]:[0-5][1-9]|[-][0][0]:[1-5][0-9]|[0][0]:[0][0])"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Numeric Simple Type Definitions -->
+  <xs:simpleType name="OutputType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="-9999999"/>
+      <xs:maxInclusive value="9999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CapacityType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="9999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PsqType">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="0|([1-9][0-9]{3})|([1-9][0-9]{4})|([1-9][0-9]{5})|([1-9][0-9]{6})"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="QuantityType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1000"/>
+      <xs:maxInclusive value="9999999"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PriceType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.00"/>
+      <xs:maxInclusive value="9999.99"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PercentageType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="100.0"/>
+      <xs:fractionDigits value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TaxRateType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.00"/>
+      <xs:maxInclusive value="100.00"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="CoefficientType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.00"/>
+      <xs:maxInclusive value="100.00"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="HourType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="99.9"/>
+      <xs:fractionDigits value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="MinuteType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="99"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="PatternNumberType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="1"/>
+      <xs:maxInclusive value="20"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="RatedVoltageType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="1000.0"/>
+      <xs:fractionDigits value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FrequencyType">
+    <xs:restriction base="xs:int">
+      <xs:pattern value="([5]|[6])[0]"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ContinuousOperationFrequencyType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="40.0"/>
+      <xs:maxInclusive value="70.0"/>
+      <xs:fractionDigits value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FullPowerGenerationTimeType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="99.9"/>
+      <xs:fractionDigits value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="NumberOfStartupsType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+      <xs:maxInclusive value="9999"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Date and Time Simple Type Definitions -->
+  <xs:simpleType name="DateDataType">
+    <xs:restriction base="xs:date">
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TimestampType">
+    <xs:restriction base="xs:dateTime">
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Common Complex Type Definitions -->
+  <xs:complexType name="MessagesType">
+    <xs:sequence>
+      <xs:element name="Error" type="ErrorType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Warning" type="WarningType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Information" type="InformationType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ErrorType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Code" type="CodeType"
+                      use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="WarningType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Code" type="CodeType"
+                      use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="InformationType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="Code" type="CodeType"
+                      use="optional"/>
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="ProcessingStatisticsType">
+    <xs:attribute name="Received" type="xs:int" use="optional"/>
+    <xs:attribute name="Valid" type="xs:int" use="optional"/>
+    <xs:attribute name="Invalid" type="xs:int" use="optional"/>
+    <xs:attribute name="Successful" type="xs:int" use="optional"/>
+    <xs:attribute name="Unsuccessful" type="xs:int" use="optional"/>
+    <xs:attribute name="ProcessingTimeMs" type="xs:long" use="optional"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType" use="optional"/>
+    <xs:attribute name="TimeStamp" type="xs:string" use="optional"/>
+    <xs:attribute name="XmlTimeStamp" type="TimestampType" use="optional"/>
+  </xs:complexType>
+
+  <!-- Data Type Complex Type Definitions -->
+  <xs:complexType name="ResAttachmentType">
+    <xs:attribute name="DocumentId" type="xs:long"
+                  use="optional"/>
+    <xs:attribute name="DocumentType" type="ResDocumentTypeType"
+                  default="RES_EXAMINATION_DATA"/>
+    <xs:attribute name="FileName" type="ResFileNameType"
+                  use="required"/>
+    <xs:attribute name="Action" type="AttachmentActionType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrCustomerListAttachmentType">
+    <xs:attribute name="DocumentId" type="xs:long"
+                  use="optional"/>
+    <xs:attribute name="FileName" type="DrCustomerListFileNameType"
+                  use="required"/>
+    <xs:attribute name="Action" type="AttachmentActionType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrEvaluationAttachmentType">
+    <xs:attribute name="DocumentId" type="xs:long"
+                  use="optional"/>
+    <xs:attribute name="FileName" type="DrEvaluationFileNameType"
+                  use="required"/>
+    <xs:attribute name="Action" type="AttachmentActionType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="OutputBandInfoType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="Output" type="OutputType"
+                  use="required"/>
+    <xs:attribute name="GfWidth" type="CapacityType"
+                  use="required"/>
+    <xs:attribute name="AfcWidth" type="CapacityType"
+                  use="required"/>
+    <xs:attribute name="AfcVariationSpeed" type="CapacityType"
+                  use="required"/>
+    <xs:attribute name="OtmVariationSpeed" type="CapacityType"
+                  use="required"/>
+    <xs:attribute name="AfcOtmVariationSpeed" type="CapacityType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="OutputBandType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="OutputBandInfo" type="OutputBandInfoType"
+                  minOccurs="1" maxOccurs="20"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="SwitchOutputInfoType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="Output" type="CapacityType"
+                  use="required"/>
+    <xs:attribute name="SwitchTime" type="MinuteType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="SwitchOutputType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="SwitchOutputInfo" type="SwitchOutputInfoType"
+                  minOccurs="1" maxOccurs="20"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="OutputRangeBelowAfcInfoType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="Output" type="CapacityType"
+                  use="required"/>
+    <xs:attribute name="OperationTime" type="HourType"
+                  use="required"/>
+    <xs:attribute name="OutputVariationSpeed" type="CapacityType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="OutputRangeBelowAfcType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="OutputRangeBelowAfcInfo" type="OutputRangeBelowAfcInfoType"
+                  minOccurs="1" maxOccurs="20"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="StartupPatternEventType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="EventName" type="StartupEventNameType"
+                  use="required"/>
+    <xs:attribute name="ChangeTime" type="StartupHourMinuteType"
+                  use="required"/>
+    <xs:attribute name="Output" type="CapacityType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="StartupPatternInfoType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="StartupPatternEvent" type="StartupPatternEventType"
+                  minOccurs="6" maxOccurs="25"/>
+    </xs:sequence>
+    <xs:attribute name="PatternName" type="ResPatternNameType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="StartupPatternType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="StartupPatternInfo" type="StartupPatternInfoType"
+                  minOccurs="1" maxOccurs="20"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="StopPatternEventType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="EventName" type="StopEventNameType"
+                  use="required"/>
+    <xs:attribute name="ChangeTime" type="StopHourMinuteType"
+                  use="required"/>
+    <xs:attribute name="Output" type="CapacityType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="StopPatternInfoType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="StopPatternEvent" type="StopPatternEventType"
+                  minOccurs="2" maxOccurs="21"/>
+    </xs:sequence>
+    <xs:attribute name="PatternName" type="ResPatternNameType"
+                  use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="StopPatternType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="StopPatternInfo" type="StopPatternInfoType"
+                  minOccurs="1" maxOccurs="20"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Submit Complex Type Definitions -->
+  <xs:complexType name="ParticipantSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="ParticipantType" type="ParticipantTypeType"
+                  use="required"/>
+    <xs:attribute name="Area" type="AreaType"
+                  use="optional"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="CompanyShortName" type="CompanyShortNameType"
+                  use="required"/>
+    <xs:attribute name="CompanyLongName" type="CompanyLongNameType"
+                  use="required"/>
+    <xs:attribute name="PhonePart1" type="PhoneType1"
+                  use="required"/>
+    <xs:attribute name="PhonePart2" type="PhoneType2"
+                  use="required"/>
+    <xs:attribute name="PhonePart3" type="PhoneType2"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ParticipantValiditySubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="ParticipantState" type="ValidityStateType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="UserSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="UserName" type="UserNameType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="RepresentativeUser" type="xs:boolean"
+                  default="false"/>
+    <xs:attribute name="Email" type="EmailType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="UserSystemAccessSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="UserName" type="UserNameType"
+                  use="required"/>
+    <xs:attribute name="SubsystemName" type="SubsystemNameType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="AccessCode" type="AccessCodeType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="BankAccountSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="TaxStandard" type="TaxStandardType"
+                  use="required"/>
+    <xs:attribute name="TaxRate" type="TaxRateType"
+                  use="optional"/>
+    <xs:attribute name="BankCode" type="BankCodeType"
+                  use="required"/>
+    <xs:attribute name="BankName" type="BankNameType"
+                  use="required"/>
+    <xs:attribute name="BranchName" type="BranchNameType"
+                  use="required"/>
+    <xs:attribute name="BranchCode" type="BranchCodeType"
+                  use="required"/>
+    <xs:attribute name="AccountType" type="AccountTypeType"
+                  use="required"/>
+    <xs:attribute name="AccountNumber" type="AccountNumberType"
+                  use="required"/>
+    <xs:attribute name="AccountHolder" type="AccountHolderType"
+                  use="required"/>
+    <xs:attribute name="AccountHolderKatakana" type="AccountHolderKatakanaType"
+                  use="required"/>
+    <xs:attribute name="PayeePostalCode" type="PayeePostalCodeType"
+                  use="required"/>
+    <xs:attribute name="PayeeAddress" type="PayeeAddressType"
+                  use="required"/>
+    <xs:attribute name="PayeeDivisionName" type="PayeeDivisionNameType"
+                  use="required"/>
+    <xs:attribute name="PayeePhonePart1" type="PhoneType1"
+                  use="required"/>
+    <xs:attribute name="PayeePhonePart2" type="PhoneType2"
+                  use="required"/>
+    <xs:attribute name="PayeePhonePart3" type="PhoneType2"
+                  use="required"/>
+    <xs:attribute name="OperatorCode" type="OperatorCodeType"
+                  use="required"/>
+    <xs:attribute name="InvoiceNumber" type="InvoiceNumberType"
+                  use="optional"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="OutputBand" type="OutputBandType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="SwitchOutput" type="SwitchOutputType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="OutputRangeBelowAfc" type="OutputRangeBelowAfcType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="StartupPattern" type="StartupPatternType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="StopPattern" type="StopPatternType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Comments" type="CommentsType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="Area" type="AreaType"
+                  use="required"/>
+    <xs:attribute name="ContractType" type="ContractTypeType"
+                  use="required"/>
+    <xs:attribute name="ResourceType" type="ResourceTypeType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="SystemCode" type="SystemCodeType"
+                  use="required"/>
+    <xs:attribute name="ResourceShortName" type="ResourceShortNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceLongName" type="ResourceLongNameType"
+                  use="required"/>
+    <xs:attribute name="BgCode" type="BgCodeType"
+                  use="optional"/>
+    <xs:attribute name="Pri" type="xs:boolean"
+                  use="optional"/>
+    <xs:attribute name="PriResponseTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="PriContinuousTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="PriMaximumSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="PriRemResvUtilization" type="RemResvUtilizationType"
+                  use="required"/>
+    <xs:attribute name="PriRemResvMaximumSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Sec1" type="xs:boolean"
+                  use="optional"/>
+    <xs:attribute name="Sec1ResponseTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Sec1ContinuousTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Sec1MaximumSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Sec1RemResvUtilization" type="RemResvUtilizationType"
+                  use="required"/>
+    <xs:attribute name="Sec1RemResvMaximumSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Sec2" type="xs:boolean"
+                  use="optional"/>
+    <xs:attribute name="Sec2ResponseTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Sec2ContinuousTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Sec2DownTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Sec2MaximumSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Sec2RemResvUtilization" type="RemResvUtilizationType"
+                  use="required"/>
+    <xs:attribute name="Sec2RemResvMaximumSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Ter1" type="xs:boolean"
+                  use="optional"/>
+    <xs:attribute name="Ter1ResponseTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Ter1ContinuousTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Ter1MaximumSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Ter1RemResvUtilization" type="RemResvUtilizationType"
+                  use="required"/>
+    <xs:attribute name="Ter1RemResvMaximumSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Ter2" type="xs:boolean"
+                  use="optional"/>
+    <xs:attribute name="Ter2ResponseTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Ter2ContinuousTime" type="HourMinuteSecondType"
+                  use="optional"/>
+    <xs:attribute name="Ter2MaximumSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Ter2RemResvUtilization" type="RemResvUtilizationType"
+                  use="required"/>
+    <xs:attribute name="Ter2RemResvMaximumSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="PriSec1CommandOperationMethod" type="PriSec1CommandOperationMethodType"
+                  use="optional"/>
+    <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType"
+                  use="optional"/>
+    <xs:attribute name="SignalType" type="SignalTypeType"
+                  use="required"/>
+    <xs:attribute name="BaselineSettingMethod" type="BaselineSettingMethodType"
+                  use="optional"/>
+    <xs:attribute name="ContractExistence" type="ContractExistenceType"
+                  use="optional"/>
+    <xs:attribute name="DeclaredMaximumUnitPrice" type="PriceType"
+                  use="optional"/>
+    <xs:attribute name="VoltageAdjustment" type="AvailabilityType"
+                  use="required"/>
+    <xs:attribute name="Address" type="PayeeAddressType"
+                  use="optional"/>
+    <xs:attribute name="PayeePhonePart1" type="PhoneType1"
+                  use="optional"/>
+    <xs:attribute name="PayeePhonePart2" type="PhoneType2"
+                  use="optional"/>
+    <xs:attribute name="PayeePhonePart3" type="PhoneType2"
+                  use="optional"/>
+    <xs:attribute name="VenId" type="VenIdType"
+                  use="optional"/>
+    <xs:attribute name="MarketContext" type="MarketContextType"
+                  use="optional"/>
+    <xs:attribute name="ModelName" type="ModelNameType"
+                  use="optional"/>
+    <xs:attribute name="RatedCapacity" type="QuantityType"
+                  use="optional"/>
+    <xs:attribute name="RatedVoltage" type="RatedVoltageType"
+                  use="optional"/>
+    <xs:attribute name="ContinuousOperationVoltage" type="PercentageType"
+                  use="optional"/>
+    <xs:attribute name="RatedPowerFactor" type="PercentageType"
+                  use="optional"/>
+    <xs:attribute name="Frequency" type="FrequencyType"
+                  use="optional"/>
+    <xs:attribute name="InPlantRate" type="InPlantRateType"
+                  use="optional"/>
+    <xs:attribute name="ContinuousOperationFrequencyLower" type="ContinuousOperationFrequencyType"
+                  use="optional"/>
+    <xs:attribute name="ContinuousOperationFrequencyUpper" type="ContinuousOperationFrequencyType"
+                  use="optional"/>
+    <xs:attribute name="BlackStart" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="RatedOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="MinimumOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="AuthorizedMaximumOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="ThermalType" type="ThermalTypeType"
+                  use="optional"/>
+    <xs:attribute name="BatteryCapacity" type="QuantityType"
+                  use="optional"/>
+    <xs:attribute name="PumpCharging" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="VariableSpeedOperation" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="DischargingOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="DischargingTime" type="MinuteType"
+                  use="optional"/>
+    <xs:attribute name="ChargingOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="ChargingTime" type="MinuteType"
+                  use="optional"/>
+    <xs:attribute name="FullPowerGenerationTime" type="HourType"
+                  use="optional"/>
+    <xs:attribute name="ContinuousOperationTime" type="HourType"
+                  use="optional"/>
+    <xs:attribute name="ContinuousOperationTimeLimited" type="HourType"
+                  use="optional"/>
+    <xs:attribute name="PhaseModifyingOperation" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="AmountOfWaterUsed" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="ReservoirCapacity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="InflowAmount" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="ContinuousOperationOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="PumpedSupply" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="FcbOperation" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="OverPowerOperation" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="PeakModeOperation" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="Dss" type="AvailabilityType"
+                  use="optional"/>
+    <xs:attribute name="OverPowerOperationMaximumOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="PeakModeOperationMaximumOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="OperationTime" type="HourType"
+                  use="optional"/>
+    <xs:attribute name="NumberOfStartups" type="NumberOfStartupsType"
+                  use="optional"/>
+    <xs:attribute name="AfcMinimumOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="GfVariationRate" type="PercentageType"
+                  use="optional"/>
+    <xs:attribute name="GfWidthOutOfRatedOutput" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Transfer" type="xs:boolean"
+                  use="optional"/>
+    <xs:attribute name="PreviousParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="PreviousResourceName" type="ResourceNameType"
+                  use="optional"/>
+    <xs:attribute name="OverrideOption" type="OverrideOptionType"
+                  use="optional"/>
+    <xs:attribute name="RecordStatus" type="ResRecordStatusType"
+                  default="WORKING"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceEvaluationSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Attachment" type="ResAttachmentType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="required"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceValiditySubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="ResourceState" type="ValidityStateType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrPatternSubmitType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="CustomerListAttachment"
+                  type="DrCustomerListAttachmentType"
+                  minOccurs="1" maxOccurs="1"/>
+      <xs:element name="EvaluationAttachment"
+                  type="DrEvaluationAttachmentType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Comments" type="CommentsType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:sequence>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="PatternNumber" type="PatternNumberType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="PatternName" type="DrPatternNameType"
+                  use="required"/>
+    <xs:attribute name="PriPossibleSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="PriRemResvPossibleSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Sec1PossibleSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Sec1RemResvPossibleSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Sec2PossibleSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Sec2RemResvPossibleSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Ter1PossibleSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Ter1RemResvPossibleSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="Ter2PossibleSupplyQuantity" type="PsqType"
+                  use="optional"/>
+    <xs:attribute name="Ter2RemResvPossibleSupplyQuantity" type="CapacityType"
+                  use="optional"/>
+    <xs:attribute name="OverrideOption" type="OverrideOptionType"
+                  use="optional"/>
+    <xs:attribute name="RecordStatus" type="DrRecordStatusType"
+                  default="SUBMITTED"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceCoefficientSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="CommodityCategory" type="CommodityCategoryType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="Coefficient" type="CoefficientType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceTransferSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="PreviousParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceSuspensionSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="CommodityCategory" type="CommodityType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="Suspend" type="xs:boolean"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrPatternSuspensionSubmitType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="PatternNumber" type="PatternNumberType"
+                  use="required"/>
+    <xs:attribute name="CommodityCategory" type="CommodityType"
+                  use="required"/>
+    <xs:attribute name="StartDate" type="DateDataType"
+                  use="required"/>
+    <xs:attribute name="EndDate" type="DateDataType"
+                  use="optional"/>
+    <xs:attribute name="Suspend" type="xs:boolean"
+                  use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <!-- Query Complex Type Definitions -->
+  <xs:complexType name="ParticipantQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ParticipantValidityQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="UserQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="UserName" type="UserNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="UserSystemAccessQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="UserName" type="UserNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="BankAccountQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="optional"/>
+    <xs:attribute name="RecordStatus" type="ResRecordStatusType"
+                  use="optional"/>
+   <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceEvaluationQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="optional"/>
+    <xs:attribute name="DocumentId" type="xs:long"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceValidityQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrPatternQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="optional"/>
+    <xs:attribute name="PatternNumber" type="PatternNumberType"
+                  use="optional"/>
+    <xs:attribute name="RecordStatus" type="DrRecordStatusType"
+                  use="optional"/>
+    <xs:attribute name="DocumentId" type="xs:long"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceCoefficientQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="optional"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ResourceSuspensionQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="CommodityCategory" type="CommodityType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrPatternSuspensionQueryType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="PatternNumber" type="PatternNumberType"
+                  use="optional"/>
+    <xs:attribute name="CommodityCategory" type="CommodityType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+
+  <!-- Approval Complex Type Definitions -->
+  <xs:complexType name="ResourceApprovalType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Comments" type="CommentsType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attributeGroup ref="CommonApprovalAttributes"/>
+    <xs:attribute name="OverrideOption" type="OverrideOptionType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="DrPatternApprovalType">
+    <xs:all>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Comments" type="CommentsType"
+                  minOccurs="0" maxOccurs="1"/>
+    </xs:all>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ResourceName" type="ResourceNameType"
+                  use="required"/>
+    <xs:attribute name="PatternNumber" type="PatternNumberType"
+                  use="required"/>
+    <xs:attributeGroup ref="CommonApprovalAttributes"/>
+    <xs:attribute name="OverrideOption" type="OverrideOptionType"
+                  use="optional"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+
+  <!-- Root Element for Submit Complex Type Definitions -->
+  <xs:complexType name="RegistrationSubmitType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Participant" type="ParticipantSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ParticipantValidity" type="ParticipantValiditySubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="User" type="UserSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="UserSystemAccess" type="UserSystemAccessSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="BankAccount" type="BankAccountSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Resource" type="ResourceSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceEvaluation" type="ResourceEvaluationSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceValidity" type="ResourceValiditySubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DrPattern" type="DrPatternSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceCoefficient" type="ResourceCoefficientSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceTransfer" type="ResourceTransferSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceSuspension" type="ResourceSuspensionSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DrPatternSuspension" type="DrPatternSuspensionSubmitType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <!-- Root Element for Query Complex Type Definitions -->
+  <xs:complexType name="RegistrationQueryType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Participant" type="ParticipantQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ParticipantValidity" type="ParticipantValidityQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="User" type="UserQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="UserSystemAccess" type="UserSystemAccessQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="BankAccount" type="BankAccountQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="Resource" type="ResourceQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceEvaluation" type="ResourceEvaluationQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceValidity" type="ResourceValidityQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DrPattern" type="DrPatternQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceCoefficient" type="ResourceCoefficientQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="ResourceSuspension" type="ResourceSuspensionQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DrPatternSuspension" type="DrPatternSuspensionQueryType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="Action" type="QueryActionType"
+                  default="NORMAL"/>
+     <xs:attribute name="Date" type="DateDataType"
+                  use="optional"/>
+     <xs:attribute name="DateType" type="DateTypeType"
+                  default="TRADE"/>
+     <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <!-- Root Element for Approval Complex Type Definitions -->
+  <xs:complexType name="RegistrationApprovalType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Resource" type="ResourceApprovalType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="DrPattern" type="DrPatternApprovalType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="RegistrationDataType">
+    <xs:sequence>
+      <xs:element name="ProcessingStatistics" type="ProcessingStatisticsType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:element name="Messages" type="MessagesType"
+                  minOccurs="0" maxOccurs="1"/>
+      <xs:choice>
+        <xs:element name="RegistrationSubmit" type="RegistrationSubmitType"
+                    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="RegistrationQuery" type="RegistrationQueryType"
+                    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="RegistrationApproval" type="RegistrationApprovalType"
+                    minOccurs="0" maxOccurs="1"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attributeGroup ref="CommonAttributes"/>
+  </xs:complexType>
+
+  <!-- Root Element -->
+  <xs:element name="RegistrationData" type="RegistrationDataType"/>
+
+</xs:schema>

@@ -1,0 +1,2395 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           version="1.0">
+
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+              +-----------------------------------------------+
+              |                                               |
+              |               COPYRIGHT (c) 2019              |
+              |                                               |
+              |       ABB BUSINESS MANAGEMENT SYSTEMS         |
+              |                                               |
+              |               All rights reserved             |
+              |                                               |
+              +-----------------------------------------------+
+
+      This is the XML schema for Interface (II) data submitted/accessed by TSO/BSP.
+
+      History:
+
+      001  06-SEP-2019  RN        Initial version.
+      002  01-NOV-2019  RN        Updated to FD Rev D.1 and merged the Switching xsd.
+      003  22-NOV-2019  DM/RN/AC  Updated to FD Rev E.
+      004  24-Dec-2019  ABB       Changes by JPABB as per XSD_PointOut_R08.xlsx and
+                                  HowToSolveIssuesForWebAPI.pptx
+      005  23-Jan-2020  RN/AC     Updated to FD Rev E.1, minor change to Messages elements
+                                  and made file extensions lower case.
+      006  22-MAY-2020  RN/DM     Added PASSED_PARTIAL ValidationStatus,
+                                  Added SttlDate/FileSize/FileExten restriction for TSO Settl,
+                                  Changed InterconEquipment from Integer to String,
+                                  Removed Pending Status for Awards, Add TSO Request acknowledgement,
+                                  Removed Commodity, Add Request Status and minor fixes in SwitchQuery,
+                                  Changed Float to Decimal for TotalContractCost in AwardResults Summary
+      007  22-Jul-2020  RN/DM/AC  1421049: Remove Commodity Category from Switching query results to align with FD
+                                  1421516: Make Participant Name and Company Short Name optional in TSO Request
+                                  query results to align with FD
+                                  1417651: Make Remark in BupStartUpCost as Optional to match FD
+                                  1430405: Add Commodity Category to Switching data at customer request
+                                  CR-26: Updated FileName format for Baselineload File
+      008  21-Aug-2020  RN/DM/AC  CR-12: Updated the enumerations to code per CR-12
+                                  and updated the JapaneseStringTypes to version v5
+      009  17-Mar-2021  RN/DM     Updated with changes for Tertiary(1)
+      010  24-Mar-2021  RN        Updated to have NumOfDays range diff for Submit and Query.
+      011  25-May-2021  RN/DM     Updated 6 required elements to optional in Award Results and Switch Query
+                                  to align XSD with FD. And Fix for SF-01583980 to increase limit for TotalContractCost.
+      012  30-Jul-2021  RN        Updated ParticipantNameType to accommodate OMI and other such participants
+      013  25-Apr-2022  RN        Updated FromCap Type in BUP to accommodate negative values
+      014  22-Nov-2022  DM        Updated for Phase 3 requirements
+	  015  03-May-2023  DM        Updated for CR-0010
+
+      </xs:documentation>
+    </xs:annotation>
+
+    <!-- BEGIN: Common Simple Type Definitions -->
+
+    <xs:simpleType name="MarketActionType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="SUBMIT"/>
+        <xs:enumeration value="QUERY"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ValidationStatusType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="PASSED"/>
+        <xs:enumeration value="WARNING"/>
+        <xs:enumeration value="PASSED_PARTIAL"/>
+        <xs:enumeration value="FAILED"/>
+        <xs:enumeration value="NOT_DONE"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CodeType">
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="50"/>
+        <xs:minLength value="2"/>
+        <xs:pattern value="[a-zA-Z_0-9\-]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="TransactionId">
+      <xs:restriction base="xs:string">
+        <xs:maxLength value="10" />
+        <xs:minLength value="8" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AttachmentActionType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="DELETE"/>
+        <xs:enumeration value="NEW"/>
+        <xs:enumeration value="NONE"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: Common Simple Type Definitions -->
+
+    <!-- BEGIN: Registration Simple Type Definitions -->
+
+    <xs:simpleType name="ParticipantNameType">
+      <xs:restriction base="xs:string">
+        <xs:length value="4"/>
+        <xs:pattern value="[A-Z]([0-9][0-9][1-9]|[0-9][1-9][0-9]|[1-9][0-9][0-9])"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="UserNameType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="12"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ResourceNameType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+        <xs:pattern value="[A-Z0-9_\-]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CompanyShortNameType">
+      <xs:restriction base="JapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ResourceShortNameType">
+      <xs:restriction base="JapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SystemCodeType">
+      <xs:restriction base="xs:string">
+        <xs:length value="5"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OfferIdType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="30"/>
+        <xs:pattern value="[a-zA-Z0-9_-]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ContractSourceType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OperatorCodeType">
+      <xs:restriction base="xs:string">
+        <xs:length value="4"/>
+        <xs:pattern value="[A-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CommandOperationMethodPriSec1Type">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="3"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CommandOperationMethodSec2Ter1Ter2Type">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ResourceTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="02"/>
+        <xs:enumeration value="03"/>
+        <xs:enumeration value="04"/>
+        <xs:enumeration value="05"/>
+        <xs:enumeration value="06"/>
+        <xs:enumeration value="07"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: Registration Simple Type Definitions -->
+
+    <!-- BEGIN: General Simple Type Definitions -->
+
+    <xs:simpleType name="FreeStringType">
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[a-zA-Z0-9 ~!@#$*()_+}{:?`='/.,%;\^\|\-\]\[\\&lt;&gt;&amp;&quot;]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="JapaneseStringType">
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*"/>
+     </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AsciiJapaneseStringType">
+      <xs:restriction base="xs:string">
+        <xs:pattern value="[a-zA-Z0-9 ~!@#$*()_+}{:?>`='/.,%;\^\|\-\]\[\\&lt;&amp;&quot;&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RemarkType">
+      <xs:restriction base="AsciiJapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="30"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PatternRemarkType">
+      <xs:restriction base="AsciiJapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="50"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DrPatternNameType">
+      <xs:restriction base="JapaneseStringType">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="FileNameType">
+      <xs:restriction base="FreeStringType">
+        <xs:minLength value="10"/>
+        <xs:maxLength value="60"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SettlementFileNameType">
+      <xs:restriction base="FreeStringType">
+        <xs:minLength value="18"/>
+        <xs:maxLength value="60"/>
+        <xs:pattern value="[A-Z0-9]{4}_[A-Z0-9]{4}_[A-Z0-9_-]{4,46}\.(pdf|zip|csv|xml)"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BaselineLoadFileNameType">
+      <xs:restriction base="FreeStringType">
+        <xs:minLength value="31"/>
+        <xs:maxLength value="40"/>
+        <xs:pattern value="W9_[0-9]{4}_[0-9]{8}_[0-9]{2}_[A-Z0-9]{5}_[A-Z0-9_\-]{1,10}\.xml"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="InterconEquipmentType">
+      <xs:restriction base="xs:string">
+        <xs:length value="2"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BandNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="20"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="StackNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="20"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DrPatternNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="20"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PatternNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="BupBandNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="20"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AbcBandNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="5"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="StartupCostCaseNumberType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="NumOfDays31Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="31"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="NumOfDays7Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="7"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ContractIdType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="19"/>
+        <xs:maxLength value="19"/>
+        <xs:pattern value="[a-zA-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RankType">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="9999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: General Simple Type Definitions -->
+
+    <!-- BEGIN: Precision Types -->
+
+    <xs:simpleType name="Id18Type">
+      <xs:restriction base="xs:long">
+        <xs:minInclusive value="1"/>
+        <xs:maxInclusive value="999999999999999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="KwPosValue7.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="9999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="KwPosNegValue7.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="-9999999"/>
+        <xs:maxInclusive value="9999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue9.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="999999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="KwPosValue13.0Type">
+      <xs:restriction base="xs:long">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="9999999999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue12.2Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="9999999999.99"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue14.2Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="999999999999.99"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="MwPosValue7.3Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.000"/>
+        <xs:maxInclusive value="9999.999"/>
+        <xs:fractionDigits value="3" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="MwNegValue7.3Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="-9999.999"/>
+        <xs:maxInclusive value="0"/>
+        <xs:fractionDigits value="3" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="MwValue7.3Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="-9999.999"/>
+        <xs:maxInclusive value="9999.999"/>
+        <xs:fractionDigits value="3" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PriceValue6.2RoundedType">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="10000.00"/>
+        <xs:fractionDigits value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PriceValue8.2RoundedType">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="1000000.00"/>
+        <xs:fractionDigits value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue6.2Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="9999.99"/>
+        <xs:fractionDigits value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosNegValue6.2Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="-9999.99"/>
+        <xs:maxInclusive value="9999.99"/>
+        <xs:fractionDigits value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue6.1Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.0"/>
+        <xs:maxInclusive value="99999.9"/>
+        <xs:fractionDigits value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosNegValue6.1Type">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="-99999.9"/>
+        <xs:maxInclusive value="99999.9"/>
+        <xs:fractionDigits value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue4.2RoundedType">
+      <xs:restriction base="xs:decimal">
+        <xs:minInclusive value="0.00"/>
+        <xs:maxInclusive value="100.00"/>
+        <xs:fractionDigits value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue3.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PosValue8.0Type">
+      <xs:restriction base="xs:int">
+        <xs:minInclusive value="0"/>
+        <xs:maxInclusive value="99999999"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: Precision Types -->
+
+    <!-- BEGIN: JBMS Simple Enumeration Types -->
+
+    <xs:simpleType name="MarketTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="DAM"/>
+        <xs:enumeration value="WAM"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CommodityCategoryType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1000"/>  <!-- Primary              -->
+        <xs:enumeration value="2100"/>  <!-- Secondary 1          -->
+        <xs:enumeration value="2200"/>  <!-- Secondary 2          -->
+        <xs:enumeration value="3100"/>  <!-- Tertiary 1           -->
+        <xs:enumeration value="3200"/>  <!-- Tertiary 2           -->
+        <xs:enumeration value="4000"/>  <!-- Compound / Whole WAM -->
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DirectionUpDownType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DirectionFwdBkwdType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="0" />
+        <xs:enumeration value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AfterGCType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="0" />
+        <xs:enumeration value="1" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ProcurementAreaType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AwardStatusLimitedType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="ACTIVE"/>
+        <xs:enumeration value="SWITCHED"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AwardStatusType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="ACTIVE"/>
+        <xs:enumeration value="SWITCHED"/>
+        <xs:enumeration value="TENTATIVE"/>
+        <xs:enumeration value="TSO"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RequestStatusType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="Requested"/>
+        <xs:enumeration value="Acknowledged"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="OfferAwardedLevelType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AreaType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="01"/>
+        <xs:enumeration value="02"/>
+        <xs:enumeration value="03"/>
+        <xs:enumeration value="04"/>
+        <xs:enumeration value="05"/>
+        <xs:enumeration value="06"/>
+        <xs:enumeration value="07"/>
+        <xs:enumeration value="08"/>
+        <xs:enumeration value="09"/>
+        <xs:enumeration value="10"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="DestinationTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="TSO" />
+        <xs:enumeration value="Tentative" />
+        <xs:enumeration value="Resource" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="PatternStatusType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1" />
+        <xs:enumeration value="0" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="NPFlag">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1" />
+        <xs:enumeration value="2" />
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="AwardTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="MA"/>
+        <xs:enumeration value="Switching"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="SubRequirementTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="PRI"/>
+        <xs:enumeration value="SEC1"/>
+        <xs:enumeration value="SEC2"/>
+        <xs:enumeration value="TER1"/>
+        <xs:enumeration value="PRI-SEC1"/>
+        <xs:enumeration value="PRI-SEC2"/>
+        <xs:enumeration value="PRI-TER1"/>
+        <xs:enumeration value="SEC1-SEC2"/>
+        <xs:enumeration value="SEC1-TER1"/>
+        <xs:enumeration value="SEC2-TER1"/>
+        <xs:enumeration value="PRI-SEC1-SEC2"/>
+        <xs:enumeration value="PRI-SEC1-TER1"/>
+        <xs:enumeration value="PRI-SEC2-TER1"/>
+        <xs:enumeration value="SEC1-SEC2-TER1"/>
+        <xs:enumeration value="PRI-SEC1-SEC2-TER1"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <!-- END: JBMS Simple Enumeration Types -->
+
+    <!-- BEGIN: Common Attribute Group Definitions -->
+
+    <xs:attributeGroup name="CommonAttributes">
+      <xs:attribute name="Validation" type="ValidationStatusType" use="optional" default="NOT_DONE"/>
+      <xs:attribute name="Success" type="xs:boolean" use="optional"/>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="NonStndCommonAttributes">
+      <xs:attribute name="Process" type="xs:boolean" use="optional" />
+      <xs:attribute name="Valid" type="xs:boolean" use="optional" />
+      <xs:attribute name="Success" type="xs:boolean" use="optional" />
+      <xs:attribute name="VersionNo" type="xs:float" use="required" fixed="1.0" />
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="HeaderAttributes">
+      <xs:attribute name="Date" type="xs:date" use="required" />
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="required" />
+      <xs:attribute name="UserName" type="UserNameType" use="required" />
+      <xs:attribute name="MarketType" type="MarketTypeType" use="optional" />
+    </xs:attributeGroup>
+
+    <!-- HeaderSubmit and HeaderQuery should be kept in sync -->
+    <xs:attributeGroup name="HeaderSubmitAttributes">
+      <xs:attribute name="NumOfDays" type="NumOfDays31Type" use="optional" default="1"/>
+    </xs:attributeGroup>
+
+    <xs:attributeGroup name="HeaderQueryAttributes">
+        <xs:attribute name="NumOfDays" type="NumOfDays7Type" use="optional" default="1" />
+    </xs:attributeGroup>
+
+    <!-- END: Common Attribute Group Definitions -->
+
+    <!-- BEGIN: Common Complex Type Definitions -->
+
+    <xs:complexType name="ErrorType">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Code" type="CodeType" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="WarningType">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Code" type="CodeType" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="InformationType">
+      <xs:simpleContent>
+        <xs:extension base="xs:string">
+          <xs:attribute name="Code" type="CodeType" use="optional"/>
+        </xs:extension>
+      </xs:simpleContent>
+    </xs:complexType>
+
+    <xs:complexType name="MessagesType">
+      <xs:sequence>
+        <xs:element name="Error" type="ErrorType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Warning" type="WarningType" minOccurs="0" maxOccurs="unbounded"/>
+        <xs:element name="Information" type="InformationType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="ProcessingStatisticsType">
+      <xs:attribute name="Received" type="xs:int" use="optional" />
+      <xs:attribute name="Valid" type="xs:int" use="optional" />
+      <xs:attribute name="Invalid" type="xs:int" use="optional" />
+      <xs:attribute name="Successful" type="xs:int" use="optional" />
+      <xs:attribute name="Unsuccessful" type="xs:int" use="optional" />
+      <xs:attribute name="ProcessingTimeMs" type="xs:long" use="optional" />
+      <xs:attribute name="TransactionId" type="TransactionId" use="optional" />
+      <xs:attribute name="TimeStamp" type="xs:string" use="optional" />
+      <xs:attribute name="XmlTimeStamp" type="xs:dateTime" use="optional" />
+    </xs:complexType>
+
+<!-- END: Common Complex Type Definitions -->
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Reserve Requirement Data Definitions                                                                                                -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="RequirementType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          ReserveRequirement: Requirement type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="PrimaryReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundPriSec1ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundPriSec2ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundPriTer1ReserveQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="ReserveRequirementSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          ReserveRequirement: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Requirement" type="RequirementType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="ReserveRequirementQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          ReserveRequirement: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Allowable Inter-area Award Data Definitions                                                                                         -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="InterareaAwardType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllowableInterareaAward: Inter-area Award type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="PrimaryPossibleQuantityInMw" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="Secondary1PossibleQuantityInMw" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="Secondary2PossibleQuantityInMw" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="Tertiary1PossibleQuantityInMw" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="Tertiary2PossibleQuantityInMw" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="CompoundPossibleQuantityInMw" type="MwPosValue7.3Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="AllowableInterareaAwardSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllowableInterareaAward: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="InterareaAward" type="InterareaAwardType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="AllowableInterareaAwardQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllowableInterareaAward: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Upper Limit Tieline Data Definitions                                                                                                -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="UpperLimitDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          UpperLimitTieline: Upper Limit Data type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Direction" type="DirectionFwdBkwdType" use="required"/>
+      <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
+      <xs:attribute name="UpperLimitAtcInMw" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="UpperLimitFenceAtc1InMw" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="UpperLimitFenceAtc2InMw" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="UpperLimitFenceAtc3InMw" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="UpperLimitFenceAtc4InMw" type="MwValue7.3Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="UpperLimitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          UpperLimitTieline: Upper Limit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="UpperLimitData" type="UpperLimitDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="UpperLimitTielineSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          UpperLimitTieline: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="UpperLimit" type="UpperLimitType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="UpperLimitTielineQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          UpperLimitTieline: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Settlement Results Data Definitions                                                                                                 -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="SettlementFileType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          SettlementResults: Settlement File type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Name" type="SettlementFileNameType" use="required"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="SttlDate" type="xs:date" use="optional"/>
+      <xs:attribute name="FileSize" type="PosValue9.0Type" use="optional"/>
+
+    </xs:complexType>
+
+    <xs:complexType name="SettlementResultsSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          SettlementResults: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="File" type="SettlementFileType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="SettlementResultsFileDownloadQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          SettlementResults: File Download Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="File" type="SettlementFileType" minOccurs="1" maxOccurs="10"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="SettlementResultsFileListQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          SettlementResults: Query List of the Files
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Offline Frame Data Definitions                                                                                                      -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="OfflineFrameDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame: Data type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartDate" type="xs:date" use="required"/>
+      <xs:attribute name="EndDate" type="xs:date" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="OfflineFrameQuantityInKw" type="KwPosValue7.0Type" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfflineFrameSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="OfflineFrame" type="OfflineFrameDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfflineFrameQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartDate" type="xs:date" use="optional"/>
+      <xs:attribute name="EndDate" type="xs:date" use="optional"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Offline Frame Usage Data Definitions                                                                                                -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="OfflineFrameUsageDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame Usage: Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attribute name="OfflineFrameQuantityInKw" type="KwPosValue7.0Type" use="required"/>
+      <xs:attribute name="OfflineFrameUsageQuantityInKw" type="KwPosValue7.0Type" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfflineFrameUsageType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame Usage: Query Response with Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="OfflineFrameUsageData" type="OfflineFrameUsageDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfflineFrameUsageQueryResponseType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame Usage: Query Response
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="OfflineFrameUsage" type="OfflineFrameUsageType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="OfflineFrameUsageQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Offline Frame Usage: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="OfflineFrameUsageQueryResponse" type="OfflineFrameUsageQueryResponseType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Fringe Data Definitions                                                                                                             -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="FringeDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Fringe: Data type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartDate" type="xs:date" use="required"/>
+      <xs:attribute name="EndDate" type="xs:date" use="required"/>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+      <xs:attribute name="Direction" type="DirectionFwdBkwdType" use="required"/>
+      <xs:attribute name="FringeQuantityInMW" type="MwValue7.3Type" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="FringeSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Fringe: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Fringe" type="FringeDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="FringeQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Fringe: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartDate" type="xs:date" use="optional"/>
+      <xs:attribute name="EndDate" type="xs:date" use="optional"/>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Offer Data Definitions                                                                                                              -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="OfferStackType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          OfferData: Offer Stack type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StackNumber" type="StackNumberType" use="required"/>
+      <!-- Minimum Quantity -->
+      <xs:attribute name="MinimumQuantityInKw" type="KwPosValue7.0Type" use="required"/>
+      <!-- Offer Quantities -->
+      <xs:attribute name="PrimaryOfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="OfferUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="OfferId" type="OfferIdType" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfferDataSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          OfferData: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="OfferStack" type="OfferStackType" minOccurs="1" maxOccurs="20"/>
+      </xs:sequence>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
+      <xs:attribute name="BspParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="OperatorCode" type="OperatorCodeType" use="optional"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfferCancelType">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+
+                OfferData: Cancel type
+
+            </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+        <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+        <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+        <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+        <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="OfferQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          OfferData: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: BUP Data Definitions                                                                                                                -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="StandingDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: Standing Flag
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StandingFlag" type="xs:boolean" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="BandBupDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: BUP Band Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Band" type="BupBandNumberType" use="required"/>
+      <xs:attribute name="FromCap" type="KwPosNegValue7.0Type" use="required"/>
+      <xs:attribute name="V1" type="PosValue6.2Type" use="required"/>
+      <xs:attribute name="V2" type="PosValue6.2Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="BandAbcDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: ABC Band Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Band" type="AbcBandNumberType" use="required"/>
+      <xs:attribute name="FromCap" type="KwPosValue7.0Type" use="required"/>
+      <xs:attribute name="a" type="PosNegValue6.1Type" use="required"/>
+      <xs:attribute name="b" type="PosNegValue6.1Type" use="required"/>
+      <xs:attribute name="c" type="PosNegValue6.1Type" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="BandStartupDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: Startup Cost Band Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="CaseNo" type="StartupCostCaseNumberType" use="required"/>
+      <xs:attribute name="StopTime" type="PosValue3.0Type" use="required"/>
+      <xs:attribute name="V3" type="PosValue8.0Type" use="required"/>
+      <xs:attribute name="Remark" type="RemarkType" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="BupBandsType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: BUP Bands
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="BandBup" type="BandBupDataType" minOccurs="1" maxOccurs="20"/>
+      </xs:sequence>
+      <xs:attribute name="V4" type="PosValue6.2Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="AbcBandsType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: ABC Bands
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="BandAbc" type="BandAbcDataType" minOccurs="1" maxOccurs="5"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="StartupCostBandsType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: Startup Cost Bands
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="BandStartup" type="BandStartupDataType" minOccurs="1" maxOccurs="10"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="PatternDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: Pattern Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Bup" type="BupBandsType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Abc" type="AbcBandsType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="StartupCost" type="StartupCostBandsType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="PatternNo" type="PatternNumberType" use="required"/>
+      <xs:attribute name="PatternStatus" type="PatternStatusType" use="required"/>
+      <xs:attribute name="PatternRemark" type="PatternRemarkType" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="BupSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="PatternData" type="PatternDataType" minOccurs="1" maxOccurs="10"/>
+      </xs:sequence>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="BspParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="BupQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BupData: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StandingFlag" type="xs:boolean" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Baseline Load Data Definitions                                                                                                      -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="BaselineLoadFileType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BaselineLoad: File Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Name" type="BaselineLoadFileNameType" use="required"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="NegawattPosiwattFlag" type="NPFlag" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="BaselineLoadSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BaselineLoad: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="File" type="BaselineLoadFileType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="BaselineLoadFileListQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          BaselineLoad: Query List of the Files
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Merit Order List Data Definitions                                                                                                   -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="MeritOrderListDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          MeritOrderList: Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="Rank" type="RankType" use="required"/>
+      <xs:attribute name="OfferId" type="OfferIdType" use="required"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="required"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="required"/>
+      <xs:attribute name="BspParticipantName" type="ParticipantNameType" use="required"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attribute name="OfferPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="PerfEvalCoeff" type="PosValue4.2RoundedType" use="required"/>
+      <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2RoundedType" use="required"/>
+      <xs:attribute name="PrimaryOfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundOfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="PrimaryCumulativeAmountInKw" type="KwPosValue13.0Type" use="optional"/>
+      <xs:attribute name="Secondary1CumulativeAmountInKw" type="KwPosValue13.0Type" use="optional"/>
+      <xs:attribute name="Secondary2CumulativeAmountInKw" type="KwPosValue13.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1CumulativeAmountInKw" type="KwPosValue13.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2CumulativeAmountInKw" type="KwPosValue13.0Type" use="optional"/>
+      <xs:attribute name="CompoundCumulativeAmountInKw" type="KwPosValue13.0Type" use="optional"/>
+      <xs:attribute name="SubmissionTime" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="MeritOrderListType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          MeritOrderList: Query Response with Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="MeritOrderListData" type="MeritOrderListDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="ProcurementArea" type="ProcurementAreaType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="MeritOrderListQueryResponseType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          MeritOrderList: Query Response
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="MeritOrderList" type="MeritOrderListType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="MeritOrderListQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          MeritOrderList: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="MeritOrderListQueryResponse" type="MeritOrderListQueryResponseType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Award Results Data Definitions                                                                                                      -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="AwardResultsDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AwardResults: Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="ContractId" type="ContractIdType" use="required"/>
+      <xs:attribute name="JbmsId" type="Id18Type" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attribute name="LinkedArea" type="AreaType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="required"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="required"/>
+      <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
+      <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
+      <xs:attribute name="DrPatternName" type="DrPatternNameType" use="optional"/>
+      <xs:attribute name="BspParticipantName" type="ParticipantNameType" use="required"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="required"/>
+      <xs:attribute name="OperatorCode" type="OperatorCodeType" use="required"/>
+      <xs:attribute name="CommandOperationMethodPriSec1" type="CommandOperationMethodPriSec1Type" use="optional"/>
+      <xs:attribute name="CommandOperationMethodSec2Ter1Ter2" type="CommandOperationMethodSec2Ter1Ter2Type" use="optional"/>
+      <xs:attribute name="OfferPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="ContractPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="PerfEvalCoeff" type="PosValue4.2RoundedType" use="required"/>
+      <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2RoundedType" use="required"/>
+      <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>
+      <!-- Offer Quantities -->
+      <xs:attribute name="PrimaryOfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <!-- Award Quantities -->
+      <xs:attribute name="PrimaryAwardQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1AwardQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2AwardQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1AwardQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2AwardQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <!-- Contract Quantities -->
+      <xs:attribute name="PrimaryContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <!-- Valid Quantities -->
+      <xs:attribute name="PrimaryValidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1ValidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2ValidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1ValidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundValidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <!-- Invalid Quantities -->
+      <xs:attribute name="PrimaryInvalidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1InvalidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2InvalidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1InvalidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
+      <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+      <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="OfferAwardedLevel" type="OfferAwardedLevelType" use="required"/>
+      <xs:attribute name="OfferId" type="OfferIdType" use="required"/>
+      <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
+      <xs:attribute name="AfterGC" type="AfterGCType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="AwardResultsType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AwardResults: Query Response with Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AwardResultsData" type="AwardResultsDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="AwardResultsQueryResponseType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AwardResults: Query Response
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AwardResults" type="AwardResultsType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AwardResultsQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AwardResults: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AwardResultsQueryResponse" type="AwardResultsQueryResponseType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="LinkedArea" type="AreaType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="AfterGC" type="AfterGCType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Award Results Summary Data Definitions                                                                                              -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="AwardResultsSummaryDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+            AwardResultsSummary: Data
+
+        </xs:documentation>
+      </xs:annotation>
+        <xs:sequence>
+          <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        </xs:sequence>
+        <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+        <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+        <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+        <!-- Reserve Quantities -->
+        <xs:attribute name="PrimaryReserveRequirement" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Secondary1ReserveRequirement" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Secondary2ReserveRequirement" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Tertiary1ReserveRequirement" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Tertiary2ReserveRequirement" type="KwPosValue7.0Type" use="optional"/>
+        <!-- Reserve Shortage Quantities -->
+        <xs:attribute name="PrimaryReserveShortage" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Secondary1ReserveShortage" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Secondary2ReserveShortage" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Tertiary1ReserveShortage" type="KwPosValue7.0Type" use="optional"/>
+        <xs:attribute name="Tertiary2ReserveShortage" type="KwPosValue7.0Type" use="optional"/>
+        <!-- Contract Quantities -->
+        <xs:attribute name="Tertiary2TotalContractQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <!-- Valid Quantities -->
+        <xs:attribute name="PrimaryTotalValidContractQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Secondary1TotalValidContractQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Secondary2TotalValidContractQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Tertiary1TotalValidContractQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <!-- In Area Quantities -->
+        <xs:attribute name="PrimaryInAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Secondary1InAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Secondary2InAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Tertiary1InAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Tertiary2InAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <!-- Out Area Quantities -->
+        <xs:attribute name="PrimaryOutOfAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Secondary1OutOfAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Secondary2OutOfAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Tertiary1OutOfAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="Tertiary2OutOfAreaQuantity" type="KwPosValue13.0Type" use="optional"/>
+        <xs:attribute name="TotalContractCost" type="PosValue14.2Type" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="AwardResultsSummaryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AwardResultsSummary: Query Response with Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AwardResultsSummaryData" type="AwardResultsSummaryDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="AwardResultsSummaryQueryResponseType">
+        <xs:annotation>
+          <xs:documentation xml:lang="en">
+
+            AwardResultsSummary: Query Response
+
+          </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+          <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="AwardResultsSummary" type="AwardResultsSummaryType" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AwardResultsSummaryQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+            AwardResultsSummary: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AwardResultsSummaryQueryResponse" type="AwardResultsSummaryQueryResponseType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Allocated Tie-line Capacity Data Definitions                                                                                        -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="AllocatedTielineCapacityDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllocatedTielineCapacity: Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
+      <!-- Allocated Capacity Values -->
+      <xs:attribute name="AllocCapacityForward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocCapacityBackward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence1Forward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence1Backward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence2Forward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence2Backward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence3Forward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence3Backward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence4Forward" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AllocFence4Backward" type="MwValue7.3Type" use="optional"/>
+      <!-- Delta kW Values -->
+      <xs:attribute name="DkwForwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="DkwBackwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw1ForwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw1BackwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw2ForwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw2BackwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw3ForwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw3BackwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw4ForwardMargin" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw4BackwardMargin" type="MwValue7.3Type" use="optional"/>
+      <!-- ATC Values -->
+      <xs:attribute name="NetAtcForward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="NetAtcBackward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc1Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc1Backward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc2Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc2Backward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc3Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc3Backward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc4Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="NetFenceAtc4Backward" type="MwNegValue7.3Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="AllocatedTielineCapacityType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllocatedTielineCapacity: Query Response with Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AllocatedTielineCapacityData" type="AllocatedTielineCapacityDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="AwardType" type="AwardTypeType" use="optional"/>
+      <xs:attribute name="ModifiedTime" type="xs:dateTime" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="AllocatedTielineCapacityQueryResponseType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllocatedTielineCapacity: Query Response
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AllocatedTielineCapacity" type="AllocatedTielineCapacityType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="AllocatedTielineCapacityQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          AllocatedTielineCapacity: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="AllocatedTielineCapacityQueryResponse" type="AllocatedTielineCapacityQueryResponseType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="AwardType" type="AwardTypeType" use="optional"/>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Tie-line Data Definitions                                                                                                           -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="TielineDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TielineData: Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
+      <xs:attribute name="AtcForward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="AtcBackward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="MinFlowForward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="MinFlowBackward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc1Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc1Backward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc2Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc2Backward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc3Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc3Backward" type="MwNegValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc4Forward" type="MwPosValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc4Backward" type="MwNegValue7.3Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="TielineType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TielineData: Query Response with Data
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TielineData" type="TielineDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="TielineQueryResponseType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TielineData: Query Response
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Tieline" type="TielineType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="TielineQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TielineData: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TielineQueryResponse" type="TielineQueryResponseType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Switch Data Definitions                                                                                                             -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="SwitchQueryResultsType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Query Results type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="ContractId" type="ContractIdType" use="required"/>
+      <xs:attribute name="JbmsId" type="Id18Type" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="ModifiedTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="PrimaryQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Price" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="PerfEvalCoefficient" type="PosValue4.2RoundedType" use="optional"/>
+      <xs:attribute name="LinkedArea" type="AreaType" use="optional"/>
+      <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="required"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
+      <xs:attribute name="DrPattern" type="DrPatternNumberType" use="optional"/>
+      <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>
+      <xs:attribute name="Status" type="AwardStatusType" use="required"/>
+      <xs:attribute name="RequestStatus" type="RequestStatusType" use="optional"/>
+      <xs:attribute name="AfterGC" type="AfterGCType" use="required"/>
+      <xs:attribute name="SourceJbmsId" type="Id18Type" use="optional"/>
+      <xs:attribute name="SourceParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="SourceCompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="SourceResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="SourceResourceShortName" type="ResourceShortNameType" use="optional"/>
+      <xs:attribute name="SourceSystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="SourceArea" type="AreaType" use="optional"/>
+      <xs:attribute name="SourceResourceType" type="ResourceTypeType" use="optional"/>
+      <xs:attribute name="SourcePrimaryQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="SourceSecondary1Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="SourceSecondary2Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="SourceTertiary1Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="SourceTertiary2Quantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="SourceCompoundQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="SourcePrice" type="PriceValue6.2RoundedType" use="optional"/>
+      <xs:attribute name="SourcePerfEvalCoefficient" type="PosValue4.2RoundedType" use="optional"/>
+      <xs:attribute name="SourceDrPattern" type="DrPatternNumberType" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="TsoRequestQueryResultsType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TSO Request Data: Query Results type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="JbmsId" type="Id18Type" use="required"/>
+      <xs:attribute name="RequestTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
+      <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="required"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="required"/>
+      <xs:attribute name="ContractId" type="ContractIdType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="PrimaryContractQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1ContractQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2ContractQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1ContractQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2ContractQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundContractQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="PrimaryRequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1RequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2RequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1RequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2RequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="CompoundRequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Price" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="TsoName" type="ParticipantNameType" use="required"/>
+      <xs:attribute name="TsoShortName" type="CompanyShortNameType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="AcknowledgeTsoRequestType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TSO Request Data: Ack type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="JbmsId" type="Id18Type" use="required"/>
+      <xs:attribute name="AcknowledgeRequest" type="xs:boolean" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="DestinationType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Destination type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="DestinationType" type="DestinationTypeType" use="required"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
+      <xs:attribute name="PrimaryQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary1QuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Secondary2QuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary1QuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Tertiary2QuantityInKw" type="KwPosValue7.0Type" use="optional"/>
+      <xs:attribute name="Price" type="PriceValue6.2RoundedType" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="SourceType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Source type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="Destination" type="DestinationType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="JbmsId" type="Id18Type"/>
+    </xs:complexType>
+
+    <xs:complexType name="TielineChangeDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Tieline Change Data type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
+      <!-- ATC Values -->
+      <xs:attribute name="AtcForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="AtcBackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc1ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc1BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc2ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc2BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc3ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc3BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc4ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceAtc4BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <!-- Delta kW Values -->
+      <xs:attribute name="DkwForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="DkwBackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw1ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw1BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw2ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw2BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw3ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw3BackwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw4ForwardDelta" type="MwValue7.3Type" use="optional"/>
+      <xs:attribute name="FenceDkw4BackwardDelta" type="MwValue7.3Type" use="optional"/>
+    </xs:complexType>
+
+    <xs:complexType name="TielineChangeType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Tieline Change type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TielineChangeData" type="TielineChangeDataType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+    </xs:complexType>
+
+    <xs:complexType name="TielineDatalistType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Tieline Datalist type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TielineChange" type="TielineChangeType" minOccurs="1" maxOccurs="unbounded"/>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:complexType name="SwitchSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TielineDatalist" type="TielineDatalistType" minOccurs="0" maxOccurs="1"/>
+        <xs:choice>
+          <xs:element name="Source" type="SourceType" minOccurs="1" maxOccurs="unbounded"/>
+          <xs:element name="AcknowledgeTsoRequest" type="AcknowledgeTsoRequestType" minOccurs="1"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="SwitchQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          Switch Data: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="SwitchQueryResults" type="SwitchQueryResultsType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="LinkedArea" type="AreaType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="SourceJbmsId" type="Id18Type" use="optional"/>
+      <xs:attribute name="Status" type="AwardStatusType" use="optional"/>
+      <xs:attribute name="AfterGC" type="AfterGCType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="TsoRequestQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          TsoRequestData: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
+        <xs:element name="TsoRequestQueryResults" type="TsoRequestQueryResultsType" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+
+<!-- ########################################################################################################################################## -->
+<!-- ########################################################################################################################################## -->
+<!-- BEGIN: Interface Definitions                                                                                                               -->
+<!-- ########################################################################################################################################## -->
+<!-- ########################################################################################################################################## -->
+
+
+<!-- ########################################################################################################################################## -->
+<!-- Main Submit Objects                                                                                                                        -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="MarketSubmitType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+        This is used to submit the different Interface Data.
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" />
+        <xs:choice>
+          <!-- TSO Data Submit types -->
+          <xs:element name="ReserveRequirement" type="ReserveRequirementSubmitType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="AllowableInterareaAward" type="AllowableInterareaAwardSubmitType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="UpperLimitTieline" type="UpperLimitTielineSubmitType" minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="SettlementResults" type="SettlementResultsSubmitType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="OfflineFrameSubmit" type="OfflineFrameSubmitType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="FringeSubmit" type="FringeSubmitType" minOccurs="0" maxOccurs="1"/>
+
+          <!-- Market Data Submit types -->
+          <xs:element name="OfferData" type="OfferDataSubmitType" minOccurs="0" maxOccurs="unbounded" />
+          <xs:sequence>
+            <xs:element name="StandingData" type="StandingDataType" minOccurs="0" maxOccurs="1"/>
+            <xs:element name="BupSubmit" type="BupSubmitType" minOccurs="0" maxOccurs="unbounded" />
+          </xs:sequence>
+          <xs:element name="BaselineLoad" type="BaselineLoadSubmitType" minOccurs="0" maxOccurs="1"/>
+
+          <!-- Switching data Submit Type -->
+          <xs:element name="Switch" type="SwitchSubmitType" minOccurs="0" maxOccurs="1" />
+
+        </xs:choice>
+      </xs:sequence>
+    <xs:attributeGroup ref="HeaderAttributes" />
+    <xs:attributeGroup ref="HeaderSubmitAttributes"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+<!-- ########################################################################################################################################## -->
+<!-- Main Query Objects                                                                                                                         -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="MarketQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+        This is used to query the different Interface Data.
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" />
+        <xs:choice>
+          <!-- TSO Data query types -->
+          <xs:element name="ReserveRequirementQuery" type="ReserveRequirementQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="AllowableInterareaAwardQuery" type="AllowableInterareaAwardQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="UpperLimitTielineQuery" type="UpperLimitTielineQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="SettlementResultsFileListQuery" type="SettlementResultsFileListQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="SettlementResultsFileDownloadQuery" type="SettlementResultsFileDownloadQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="OfflineFrameQuery" type="OfflineFrameQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="OfflineFrameUsageQuery" type="OfflineFrameUsageQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="FringeQuery" type="FringeQueryType" minOccurs="0" maxOccurs="1"/>
+
+          <!-- Market Data query types -->
+          <xs:element name="OfferQuery" type="OfferQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="BupQuery" type="BupQueryType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="BaselineLoadFileListQuery" type="BaselineLoadFileListQueryType" minOccurs="0" maxOccurs="1"/>
+
+          <!-- MA Results Query Type -->
+          <xs:element name="MeritOrderListQuery" type="MeritOrderListQueryType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="AwardResultsQuery" type="AwardResultsQueryType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="AllocatedTielineCapacityQuery" type="AllocatedTielineCapacityQueryType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="AwardResultsSummaryQuery" type="AwardResultsSummaryQueryType" minOccurs="0" maxOccurs="1" />
+
+          <!-- OCCTO data Query Type -->
+          <xs:element name="TielineQuery" type="TielineQueryType" minOccurs="0" maxOccurs="1" />
+
+          <!-- Switching data query and response types -->
+          <xs:element name="SwitchQuery" type="SwitchQueryType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="TsoRequestQuery" type="TsoRequestQueryType" minOccurs="0" maxOccurs="1" />
+
+        </xs:choice>
+      </xs:sequence>
+    <xs:attributeGroup ref="HeaderAttributes" />
+    <xs:attributeGroup ref="HeaderQueryAttributes"/>
+    <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+<!-- ########################################################################################################################################## -->
+<!-- Main Cancel Objects                                                                                                                        -->
+<!-- ########################################################################################################################################## -->
+
+    <xs:complexType name="MarketCancelType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+            This is used to cancel the different Interface Data.
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType" minOccurs="0" />
+        <xs:choice>
+          <xs:element name="OfferCancel" type="OfferCancelType" minOccurs="0" maxOccurs="unbounded" />
+        </xs:choice>
+      </xs:sequence>
+      <xs:attributeGroup ref="HeaderAttributes" />
+      <xs:attributeGroup ref="HeaderSubmitAttributes"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="MarketDataListType">
+      <xs:sequence>
+        <xs:element name="ProcessingStatistics" type="ProcessingStatisticsType" minOccurs="0" maxOccurs="1" />
+        <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+        <xs:choice>
+          <xs:element name="MarketSubmit" type="MarketSubmitType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="MarketQuery" type="MarketQueryType" minOccurs="0" maxOccurs="1" />
+          <xs:element name="MarketCancel" type="MarketCancelType" minOccurs="0" maxOccurs="1" />
+       </xs:choice>
+      </xs:sequence>
+    </xs:complexType>
+
+    <xs:element name="MarketData" type="MarketDataListType" />
+
+</xs:schema>
