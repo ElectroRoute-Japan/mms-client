@@ -1,0 +1,379 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema elementFormDefault="qualified"
+           attributeFormDefault="unqualified"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+           jxb:version="1.0"
+           version="1.0.0">
+
+  <xs:annotation>
+    <xs:documentation xml:lang="en">
+
+            +-----------------------------------------------+
+            |                                               |
+            |               COPYRIGHT (c) 2005              |
+            |                                               |
+            |       ABB BUSINESS MANAGEMENT SYSTEMS         |
+            |                                               |
+            |               All rights reserved             |
+            |                                               |
+            +-----------------------------------------------+
+
+    This is the XML schema for MI reports.
+
+    History:
+    001  20-Nov-2019  PD  Revised based on Reports FD Version E.
+    </xs:documentation>
+  </xs:annotation>
+
+  <xs:element name="MarketReport" type="MarketReportType"/>
+
+  <!-- ==================================== -->
+  <!-- Common Simple Type Definitions Start -->
+  <!-- ==================================== -->
+
+  <xs:simpleType name="InformationType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="WarningType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="ErrorType">
+    <xs:restriction base="xs:string"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TimeStampType">
+    <xs:restriction base="xs:dateTime"/>
+  </xs:simpleType>
+
+  <xs:simpleType name="TitleType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ParamNameType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="32"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ValueType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="200"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TransactionIdType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="10"/>
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ValidationStatusType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="PASSED"/>
+      <xs:enumeration value="WARNING"/>
+      <xs:enumeration value="FAILED"/>
+      <xs:enumeration value="NOT_DONE"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ApplicationTypeType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+        Supported Application types
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="MARKET_REPORT"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ParticipantNameType">
+    <xs:restriction base="xs:string">
+      <xs:length value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+    <xs:simpleType name="BSPNameType">
+    <xs:restriction base="xs:string">
+      <xs:length value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FileSizeType">
+    <xs:restriction base="xs:int">
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ReportTypeType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+        Base Report types
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="REGISTRATION"/>
+      <xs:enumeration value="MA"/>
+      <xs:enumeration value="INTERFACE"/>
+	  <xs:enumeration value="SWITCH"/>
+	  <xs:enumeration value="SYSTEM"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ReportSubTypeType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+        Base Report sub-types
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="AWARDS"/>
+      <xs:enumeration value="MOL"/>
+      <xs:enumeration value="OFFERS"/>
+      <xs:enumeration value="BUP"/>
+      <xs:enumeration value="RESREQ"/>
+      <xs:enumeration value="ACCESS"/>
+      <xs:enumeration value="RESOURCE"/>
+      <xs:enumeration value="REQUEST"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+ <xs:simpleType name="PeriodicityType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+        Supported periodicities
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="YEARLY"/>
+	  <xs:enumeration value="MONTHLY"/>
+	  <xs:enumeration value="DAILY"/>
+	  <xs:enumeration value="HOURLY"/>
+	  <xs:enumeration value="HALF_HOURLY"/>
+	  <xs:enumeration value="SUB_HOURLY"/>
+	  <xs:enumeration value="ON_DEMAND"/>
+	  <xs:enumeration value="NOT_APPLICABLE"/>
+      </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="AccessClassType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+        Access Class
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="BSP"/>
+      <xs:enumeration value="TSO"/>
+      <xs:enumeration value="MO"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FileTypeType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+        Report File-types
+
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="CSV"/>
+      <xs:enumeration value="XML"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="ReportNameType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="50"/>
+      <xs:minLength value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FileNameType">
+    <xs:restriction base="xs:string">
+      <xs:maxLength value="60"/>
+      <xs:minLength value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DateStampType">
+    <xs:restriction base="xs:date"/>
+  </xs:simpleType>
+
+  <!-- Common Simple Type Definitions End -->
+
+  <!-- ================================== -->
+  <!-- Common Attribute Definitions Start -->
+  <!-- ================================== -->
+
+  <xs:attributeGroup name="ReportItemAttributes">
+    <xs:attribute name="ReportType" type="ReportTypeType" use="required"/>
+    <xs:attribute name="ReportSubType" type="ReportSubTypeType" use="required"/>
+    <xs:attribute name="Periodicity" type="PeriodicityType" use="required"/>
+    <xs:attribute name="ReportName" type="ReportNameType" use="required"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType" use="required"/>
+    <xs:attribute name="AccessClass" type="AccessClassType" use="required"/>
+    <xs:attribute name="Date" type="DateStampType" use="required"/>
+    <xs:attribute name="FileType" type="FileTypeType" use="required"/>
+    <xs:attribute name="FileName" type="FileNameType" use="required"/>
+    <xs:attribute name="FileSize" type="FileSizeType" use="optional"/>
+    <xs:attribute name="BinaryFile" type="xs:boolean" use="optional"/>
+    <xs:attribute name="ExpiryDate" type="DateStampType" use="optional"/>
+    <xs:attribute name="Description" type="TitleType" use="optional"/>
+  </xs:attributeGroup>
+
+  <!-- Common Attribute Definitions End -->
+
+  <!-- ===================================== -->
+  <!-- Common Complex Type Definitions Start -->
+  <!-- ===================================== -->
+
+  <xs:complexType name="ParamType">
+    <xs:attribute name="Name" type="ParamNameType" use="required"/>
+    <xs:attribute name="Value" type="ValueType" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="MessagesType">
+    <xs:sequence>
+      <xs:element name="Error" type="ErrorType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+      <xs:element name="Warning" type="WarningType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+      <xs:element name="Information" type="InformationType" minOccurs="0"
+                  maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ProcessingStatisticsType">
+    <xs:attribute name="TimeInMs" type="xs:long" use="optional"/>
+    <xs:attribute name="TransactionId" type="TransactionIdType" use="optional"/>
+    <xs:attribute name="TimeStamp" type="xs:string" use="optional"/>
+    <xs:attribute name="XmlTimeStamp" type="TimeStampType" use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="ReportItemType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attributeGroup ref="ReportItemAttributes"/>
+  </xs:complexType>
+
+  <xs:complexType name="ReportListResponseType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+      <xs:element name="ReportItem" type="ReportItemType"
+                  minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ReportListRequestType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+      <xs:element name="ReportListResponse" type="ReportListResponseType"
+                  minOccurs="0"/>
+    </xs:sequence>
+	<xs:attribute name="ReportName" type="ReportNameType" use="optional"/>
+    <xs:attribute name="ReportType" type="ReportTypeType" use="required"/>
+    <xs:attribute name="ReportSubType" type="ReportSubTypeType" use="required"/>
+	<xs:attribute name="Periodicity" type="PeriodicityType" use="required"/>
+    <xs:attribute name="Date" type="DateStampType" use="required"/>
+    <xs:attribute name="ValidationStatus" type="ValidationStatusType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="ReportDownloadRequestType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+    </xs:sequence>
+	<xs:attribute name="ReportType" type="ReportTypeType" use="required"/>
+    <xs:attribute name="ReportSubType" type="ReportSubTypeType" use="required"/>
+    <xs:attribute name="Periodicity" type="PeriodicityType" use="required"/>
+    <xs:attribute name="ReportName" type="ReportNameType" use="required"/>
+    <xs:attribute name="Date" type="DateStampType" use="required"/>
+    <xs:attribute name="AccessClass" type="AccessClassType" use="required"/>
+    <xs:attribute name="FileName" type="FileNameType" use="required"/>
+    <xs:attribute name="FileType" type="FileTypeType" use="required"/>
+    <xs:attribute name="ValidationStatus" type="ValidationStatusType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="ReportDownloadRequestTrnIDType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+    </xs:sequence>
+	<xs:attribute name="TransactionId" type="TransactionIdType" use="required"/>
+    <xs:attribute name="ValidationStatus" type="ValidationStatusType"
+                  use="optional"/>
+  </xs:complexType>
+
+   <xs:complexType name="ReportCreateRequestType">
+    <xs:sequence>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+      <xs:element name="Param" type="ParamType" minOccurs="0" maxOccurs="5"/>
+    </xs:sequence>
+	<xs:attribute name="ReportName" type="ReportNameType" use="required"/>
+	<xs:attribute name="BSPName" type="BSPNameType" use="optional"/>
+    <xs:attribute name="ReportType" type="ReportTypeType" use="required"/>
+    <xs:attribute name="ReportSubType" type="ReportSubTypeType" use="required"/>
+	<xs:attribute name="Periodicity" type="PeriodicityType" use="required"/>
+	<xs:attribute name="Date" type="DateStampType" use="required"/>
+    <xs:attribute name="ValidationStatus" type="ValidationStatusType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <xs:complexType name="MarketReportType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+
+          This is used to bundle all types of report requests.
+
+        </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ProcessingStatistics" type="ProcessingStatisticsType"
+                  minOccurs="0"/>
+      <xs:element name="Messages" type="MessagesType" minOccurs="0"/>
+      <xs:choice>
+        <xs:element name="ReportListRequest"
+                    type="ReportListRequestType"
+                    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="ReportDownloadRequest"
+                    type="ReportDownloadRequestType"
+                    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="ReportDownloadRequestTrnID"
+                    type="ReportDownloadRequestTrnIDType"
+                    minOccurs="0" maxOccurs="1"/>
+        <xs:element name="ReportCreateRequest"
+                    type="ReportCreateRequestType"
+                    minOccurs="0" maxOccurs="1"/>
+      </xs:choice>
+    </xs:sequence>
+    <xs:attribute name="ApplicationType" type="ApplicationTypeType"
+                  use="required"/>
+    <xs:attribute name="ParticipantName" type="ParticipantNameType"
+                  use="required"/>
+    <xs:attribute name="ValidationStatus" type="ValidationStatusType"
+                  use="optional"/>
+  </xs:complexType>
+
+  <!-- Common Complex Type Definitions End -->
+
+</xs:schema>

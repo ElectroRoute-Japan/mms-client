@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+  name="OmiWebService"
+  targetNamespace="urn:ws.web.omi.co.jp"
+  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+  xmlns:types="urn:types.ws.web.omi.co.jp"
+  xmlns:tns="urn:ws.web.omi.co.jp">
+
+  <wsdl:documentation>
+   This is the WSDL for OMI based web service.
+   History:
+      001  2021-03-29 Initial version.
+
+  </wsdl:documentation>
+
+  <!-- Types -->
+  <wsdl:types>
+    <xsd:schema targetNamespace="urn:types.ws.web.omi.co.jp"
+                xmlns:types="urn:types.ws.web.omi.co.jp">
+
+      <!-- Request Type -->
+      <xsd:simpleType name="RequestType">
+        <xsd:annotation>
+          <xsd:documentation>
+            Identifies the request type. Valid values are:
+
+            mp.omi:
+            OMIに関する各種リクエスト
+
+
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="mp.omi" />
+
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <xsd:simpleType name="RequestDataType">
+        <xsd:annotation>
+          <xsd:documentation>
+            Identifies the inbound request data type.
+            NOTE: JSON is not supported. For future use.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="XML" />
+          <xsd:enumeration value="JSON" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <!-- Request Digital Signature -->
+      <xsd:simpleType name="RequestSignature">
+        <xsd:annotation>
+          <xsd:documentation>
+            Base64 SHA2 hash RSA encrypted digital signature of canonicalized
+            XML input file
+            http://www.w3.org/TR/2001/REC-xml-c14n-20010315#WithComments
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="2048" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <!-- Attachment Digital Signature -->
+      <xsd:simpleType name="AttachmentSignature">
+        <xsd:annotation>
+          <xsd:documentation>
+            Base64 SHA2 hash RSA encrypted digital signature of non-canonicalized
+            attachment file
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+          <xsd:minLength value="1" />
+          <xsd:maxLength value="2048" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <!-- Attachment -->
+      <xsd:complexType name="AttachmentType">
+        <xsd:sequence>
+          <xsd:element name="binaryData" type="xsd:base64Binary"
+            minOccurs="0" maxOccurs="1" />
+          <xsd:element name="signature" type="types:AttachmentSignature"
+            minOccurs="0" maxOccurs="1" />
+          <xsd:element name="name" type="xsd:string"
+            minOccurs="0" maxOccurs="1" />
+        </xsd:sequence>
+      </xsd:complexType>
+
+      <xsd:simpleType name="ResponseDataType">
+        <xsd:annotation>
+          <xsd:documentation>
+            Identifies the outbound response data type.
+            NOTE: JSON is not supported. For future use.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="XML" />
+          <xsd:enumeration value="HTML" />
+          <xsd:enumeration value="CSV" />
+          <xsd:enumeration value="JSON" />
+          <xsd:enumeration value="TXT" />
+        </xsd:restriction>
+      </xsd:simpleType>
+
+      <!-- Input request for Soap Attachment -->
+      <xsd:element name="RequestAttInfo">
+        <xsd:annotation>
+          <xsd:documentation>
+            Web Service Request Parameters:
+            -------------------------------
+            requestType : The type of request.
+            adminRole : Indicates, if the request is submitted
+            by the ISO administrator.
+            requestDataCompressed : Indicates if the inbound request is
+            compressed.
+            requestDataType : Indicate the type of request
+            (XML).
+            sendRequestDataOnSuccess : Include request data in the response
+            even if it is successful.
+            sendResponseDataCompressed : Compress the response payload.
+            requestSignature : The digital signature of the
+            request payload.
+            requestData : The actual request payload.
+
+            NOTE : requestDataCompressed,
+            sendResponseDataCompressed, and
+            requestDataType="JSON" are for
+            potential future use.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <!-- Request Params -->
+            <xsd:element name="requestType"
+              type="types:RequestType" minOccurs="1" maxOccurs="1" />
+            <xsd:element name="adminRole"
+              type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false" />
+            <xsd:element name="requestDataCompressed"
+              type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false" />
+            <xsd:element name="requestDataType"
+              type="types:RequestDataType" minOccurs="1" maxOccurs="1"
+              default="XML" />
+            <xsd:element name="sendRequestDataOnSuccess"
+              type="xsd:boolean" minOccurs="1" maxOccurs="1" default="true" />
+            <xsd:element name="sendResponseDataCompressed"
+              type="xsd:boolean" minOccurs="1" maxOccurs="1" default="false" />
+            <xsd:element name="requestSignature"
+              type="types:RequestSignature" minOccurs="0" maxOccurs="1" />
+            <xsd:element name="requestData"
+              type="xsd:base64Binary" minOccurs="1" maxOccurs="1" xmime:expectedContentTypes="application/octet-stream" />
+            <xsd:element name="attachmentData"
+              type="types:AttachmentType" minOccurs="0" maxOccurs="20" />
+
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="ResponseAttInfo">
+        <xsd:annotation>
+          <xsd:documentation>
+            Web Service Response:
+            ---------------------
+            success : Indicates if the request is successful.
+            warnings : Indicates if there are warnings
+            during request processing. Only
+            applicable if success is true.
+            responseBinary : Indicates if the response is binary data.
+            responseCompressed : Indicate if the response is compressed.
+            responseDataType : Indicate the response data type,
+            XML/HTML/CSV/TXT.
+            responseFilename : Filename of the response, if applicable. It
+            is set for pre-generated reports.
+            responseData : The actual response payload.
+
+            NOTE : responseCompressed is not supported. It is
+            for potential future use.
+          </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="success" type="xsd:boolean"
+              minOccurs="1" maxOccurs="1" />
+            <xsd:element name="warnings" type="xsd:boolean"
+              minOccurs="1" maxOccurs="1" default="false" />
+            <xsd:element name="responseBinary" type="xsd:boolean"
+              minOccurs="1" maxOccurs="1" default="false" />
+            <xsd:element name="responseCompressed" type="xsd:boolean"
+              minOccurs="1" maxOccurs="1" default="false" />
+            <xsd:element name="responseDataType" type="types:ResponseDataType"
+              minOccurs="1" maxOccurs="1" />
+            <xsd:element name="responseFilename" type="xsd:string"
+              minOccurs="0" maxOccurs="1" />
+            <xsd:element name="responseData" type="xsd:base64Binary"
+              minOccurs="0" maxOccurs="1" xmime:expectedContentTypes="application/octet-stream" />
+            <xsd:element name="attachmentData"
+              type="types:AttachmentType" minOccurs="0" maxOccurs="20" />
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="AttachmentInfo" type="types:AttachmentType">
+        <xsd:annotation>
+          <xsd:documentation>
+            Attachment Response definition.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+
+    </xsd:schema>
+  </wsdl:types>
+
+  <!-- Messages -->
+  <wsdl:message name="submitAttachmentRequest">
+    <wsdl:part name="RequestInput" element="types:RequestAttInfo" />
+  </wsdl:message>
+
+  <wsdl:message name="retrieveAttachmentResponse">
+    <wsdl:part name="ResponseOutput" element="types:ResponseAttInfo" />
+  </wsdl:message>
+
+  <!-- Port Types -->
+  <wsdl:portType name="OmiWebService">
+
+    <wsdl:operation name="submitAttachment">
+      <wsdl:input message="tns:submitAttachmentRequest" />
+      <wsdl:output message="tns:retrieveAttachmentResponse" />
+    </wsdl:operation>
+
+  </wsdl:portType>
+
+  <!-- Bindings -->
+  <wsdl:binding name="OmiWebServiceSOAP" type="tns:OmiWebService">
+    <soap:binding style="document"
+      transport="http://schemas.xmlsoap.org/soap/http" />
+
+    <!-- For soap file attachment based requests -->
+    <wsdl:operation name="submitAttachment">
+      <soap:operation soapAction="urn:ws.web.omi.co.jp:submitAttachment" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+
+  </wsdl:binding>
+
+  <wsdl:service name="OmiWebService">
+    <wsdl:port name="OmiWebService" binding="tns:OmiWebServiceSOAP">
+      <soap:address location="http://hostname:port/axis2/services/OmiWebService" />
+    </wsdl:port>
+  </wsdl:service>
+
+</wsdl:definitions>
