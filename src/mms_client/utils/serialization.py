@@ -117,8 +117,8 @@ class PayloadConfig:
         """
         # First, validate the payload and data we'll be sending; if this fails then a Pydantic validation error will be
         # raised. We will not catch this as it is the user's responsibility to ensure the data is valid before sending.
-        request_payload.model_validate(strict=True, from_attributes=True)
-        request_data.model_validate(strict=True, from_attributes=True)
+        request_payload.__class__.model_validate(request_payload, strict=True, from_attributes=True)
+        request_data.__class__.model_validate(request_payload, strict=True, from_attributes=True)
 
         # Next, convert the payload and data to a dictionary for serialization. We will exclude any unset or None
         # values from the serialization, as these represent optional fields that were not set.

@@ -4,6 +4,7 @@ import pytest
 
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
+from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.utils.web import MI_WEBSERVICE_PORT
 from mms_client.utils.web import OMI_WEBSERVICE_PORT
@@ -89,7 +90,14 @@ def test_zwrapper_submit_works(mocker):
     z._client = mock_client
 
     # Next, attempt to submit a request and retrieve the response
-    resp = z.submit(MmsRequest(requestType=RequestType.INFO, requestSignature="test", requestData=b"derp"))
+    resp = z.submit(
+        MmsRequest(
+            requestType=RequestType.INFO,
+            requestDataType=RequestDataType.XML,
+            requestSignature="test",
+            requestData=b"derp",
+        )
+    )
 
     # Finally, assert that the response is of the correct type and that the client was called once.
     assert isinstance(resp, MmsResponse)

@@ -240,10 +240,8 @@ class MmsClient:  # pylint: disable=too-many-instance-attributes
         return MmsRequest(
             requestType=req_type,
             adminRole=self._is_admin,
-            requestDataCompressed=False,
             requestDataType=RequestDataType.XML,
             sendRequestDataOnSuccess=return_req,
-            sendResponseDataCompressed=False,
             requestSignature=self._signer.sign(data),
             requestData=data,
             attachmentData=attachment_data,

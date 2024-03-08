@@ -1,4 +1,4 @@
-"""Tests the functionality in the cert module."""
+"""Tests the functionality in the mms_client.security.certs module."""
 
 import pytest
 from mock import patch

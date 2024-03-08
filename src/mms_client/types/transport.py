@@ -70,7 +70,7 @@ class MmsRequest(BaseModel):
     compressed: bool = Field(default=False, alias="requestDataCompressed")
 
     # The type of data to be sent to the MMS server.
-    data_type: RequestDataType = Field(default=RequestDataType.XML, alias="requestDataType")
+    data_type: RequestDataType = Field(alias="requestDataType")
 
     # Whether to send the request data in the response, on a successful request
     respond_with_request: bool = Field(default=True, alias="sendRequestDataOnSuccess")
