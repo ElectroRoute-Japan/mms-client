@@ -2,16 +2,15 @@
 
 import pytest
 
-from mms_client.objects.base import MmsRequest
-from mms_client.objects.base import MmsResponse
-from mms_client.objects.base import RequestType
-from mms_client.objects.base import ResponseDataType
-from mms_client.web import MI_WEBSERVICE_PORT
-from mms_client.web import OMI_WEBSERVICE_PORT
-from mms_client.web import URLS
-from mms_client.web import ClientType
-from mms_client.web import InterfaceType
-from mms_client.web import ZWrapper
+from mms_client.types.transport import MmsRequest
+from mms_client.types.transport import MmsResponse
+from mms_client.types.transport import RequestType
+from mms_client.utils.web import MI_WEBSERVICE_PORT
+from mms_client.utils.web import OMI_WEBSERVICE_PORT
+from mms_client.utils.web import URLS
+from mms_client.utils.web import ClientType
+from mms_client.utils.web import InterfaceType
+from mms_client.utils.web import ZWrapper
 
 
 @pytest.mark.parametrize(

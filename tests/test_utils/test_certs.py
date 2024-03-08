@@ -6,7 +6,7 @@ import pytest
 from mock import patch
 from pyfakefs.fake_filesystem_unittest import Patcher
 
-from mms_client.utils.certs import Certificate
+from mms_client.security.certs import Certificate
 
 
 def test_from_directory_not_found():
