@@ -128,10 +128,10 @@ class ZWrapper:
         # interface is neither "omi" nor "mi", we raise a ValueError.
         if interface == "mi":
             self._service_port = MI_WEBSERVICE_PORT
-            self._location = Path(__file__).parent / "schemas" / "wsdl" / "mi-web-service-jbms.wsdl"
+            self._location = Path(__file__).parent.parent / "schemas" / "wsdl" / "mi-web-service-jbms.wsdl"
         elif interface == "omi":
             self._service_port = OMI_WEBSERVICE_PORT
-            self._location = Path(__file__).parent / "schemas" / "wsdl" / "omi-web-service.wsdl"
+            self._location = Path(__file__).parent.parent / "schemas" / "wsdl" / "omi-web-service.wsdl"
         else:
             raise ValueError(f"Invalid interface, '{interface}'. Only 'mi' and 'omi' are supported.")
 
