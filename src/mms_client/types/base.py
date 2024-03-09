@@ -7,9 +7,9 @@ from typing import List
 from typing import Optional
 from typing import TypeVar
 
-from pendulum import DateTime
 from pydantic import BaseModel
 from pydantic import Field
+from pydantic_extra_types.pendulum_dt import DateTime
 
 from mms_client.types.enums import ValidationStatus
 
@@ -99,14 +99,14 @@ class BaseResponse(BaseModel, Generic[PQ]):
     statistics: ProcessingStatistics = Field(alias="ProcessingStatistics")
 
     # The request payload, containing the request data
-    payload: PQ = Field(exclude=True)
+    payload: PQ = Field(default=None, exclude=True)
 
     # The validation information for the request payload
-    payload_validation: ResponseCommon = Field(exclude=True)
+    payload_validation: ResponseCommon = Field(default=None, exclude=True)
 
     # The messages returned with the payload. Each object will likely have its own so these
     # will be parsed separately.
-    messages: Dict[str, Messages] = Field(exclude=True)
+    messages: Dict[str, Messages] = Field(default={}, exclude=True)
 
 
 @dataclass
@@ -120,11 +120,11 @@ class ResponseData(Generic[D]):
     data_validation: ResponseCommon
 
 
-class Response(BaseResponse, Generic[D]):
+class Response(BaseResponse[PQ], Generic[D, PQ]):
     """Contains all the data extracted from the MMS response in a format we can use."""
 
     # The payload data extracted from the response
-    payload_data: ResponseData[D] = Field(exclude=True)
+    payload_data: ResponseData[D] = Field(default=None, exclude=True)
 
     @property
     def data(self) -> D:
@@ -132,11 +132,11 @@ class Response(BaseResponse, Generic[D]):
         return self.payload_data.data  # pylint: disable=no-member
 
 
-class MultiResponse(BaseResponse, Generic[D]):
+class MultiResponse(BaseResponse[PQ], Generic[D, PQ]):
     """Contains all the data extracted from the MMS response in a format we can use."""
 
     # The payload data extracted from the response
-    payload_data: List[ResponseData[D]] = Field(exclude=True)
+    payload_data: List[ResponseData[D]] = Field(default=None, exclude=True)
 
     @property
     def data(self) -> List[D]:
