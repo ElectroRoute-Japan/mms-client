@@ -4,7 +4,7 @@ from pydantic import Field
 from pydantic_core import PydanticUndefined
 
 # Describes the regular expression required by the MMS API for Japanese text
-JAPANESE_TEXT = r"^[&#12288;-&#12543;&#65280;-&#65376;&#65440;-&#65519;&#19968;-&#40938;]*$"
+JAPANESE_TEXT = r"^[\u3000-\u30FF\uFF00-\uFF60\uFFA0-\uFFEF\u4E00-\u9FEA]*$"
 
 
 def participant(alias: str, optional: bool = False):

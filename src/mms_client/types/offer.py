@@ -1,13 +1,14 @@
 """Contains objects for MMS offers."""
 
+from decimal import Decimal
 from enum import Enum
 from typing import List
 from typing import Optional
 
-from pendulum import DateTime
 from pydantic import BaseModel
 from pydantic import Field
 from pydantic_core import PydanticUndefined
+from pydantic_extra_types.pendulum_dt import DateTime
 
 from mms_client.types.enums import AreaCode
 from mms_client.types.fields import company_short_name
@@ -80,7 +81,7 @@ class OfferStack(BaseModel):
     tertiary_2_qty_kw: Optional[int] = power_positive("Tertiary2OfferQuantityInKw", True)
 
     # The unit price of the power, in JPY/kW/segment
-    unit_price: float = price("OfferUnitPrice")
+    unit_price: Decimal = price("OfferUnitPrice")
 
     # The ID of the offer to which this stack belongs
     id: Optional[str] = offer_id("OfferId", True)
@@ -134,9 +135,6 @@ class OfferData(BaseModel):
 
 class OfferCancel(BaseModel):
     """Describes the data necessary to cancel an offer in the MMS."""
-
-    # The ID of the offer to be cancelled
-    id: str = offer_id("OfferId")
 
     # The identifier for the power resource this offer is trading on
     resource: str = resource_name("ResourceName")

@@ -81,40 +81,31 @@ def test_mms_request_full():
 def test_mms_response_defaults():
     """Test that the MmsResponse class initializes and converts to a dictionary as we expect."""
     # First, create a new MMS response
-    response = MmsResponse(
-        success=True,
-        responseDataType=ResponseDataType.CSV,
-        responseData=b"FAKE_PAYLOAD",
-    )
+    data = {"success": True, "responseDataType": ResponseDataType.CSV, "responseData": b"FAKE_PAYLOAD"}
 
-    # Next, convert the response to a dictionary
-    data = response.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    # Next, attempt to convert the data to a MmsResponse object
+    response = MmsResponse.model_validate(data)
 
     # Finally, verify that the response was created with the correct parameters
     verify_mms_response(response, True, ResponseDataType.CSV, b"FAKE_PAYLOAD")
-    assert data == {
-        "success": True,
-        "responseDataType": ResponseDataType.CSV,
-        "responseData": b"FAKE_PAYLOAD",
-    }
 
 
 def test_mms_response_full():
     """Test that the MmsResponse class initializes and converts to a dictionary as we expect."""
     # First, create a new MMS response
-    response = MmsResponse(
-        success=True,
-        responseBinary=True,
-        responseCompressed=True,
-        responseDataType=ResponseDataType.JSON,
-        responseFilename="FAKE_FILENAME",
-        responseData=b"FAKE_PAYLOAD",
-        warnings=True,
-        attachmentData=[Attachment(signature="FAKE_SIGNATURE", name="FAKE_NAME", binaryData=b"FAKE_DATA")],
-    )
+    data = {
+        "success": True,
+        "responseDataType": ResponseDataType.JSON,
+        "responseData": b"FAKE_PAYLOAD",
+        "responseFilename": "FAKE_FILENAME",
+        "warnings": True,
+        "responseBinary": True,
+        "responseCompressed": True,
+        "attachmentData": [{"signature": "FAKE_SIGNATURE", "name": "FAKE_NAME", "binaryData": b"FAKE_DATA"}],
+    }
 
-    # Next, convert the response to a dictionary
-    data = response.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    # Next, attempt to convert the data to a MmsResponse object
+    response = MmsResponse.model_validate(data)
 
     # Finally, verify that the response was created with the correct parameters
     verify_mms_response(
@@ -128,16 +119,6 @@ def test_mms_response_full():
         True,
         verifiers=[attachment_verifier("FAKE_NAME", b"FAKE_DATA", "FAKE_SIGNATURE")],
     )
-    assert data == {
-        "success": True,
-        "warnings": True,
-        "responseBinary": True,
-        "responseCompressed": True,
-        "responseDataType": ResponseDataType.JSON,
-        "responseFilename": "FAKE_FILENAME",
-        "responseData": b"FAKE_PAYLOAD",
-        "attachmentData": [{"signature": "FAKE_SIGNATURE", "name": "FAKE_NAME", "binaryData": b"FAKE_DATA"}],
-    }
 
 
 def verify_mms_request(
