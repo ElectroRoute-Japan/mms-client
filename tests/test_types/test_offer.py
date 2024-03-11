@@ -204,7 +204,11 @@ def verify_offer_data(
     assert request.start == start
     assert request.end == end
     assert request.direction == direction
+    assert len(request.stack) == len(stack_verifiers)
+    for stack, verifier in zip(request.stack, stack_verifiers):
+        verifier(stack)
     verify_offer_data_optional(
+        request,
         pattern_number=pattern,
         bsp_participant=bsp_participant,
         company_short_name=company_short_name,
@@ -214,9 +218,6 @@ def verify_offer_data(
         system_code=system_code,
         submission_time=submission_time,
     )
-    assert len(request.stack) == len(stack_verifiers)
-    for stack, verifier in zip(request.stack, stack_verifiers):
-        verifier(stack)
 
 
 def verify_offer_data_optional(request: OfferData, **kwargs):

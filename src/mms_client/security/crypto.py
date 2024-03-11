@@ -1,10 +1,13 @@
 """Contains objects for cryptographic operations."""
 
 from base64 import b64encode
+from hashlib import sha256
 
-from Crypto.Hash import SHA256
-from Crypto.PublicKey import RSA
-from Crypto.Signature import pkcs1_15
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
+from cryptography.hazmat.primitives.serialization.pkcs12 import load_key_and_certificates
 
 from mms_client.security.certs import Certificate
 
@@ -22,10 +25,19 @@ class CryptoWrapper:
         self._cert = cert
 
         # Next, import the private key from the certificate
-        private_key = RSA.import_key(cert.certificate, passphrase=cert.passphrase)
+        private_key, _, _ = load_key_and_certificates(
+            self._cert.certificate, self._cert.passphrase.encode(), default_backend()
+        )
 
-        # Finally, create a signer from the private key
-        self._signer = pkcs1_15.new(private_key)
+        # Now, we need to assert typing on this private key to make mypy happy
+        if isinstance(private_key, RSAPrivateKey):
+            self._private_key = private_key
+        else:
+            raise TypeError(f"Private key of type ({type(private_key).__name__}) was not expected.")
+
+        # Finally, save our padding and algorithm for later use
+        self._padding = padding.PKCS1v15()
+        self._algorithm = hashes.SHA256()
 
     def sign(self, data: bytes) -> bytes:
         """Create a signature from the given data using the certificate.
@@ -36,10 +48,10 @@ class CryptoWrapper:
         Returns:    A base64-encoded string containing the signature.
         """
         # First, hash the data using SHA256
-        hashed = SHA256.new(data)
+        hashed = sha256(data)
 
         # Next, sign the hash using the private key
-        signature = self._signer.sign(hashed)
+        signature = self._private_key.sign(hashed.digest(), self._padding, self._algorithm)
 
         # Finally, return the base64-encoded signature
         return b64encode(signature)

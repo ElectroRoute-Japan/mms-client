@@ -14,8 +14,8 @@ requests-pkcs12 = "^1.24"
 pydantic = "^2.6.3"
 pendulum = "^3.0.0"
 dicttoxml = "^1.7.16"
-pycryptodome = "^3.20.0"
 xmlschema = "^3.0.2"
+cryptography = "^42.0.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"

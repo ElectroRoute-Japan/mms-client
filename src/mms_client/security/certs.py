@@ -1,5 +1,6 @@
 """Contains functionality associated with certificates."""
 
+from pathlib import Path
 from typing import Union
 
 from requests_pkcs12 import Pkcs12Adapter
@@ -8,7 +9,7 @@ from requests_pkcs12 import Pkcs12Adapter
 class Certificate:
     """Describes a certificate composed of a cert file and a key file."""
 
-    def __init__(self, cert: Union[str, bytes], passphrase: str):
+    def __init__(self, cert: Union[str, Path, bytes], passphrase: str):
         """Create a new Certificate.
 
         Creates a new certificate from the absolute path to the certificate file and a passpharse.
@@ -19,7 +20,7 @@ class Certificate:
         passphrase:     The passphrase the certificate is encrypted with
         """
         # Get the certificate file contents
-        if isinstance(cert, str):
+        if isinstance(cert, (str, Path)):
             with open(cert, "rb") as file:
                 self._cert = file.read()
         else:
