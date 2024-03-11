@@ -2,8 +2,25 @@
 
 from pathlib import Path
 
-from mms_client.security.crypto import Certificate
+import pytest
+from mock import patch
+
+from mms_client.security.certs import Certificate
 from mms_client.security.crypto import CryptoWrapper
+
+
+@patch("mms_client.security.crypto.load_key_and_certificates", return_value=(12, None, None))
+def test_init_keytype_invalid(mock):
+    """Test that the CryptoWrapper class raises a TypeError when the private key is not an RSAPrivateKey."""
+    # First, create a new Certificate with a fake certificate
+    cert = Certificate(Path(__file__).parent / "fake.p12", "")
+
+    # Next, attempt to create a new CryptoWrapper with the fake certificate; this should fail
+    with pytest.raises(TypeError) as ex_info:
+        _ = CryptoWrapper(cert)
+
+    # Finally, verify the details of the raised exception
+    assert str(ex_info.value) == "Private key of type (int) was not expected."
 
 
 def test_sign():
