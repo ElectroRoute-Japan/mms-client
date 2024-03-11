@@ -5,11 +5,12 @@ from enum import Enum
 from typing import List
 from typing import Optional
 
-from pydantic import BaseModel
-from pydantic import Field
 from pydantic_core import PydanticUndefined
 from pydantic_extra_types.pendulum_dt import DateTime
+from pydantic_xml import attr
+from pydantic_xml import element
 
+from mms_client.types.base import Payload
 from mms_client.types.enums import AreaCode
 from mms_client.types.fields import company_short_name
 from mms_client.types.fields import dr_patter_number
@@ -34,9 +35,9 @@ def offer_id(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the offer ID.
     """
-    return Field(
+    return attr(
         default=None if optional else PydanticUndefined,
-        alias=alias,
+        name=alias,
         min_length=1,
         max_length=30,
         pattern=r"^[a-zA-Z0-9_-]*$",
@@ -50,8 +51,8 @@ class Direction(Enum):
     BUY = "2"  # Decreasing the reserves (buy)
 
 
-class OfferStack(BaseModel):
-    """Represents a single price-quantity pair in an offer.
+class OfferStack(Payload):
+    """Represents a single price-quantity pair in an offer request.
 
     Notes:
         For the Day-ahead Market, the tertiary 2 sell bidding volume is mandatory.
@@ -60,7 +61,7 @@ class OfferStack(BaseModel):
     """
 
     # A number used to identify this PQ pair within the offer
-    stack_number: int = Field(alias="StackNumber", ge=1, le=20)
+    number: int = attr(name="StackNumber", ge=1, le=20)
 
     # The minimum quantity that must be provided before the offer can be awarded
     minimum_quantity_kw: int = power_positive("MinimumQuantityInKw")
@@ -87,26 +88,23 @@ class OfferStack(BaseModel):
     id: Optional[str] = offer_id("OfferId", True)
 
 
-class OfferData(BaseModel):
-    """Describes the data necessary to submit an offer to the MMS.
-
-    Note that this data will also be returned when querying for offers.
-    """
+class OfferData(Payload):
+    """Describes the data common to both offer requests and responses."""
 
     # The separate offers that make up the offer stack
-    stack: List[OfferStack] = Field(alias="OfferStack", min_length=1, max_length=20)
+    stack: List[OfferStack] = element(tag="OfferStack", min_length=1, max_length=20)
 
     # The identifier for the power resource being traded
     resource: str = resource_name("ResourceName")
 
     # Date and time of the starting block associated with the offer
-    start: DateTime = Field(alias="StartTime")
+    start: DateTime = attr(name="StartTime")
 
     # Date and time of the ending block associated with the offer
-    end: DateTime = Field(alias="EndTime")
+    end: DateTime = attr(name="EndTime")
 
     # The direction of the offer (buy, sell)
-    direction: Direction = Field(alias="Direction")
+    direction: Direction = attr(name="Direction")
 
     # The type of market for which the offer is being submitted
     pattern_number: Optional[int] = dr_patter_number("DrPatternNumber", True)
@@ -121,7 +119,7 @@ class OfferData(BaseModel):
     operator: Optional[str] = operator_code("OperatorCode", True)
 
     # The area associated with the offer
-    area: Optional[AreaCode] = Field(default=None, alias="Area")
+    area: Optional[AreaCode] = attr(default=None, name="Area")
 
     # The abbreviated name of the resource being traded
     resource_short_name: Optional[str] = resource_short_name("ResourceShortName", True)
@@ -130,35 +128,35 @@ class OfferData(BaseModel):
     system_code: Optional[str] = system_code("SystemCode", True)
 
     # The date and time when the offer was submitted
-    submission_time: Optional[DateTime] = Field(default=None, alias="SubmissionTime")
+    submission_time: Optional[DateTime] = attr(default=None, name="SubmissionTime")
 
 
-class OfferCancel(BaseModel):
+class OfferCancel(Payload):
     """Describes the data necessary to cancel an offer in the MMS."""
 
     # The identifier for the power resource this offer is trading on
     resource: str = resource_name("ResourceName")
 
     # The date and time of the starting block associated with the offer
-    start: DateTime = Field(alias="StartTime")
+    start: DateTime = attr(name="StartTime")
 
     # The date and time of the ending block associated with the offer. You can cancel multiple blocks by specifying the
     # end date and time for any block within the period from the trading day to the specified number of days.
-    end: DateTime = Field(alias="EndTime")
+    end: DateTime = attr(name="EndTime")
 
     # The type of market for the offer was submitted on
-    market_type: MarketType = Field(alias="MarketType")
+    market_type: MarketType = attr(name="MarketType")
 
 
-class OfferQuery(BaseModel):
+class OfferQuery(Payload):
     """Describes the data necessary to query for offers in the MMS."""
 
     # The type of market for the offer was submitted on
-    market_type: MarketType = Field(alias="MarketType")
+    market_type: MarketType = attr(name="MarketType")
 
     # The identifier for the power resource being requested. If this isn't provided, then all offers for the specified
     # region will be returned
     resource: Optional[str] = resource_name("ResourceName", True)
 
     # The area associated with the offer. For TSOs and MOs, this field is mandatory
-    area: Optional[AreaCode] = Field(default=None, alias="Area")
+    area: Optional[AreaCode] = attr(default=None, name="Area")

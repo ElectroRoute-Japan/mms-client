@@ -4,54 +4,44 @@ from typing import Optional
 
 from pendulum import DateTime
 from pendulum import Timezone
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic_xml import BaseXmlModel
+from pydantic_xml import attr
 
 from mms_client.types.base import BaseResponse
+from mms_client.types.base import Envelope
 from mms_client.types.base import MultiResponse
 from mms_client.types.base import ProcessingStatistics
-from mms_client.types.base import RequestPayload
 from mms_client.types.base import Response
 from mms_client.types.base import ResponseData
+from mms_client.types.base import SchemaType
 
 
 def test_response_base_validate_defaults_works():
-    """Test that the ResponseBase class can be converted from a dictionary as expected."""
+    """Test that the ResponseBase class can be converted from an XML payload as expected."""
 
-    # First, create our test dictionary
-    raw = {"ProcessingStatistics": {}}
+    # First, create our test XML payload
+    raw = b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="mi-market.xsd"><ProcessingStatistics TimeStamp=""/></BaseResponse>"""
 
     # Next, attempt to validate it against our ResponseBase model
-    data = BaseResponse[RequestPayload].model_validate(raw)
+    data = BaseResponse[Envelope].from_xml(raw)
 
     # Finally, verify the data was created as expected
-    verify_base_response(data)
+    verify_base_response(data, SchemaType.MARKET)
 
 
 def test_response_base_validate_full_works():
-    """Test that the ResponseBase class can be converted from a dictionary as expected."""
+    """Test that the ResponseBase class can be converted from an XML payload as expected."""
 
-    # First, create our test dictionary
-    raw = {
-        "ProcessingStatistics": {
-            "Received": 1,
-            "Valid": 2,
-            "Invalid": 3,
-            "Successful": 4,
-            "Unsuccessful": 5,
-            "ProcessingTimeMs": 6,
-            "TransactionID": "derpderp",
-            "TimeStamp": "Mon Aug 30 03:25:41 JST 2019",
-            "XmlTimeStamp": "2019-08-30T03:25:41Z",
-        },
-    }
+    # First, create our test XML payload
+    raw = b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="mi-market.xsd"><ProcessingStatistics Received="1" Valid="2" Invalid="3" Successful="4" Unsuccessful="5" ProcessingTimeMs="6" TransactionID="derpderp" TimeStamp="Mon Aug 30 03:25:41 JST 2019" XmlTimeStamp="2019-08-30T03:25:41Z"/></BaseResponse>"""
 
     # Next, attempt to validate it against our ResponseBase model
-    data = BaseResponse[RequestPayload].model_validate(raw)
+    data = BaseResponse[Envelope].from_xml(raw)
 
     # Finally, verify the data was created as expected
     verify_base_response(
         data,
+        SchemaType.MARKET,
         valid=2,
         invalid=3,
         received=1,
@@ -67,8 +57,8 @@ def test_response_base_validate_full_works():
 def test_response_data_works():
     """Test that the data property of the Response class works as expected."""
     # Create a new response data object
-    resp = Response[RequestPayload, FakeModel](ProcessingStatistics=ProcessingStatistics())
-    resp.payload_data = ResponseData[FakeModel](FakeModel(), None)
+    resp = Response[Envelope, FakeModel](statistics=ProcessingStatistics(), location=SchemaType.MARKET)
+    resp.data = ResponseData[FakeModel](FakeModel(), None)
 
     # Verify that the data property returns the correct value
     assert resp.data.name == "test"
@@ -77,8 +67,8 @@ def test_response_data_works():
 def test_response_multi_data_works():
     """Test that the data property of the MultiResponse class works as expected."""
     # Create a new response data object
-    resp = MultiResponse[RequestPayload, FakeModel](ProcessingStatistics=ProcessingStatistics())
-    resp.payload_data = [
+    resp = MultiResponse[Envelope, FakeModel](statistics=ProcessingStatistics(), location=SchemaType.MARKET)
+    resp.data = [
         ResponseData[FakeModel](FakeModel(name="test1"), None),
         ResponseData[FakeModel](FakeModel(name="test2"), None),
     ]
@@ -88,15 +78,16 @@ def test_response_multi_data_works():
     assert resp.data[1].name == "test2"
 
 
-class FakeModel(BaseModel):
+class FakeModel(BaseXmlModel):
     """Test model to use for testing the Response classes."""
 
     # The name of the test model
-    name: str = Field(default="test")
+    name: str = attr(default="test")
 
 
 def verify_base_response(
-    resp: BaseResponse[RequestPayload],
+    resp: BaseResponse[Envelope],
+    location: SchemaType,
     valid: Optional[int] = None,
     invalid: Optional[int] = None,
     received: Optional[int] = None,
@@ -109,8 +100,9 @@ def verify_base_response(
 ):
     """Verify that the given BaseResponse was created with the correct parameters."""
     assert not resp.messages
-    assert not resp.payload
-    assert not resp.payload_validation
+    assert not resp.envelope
+    assert not resp.envelope_validation
+    assert resp.location == location
     verify_statistics(
         resp.statistics,
         valid=valid,

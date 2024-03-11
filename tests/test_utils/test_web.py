@@ -1,4 +1,4 @@
-"""Includes unit tests for the mms_client.web module."""
+"""Includes unit tests for the mms_client.utils.web module."""
 
 import pytest
 

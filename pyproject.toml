@@ -13,9 +13,9 @@ zeep = "^4.2.1"
 requests-pkcs12 = "^1.24"
 pydantic = "^2.6.3"
 pendulum = "^3.0.0"
-dicttoxml = "^1.7.16"
 xmlschema = "^3.0.2"
 cryptography = "^42.0.5"
+pydantic-xml = "^2.9.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
@@ -46,6 +46,9 @@ exclude = [
   '^tests/'
 ]
 scripts_are_modules = true
+plugins = [
+  "pydantic_xml.mypy"
+]
 
 [[tool.mypy.overrides]]
 module = [

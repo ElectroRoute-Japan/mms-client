@@ -1,7 +1,7 @@
 """Contains the definitions for various fields used in the MMS API."""
 
-from pydantic import Field
 from pydantic_core import PydanticUndefined
+from pydantic_xml import attr
 
 # Describes the regular expression required by the MMS API for Japanese text
 JAPANESE_TEXT = r"^[\u3000-\u30FF\uFF00-\uFF60\uFFA0-\uFFEF\u4E00-\u9FEA]*$"
@@ -18,9 +18,9 @@ def participant(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the participant ID.
     """
-    return Field(
+    return attr(
         default=None if optional else PydanticUndefined,
-        alias=alias,
+        name=alias,
         min_length=4,
         max_length=4,
         pattern=r"^[A-Z]([0-9]{2}[1-9]|[0-9][1-9][0-9]|[1-9][0-9]{2})$",
@@ -38,8 +38,8 @@ def operator_code(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the operator code.
     """
-    return Field(
-        default=None if optional else PydanticUndefined, alias=alias, min_length=4, max_length=4, pattern=r"^[A-Z0-9]*$"
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, min_length=4, max_length=4, pattern=r"^[A-Z0-9]*$"
     )
 
 
@@ -54,7 +54,7 @@ def power_positive(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the power value.
     """
-    return Field(default=None if optional else PydanticUndefined, alias=alias, gt=0, le=10000000)
+    return attr(default=None if optional else PydanticUndefined, name=alias, gt=0, le=10000000)
 
 
 def price(alias: str, optional: bool = False):
@@ -68,7 +68,7 @@ def price(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the price value.
     """
-    return Field(default=None if optional else PydanticUndefined, alias=alias, ge=0.00, le=10000.00, decimal_places=2)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.00, le=10000.00, decimal_places=2)
 
 
 def dr_patter_number(alias: str, optional: bool = False):
@@ -82,7 +82,7 @@ def dr_patter_number(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the DR pattern number.
     """
-    return Field(default=None if optional else PydanticUndefined, alias=alias, ge=1, le=20)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=1, le=20)
 
 
 def company_short_name(alias: str, optional: bool = False):
@@ -96,8 +96,8 @@ def company_short_name(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the company short name.
     """
-    return Field(
-        default=None if optional else PydanticUndefined, alias=alias, min_length=1, max_length=10, pattern=JAPANESE_TEXT
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, min_length=1, max_length=10, pattern=JAPANESE_TEXT
     )
 
 
@@ -112,9 +112,9 @@ def resource_name(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the resource name.
     """
-    return Field(
+    return attr(
         default=None if optional else PydanticUndefined,
-        alias=alias,
+        name=alias,
         min_length=1,
         max_length=10,
         pattern=r"^[A-Z0-9_\-]*$",
@@ -132,8 +132,8 @@ def resource_short_name(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the resource short name.
     """
-    return Field(
-        default=None if optional else PydanticUndefined, alias=alias, min_length=1, max_length=10, pattern=JAPANESE_TEXT
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, min_length=1, max_length=10, pattern=JAPANESE_TEXT
     )
 
 
@@ -148,6 +148,6 @@ def system_code(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the system code.
     """
-    return Field(
-        default=None if optional else PydanticUndefined, alias=alias, min_length=5, max_length=5, pattern=r"^[A-Z0-9]*$"
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, min_length=5, max_length=5, pattern=r"^[A-Z0-9]*$"
     )

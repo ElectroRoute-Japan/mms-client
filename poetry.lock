@@ -414,17 +414,6 @@ test = ["certifi", "pretend", "pytest (>=6.2.0)", "pytest-benchmark", "pytest-co
 test-randomorder = ["pytest-randomly"]
 
 [[package]]
-name = "dicttoxml"
-version = "1.7.16"
-description = "Converts a Python dictionary or other native data type into a valid XML string."
-optional = false
-python-versions = ">=3.6"
-files = [
-    {file = "dicttoxml-1.7.16-py3-none-any.whl", hash = "sha256:8677671496d0d38e66c7179f82a7e9059f94887777955dc71b0ac602ee637c26"},
-    {file = "dicttoxml-1.7.16.tar.gz", hash = "sha256:6f36ce644881db5cd8940bee9b7cb3f3f6b7b327ba8a67d83d3e2caa0538bf9d"},
-]
-
-[[package]]
 name = "dill"
 version = "0.3.8"
 description = "serialize all of Python"
@@ -1088,6 +1077,25 @@ pydantic = ">=2.5.2"
 all = ["pendulum (>=3.0.0,<4.0.0)", "phonenumbers (>=8,<9)", "pycountry (>=23)", "python-ulid (>=1,<2)", "python-ulid (>=1,<3)"]
 
 [[package]]
+name = "pydantic-xml"
+version = "2.9.0"
+description = "pydantic xml extension"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "pydantic_xml-2.9.0-py3-none-any.whl", hash = "sha256:3a78d2683c80dae0fce8e1248c558e062488dc7a150fe7dd07c5171f7b0d24d6"},
+    {file = "pydantic_xml-2.9.0.tar.gz", hash = "sha256:dd09048ac977744d281cf0768448c77419433572983f183ce374fb89159d6c41"},
+]
+
+[package.dependencies]
+pydantic = ">=2.6.0"
+pydantic-core = ">=2.15.0"
+
+[package.extras]
+docs = ["Sphinx (>=5.3.0,<6.0.0)", "furo (>=2022.12.7,<2023.0.0)", "sphinx-copybutton (>=0.5.1,<0.6.0)", "sphinx_design (>=0.3.0,<0.4.0)", "toml (>=0.10.2,<0.11.0)"]
+lxml = ["lxml (>=4.9.0)"]
+
+[[package]]
 name = "pydocstyle"
 version = "6.3.0"
 description = "Python docstring style checker"
@@ -1560,4 +1568,4 @@ xmlsec = ["xmlsec (>=0.6.1)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "b76362cc65d02681c1aa6e0ef4a9a9a0780159bd73f8a5d69e98c66c88f711ff"
+content-hash = "88f2f5c69dfd6c34f93c4fb16166615e0c4e80adafd24f50b7b7149d9f4a674f"

@@ -9,9 +9,9 @@ from pendulum import Date
 
 from mms_client.security.certs import Certificate
 from mms_client.security.crypto import CryptoWrapper
-from mms_client.types.base import PQ
-from mms_client.types.base import D
+from mms_client.types.base import E
 from mms_client.types.base import MultiResponse
+from mms_client.types.base import P
 from mms_client.types.base import Response
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
@@ -24,8 +24,8 @@ from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
-from mms_client.utils.serialization import PayloadConfig
 from mms_client.utils.serialization import SchemaType
+from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import InterfaceType
 from mms_client.utils.web import ZWrapper
@@ -70,10 +70,10 @@ class MmsClient:  # pylint: disable=too-many-instance-attributes
         self._signer = CryptoWrapper(cert)
 
         # Setup the various service connections we'll use
-        self._market = PayloadConfig(SchemaType.MARKET, "MarketData", "mi")
-        self._registration = PayloadConfig(SchemaType.REGISTRATION, "RegistrationData", "mi")
-        self._report = PayloadConfig(SchemaType.REPORT, "MarketReport", "mi")
-        self._omi = PayloadConfig(SchemaType.OMI, "MarketData", "omi")
+        self._market = Serializer(SchemaType.MARKET, "MarketData")
+        self._registration = Serializer(SchemaType.REGISTRATION, "RegistrationData")
+        self._report = Serializer(SchemaType.REPORT, "MarketReport")
+        self._omi = Serializer(SchemaType.OMI, "MarketData")
 
         # Setup a mapping between interfaces and clients so we don't have to create a new client for each request
         self._clients: Dict[InterfaceType, ZWrapper] = {}
@@ -150,67 +150,67 @@ class MmsClient:  # pylint: disable=too-many-instance-attributes
 
     def _request_one(
         self,
-        payload: PQ,
-        data: D,
-        config: PayloadConfig,
+        envelope: E,
+        data: P,
+        serializer: Serializer,
         req_type: RequestType,
-        resp_payload_type: Optional[type] = None,
-    ) -> Tuple[Response[PQ, D], Dict[str, bytes]]:
+        resp_envelope_type: Optional[type] = None,
+    ) -> Tuple[Response[E, P], Dict[str, bytes]]:
         """Submit a request to the MMS server and return the response.
 
         Arguments:
-        payload (PQ):               The payload envelope to submit to the MMS server.
-        data (D):                   The data to submit to the MMS server.
-        config (PayloadConfig):     The configuration for the payload.
+        envelope (E):               The payload envelope to submit to the MMS server.
+        data (P):                   The data to submit to the MMS server.
+        serializer (Serializer):    The serializer for the payload.
         req_type (RequestType):     The type of request to submit to the MMS server.
-        resp_payload_type (type):   The type of payload to expect in the response. If not provided, the type of the
+        resp_envelope_type (type):  The type of payload to expect in the response. If not provided, the type of the
                                     payload will be used.
 
         Returns:    The response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
-        request = self._to_mms_request(req_type, config.serialize(payload, data))
+        request = self._to_mms_request(req_type, serializer.serialize(envelope, data))
 
         # Next, submit the request to the MMS server and get the response.
-        resp = self._get_zwrapper(config.schema).submit(request)
+        resp = self._get_zwrapper(serializer.schema).submit(request)
 
         # Now, extract the attachments from the response
         attachments = {a.name: a.data for a in resp.attachments}
 
         # Finally, deserialize the response and return it.
-        return config.deserialize(resp.payload, resp_payload_type or type(payload), type(data)), attachments
+        return serializer.deserialize(resp.payload, resp_envelope_type or type(envelope), type(data)), attachments
 
     def _request_many(
         self,
-        payload: PQ,
-        data: D,
-        config: PayloadConfig,
+        envelope: E,
+        data: P,
+        serializer: Serializer,
         req_type: RequestType,
-        resp_payload_type: Optional[type] = None,
-    ) -> Tuple[MultiResponse[PQ, D], Dict[str, bytes]]:
+        resp_envelope_type: Optional[type] = None,
+    ) -> Tuple[MultiResponse[E, P], Dict[str, bytes]]:
         """Submit a request to the MMS server and return the multi-response.
 
         Arguments:
-        payload (PQ):               The payload envelope to submit to the MMS server.
+        envelope (PQ):              The payload envelope to submit to the MMS server.
         data (D):                   The data to submit to the MMS server.
-        config (PayloadConfig):     The configuration for the payload.
+        serializer (Serializer):    The serializer for the payload.
         req_type (RequestType):     The type of request to submit to the MMS server.
-        resp_payload_type (type):   The type of payload to expect in the response. If not provided, the type of the
+        resp_envelope_type (type):  The type of payload to expect in the response. If not provided, the type of the
                                     payload will be used.
 
         Returns:    The multi-response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
-        request = self._to_mms_request(req_type, config.serialize(payload, data))
+        request = self._to_mms_request(req_type, serializer.serialize(envelope, data))
 
         # Next, submit the request to the MMS server and get the response.
-        resp = self._get_zwrapper(config.schema).submit(request)
+        resp = self._get_zwrapper(serializer.schema).submit(request)
 
         # Now, extract the attachments from the response
         attachments = {a.name: a.data for a in resp.attachments}
 
         # Finally, deserialize the response and return it.
-        return config.deserialize_multi(resp.payload, resp_payload_type or type(payload), type(data)), attachments
+        return serializer.deserialize_multi(resp.payload, resp_envelope_type or type(envelope), type(data)), attachments
 
     def _to_mms_request(
         self,

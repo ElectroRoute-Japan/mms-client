@@ -17,15 +17,15 @@ def test_offer_submit_defaults():
     """Test that the OfferData class initializes and converts to a dictionary as we expect."""
     # First, create a new offer data request
     request = OfferData(
-        OfferStack=[OfferStack(StackNumber=1, OfferUnitPrice=100, MinimumQuantityInKw=100)],
-        ResourceName="FAKE_RESO",
-        StartTime=DateTime(2019, 8, 30, 3, 24, 15),
-        EndTime=DateTime(2019, 9, 30, 3, 24, 15),
-        Direction=Direction.BUY,
+        stack=[OfferStack(number=1, unit_price=100, minimum_quantity_kw=100)],
+        resource="FAKE_RESO",
+        start=DateTime(2019, 8, 30, 3, 24, 15),
+        end=DateTime(2019, 9, 30, 3, 24, 15),
+        direction=Direction.BUY,
     )
 
     # Next, convert the request to a dictionary
-    data = request.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
     verify_offer_data(
@@ -36,48 +36,45 @@ def test_offer_submit_defaults():
         DateTime(2019, 9, 30, 3, 24, 15),
         Direction.BUY,
     )
-    assert data == {
-        "OfferStack": [{"StackNumber": 1, "OfferUnitPrice": 100, "MinimumQuantityInKw": 100}],
-        "ResourceName": "FAKE_RESO",
-        "StartTime": DateTime(2019, 8, 30, 3, 24, 15),
-        "EndTime": DateTime(2019, 9, 30, 3, 24, 15),
-        "Direction": Direction.BUY,
-    }
+    assert (
+        data
+        == b"""<OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" Direction="2"><OfferStack StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100"/></OfferData>"""
+    )
 
 
 def test_offer_submit_full():
     """Test that the OfferData class initializes and converts to a dictionary as we expect."""
     # First, create a new offer data request
     request = OfferData(
-        OfferStack=[
+        stack=[
             OfferStack(
-                StackNumber=1,
-                MinimumQuantityInKw=100,
-                PrimaryOfferQuantityInKw=150,
-                Secondary1OfferQuantityInKw=200,
-                Secondary2OfferQuantityInKw=250,
-                Tertiary1OfferQuantityInKw=300,
-                Tertiary2OfferQuantityInKw=350,
-                OfferUnitPrice=100,
-                OfferId="FAKE_ID",
+                number=1,
+                minimum_quantity_kw=100,
+                primary_qty_kw=150,
+                secondary_1_qty_kw=200,
+                secondary_2_qty_kw=250,
+                tertiary_1_qty_kw=300,
+                tertiary_2_qty_kw=350,
+                unit_price=100,
+                id="FAKE_ID",
             )
         ],
-        ResourceName="FAKE_RESO",
-        StartTime=DateTime(2019, 8, 30, 3, 24, 15),
-        EndTime=DateTime(2019, 9, 30, 3, 24, 15),
-        Direction=Direction.BUY,
-        DrPatternNumber=12,
-        BspParticipantName="F100",
-        CompanyShortName="偽会社",
-        OperatorCode="FAKE",
-        Area=AreaCode.CHUBU,
-        ResourceShortName="偽電力",
-        SystemCode="FSYS0",
-        SubmissionTime=DateTime(2019, 8, 30, 3, 24, 15),
+        resource="FAKE_RESO",
+        start=DateTime(2019, 8, 30, 3, 24, 15),
+        end=DateTime(2019, 9, 30, 3, 24, 15),
+        direction=Direction.BUY,
+        pattern_number=12,
+        bsp_participant="F100",
+        company_short_name="偽会社",
+        operator="FAKE",
+        area=AreaCode.CHUBU,
+        resource_short_name="偽電力",
+        system_code="FSYS0",
+        submission_time=DateTime(2019, 8, 30, 3, 24, 15),
     )
 
     # Next, convert the request to a dictionary
-    data = request.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
     verify_offer_data(
@@ -96,91 +93,64 @@ def test_offer_submit_full():
         "FSYS0",
         DateTime(2019, 8, 30, 3, 24, 15),
     )
-    assert data == {
-        "OfferStack": [
-            {
-                "StackNumber": 1,
-                "MinimumQuantityInKw": 100,
-                "PrimaryOfferQuantityInKw": 150,
-                "Secondary1OfferQuantityInKw": 200,
-                "Secondary2OfferQuantityInKw": 250,
-                "Tertiary1OfferQuantityInKw": 300,
-                "Tertiary2OfferQuantityInKw": 350,
-                "OfferUnitPrice": 100,
-                "OfferId": "FAKE_ID",
-            }
-        ],
-        "ResourceName": "FAKE_RESO",
-        "StartTime": DateTime(2019, 8, 30, 3, 24, 15),
-        "EndTime": DateTime(2019, 9, 30, 3, 24, 15),
-        "Direction": Direction.BUY,
-        "DrPatternNumber": 12,
-        "BspParticipantName": "F100",
-        "CompanyShortName": "偽会社",
-        "OperatorCode": "FAKE",
-        "Area": AreaCode.CHUBU,
-        "ResourceShortName": "偽電力",
-        "SystemCode": "FSYS0",
-        "SubmissionTime": DateTime(2019, 8, 30, 3, 24, 15),
-    }
+    assert data == (
+        """<OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" """
+        """Direction="2" DrPatternNumber="12" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" """
+        """Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2019-08-30T03:24:15"><OfferStack """
+        """StackNumber="1" MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
+        """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """
+        """OfferUnitPrice="100" OfferId="FAKE_ID"/></OfferData>"""
+    ).encode("UTF-8")
 
 
 def test_offer_cancel():
     """Test that the OfferCancel class initializes and converts to a dictionary as we expect."""
     # First, create a new offer cancel request
     request = OfferCancel(
-        ResourceName="FAKE_RESO",
-        StartTime=DateTime(2019, 8, 30, 3, 24, 15),
-        EndTime=DateTime(2019, 9, 30, 3, 24, 15),
-        MarketType=MarketType.WEEK_AHEAD,
+        resource="FAKE_RESO",
+        start=DateTime(2019, 8, 30, 3, 24, 15),
+        end=DateTime(2019, 9, 30, 3, 24, 15),
+        market_type=MarketType.WEEK_AHEAD,
     )
 
     # Next, convert the request to a dictionary
-    data = request.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
     assert request.resource == "FAKE_RESO"
     assert request.start == DateTime(2019, 8, 30, 3, 24, 15)
     assert request.end == DateTime(2019, 9, 30, 3, 24, 15)
     assert request.market_type == MarketType.WEEK_AHEAD
-    assert data == {
-        "ResourceName": "FAKE_RESO",
-        "StartTime": DateTime(2019, 8, 30, 3, 24, 15),
-        "EndTime": DateTime(2019, 9, 30, 3, 24, 15),
-        "MarketType": MarketType.WEEK_AHEAD,
-    }
+    assert (
+        data
+        == b"""<OfferCancel ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" MarketType="WAM"/>"""
+    )
 
 
 def test_offer_query_defaults():
     """Test that the OfferQuery class initializes and converts to a dictionary as we expect."""
     # First, create a new offer query request
-    request = OfferQuery(MarketType=MarketType.WEEK_AHEAD)
+    request = OfferQuery(market_type=MarketType.WEEK_AHEAD)
 
     # Next, convert the request to a dictionary
-    data = request.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
     verify_offer_query(request, MarketType.WEEK_AHEAD)
-    assert data == {
-        "MarketType": MarketType.WEEK_AHEAD,
-    }
+    assert data == b"""<OfferQuery MarketType="WAM"/>"""
 
 
 def test_offer_query_full():
     """Test that the OfferQuery class initializes and converts to a dictionary as we expect."""
     # First, create a new offer query request
-    request = OfferQuery(MarketType=MarketType.WEEK_AHEAD, Area=AreaCode.CHUBU, ResourceName="FAKE_RESO")
+    request = OfferQuery(market_type=MarketType.WEEK_AHEAD, area=AreaCode.CHUBU, resource="FAKE_RESO")
 
     # Next, convert the request to a dictionary
-    data = request.model_dump(by_alias=True, exclude_unset=True, exclude_none=True)
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
     verify_offer_query(request, MarketType.WEEK_AHEAD, AreaCode.CHUBU, "FAKE_RESO")
-    assert data == {
-        "MarketType": MarketType.WEEK_AHEAD,
-        "Area": AreaCode.CHUBU,
-        "ResourceName": "FAKE_RESO",
-    }
+    assert data == b"""<OfferQuery MarketType="WAM" ResourceName="FAKE_RESO" Area="04"/>"""
 
 
 def verify_offer_data(
@@ -244,7 +214,7 @@ def offer_stack_verifier(
     """Verify that the given offer stack has the expected parameters."""
 
     def inner(stack: OfferStack):
-        assert stack.stack_number == number
+        assert stack.number == number
         assert stack.unit_price == price
         assert stack.minimum_quantity_kw == quantity
         assert stack.primary_qty_kw == primary
