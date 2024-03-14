@@ -1,28 +1,40 @@
 """Contains the HTTP/web layer for communicating with the MMS server."""
 
+from enum import Enum
 from pathlib import Path
-from typing import Literal
 
+from backoff import expo
+from backoff import on_exception
 from requests import Session
 from requests_pkcs12 import Pkcs12Adapter
 from zeep import Client
 from zeep import Transport
 from zeep.cache import SqliteCache
+from zeep.exceptions import TransportError
+from zeep.xsd.valueobjects import CompoundValue
 
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
 
-# The following constants identify the ports for the OMI and MI web services, respectively.
-MI_WEBSERVICE_PORT = "MiWebService"
-OMI_WEBSERVICE_PORT = "OmiWebService"
 
-# Identifies the type of client to use. The client can be either "bsp" (Balancing Service Provider) or "tso"
-# (Transmission System Operator).
-ClientType = Literal["bsp", "tso"]
+class ClientType(Enum):
+    """Identifies the type of client to use.
 
-# Identifies the type of interface to use. The interface can be either "omi" (Other Market Initiator) or
-# "mi" (Market Initiator).
-InterfaceType = Literal["omi", "mi"]
+    The client can be either "bsp" (Balancing Service Provider) or "tso" (Transmission System Operator).
+    """
+
+    BSP = "bsp"
+    TSO = "tso"
+
+
+class Interface(Enum):
+    """Identifies the type of interface to use.
+
+    The interface can be either "omi" (Other Market Initiator) or "mi" (Market Initiator).
+    """
+
+    OMI = "omi"
+    MI = "mi"
 
 
 class ServiceEndpoint:
@@ -62,31 +74,47 @@ class ServiceEndpoint:
 
 # Defines the service endpoints for the BSP and TSO clients for the OMI and MI web services, respectively.
 URLS = {
-    "bsp": {
-        "omi": ServiceEndpoint(
+    ClientType.BSP: {
+        Interface.OMI: ServiceEndpoint(
             main="https://www5.tdgc.jp/axis2/services/OmiWebService",
             backup="https://www6.tdgc.jp/axis2/services/OmiWebService",
             test="https://www7.tdgc.jp/axis2/services/OmiWebService",
         ),
-        "mi": ServiceEndpoint(
+        Interface.MI: ServiceEndpoint(
             main="https://www2.tdgc.jp/axis2/services/MiWebService",
             backup="https://www3.tdgc.jp/axis2/services/MiWebService",
             test="https://www4.tdgc.jp/axis2/services/MiWebService",
         ),
     },
-    "tso": {
-        "omi": ServiceEndpoint(
+    ClientType.TSO: {
+        Interface.OMI: ServiceEndpoint(
             main="https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
             backup="https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
             test="https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService",
         ),
-        "mi": ServiceEndpoint(
+        Interface.MI: ServiceEndpoint(
             main="https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService",
             backup="https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService",
             test="https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService",
         ),
     },
 }
+
+
+# The original service binding names, to be mapped to our actual endpoints
+SERVICE_BINDINGS = {
+    Interface.MI: "{urn:abb.com:project/mms}MiWebServiceSOAP",
+    Interface.OMI: "{urn:ws.web.omi.co.jp}OmiWebServiceSOAP",
+}
+
+
+def fatal_code(e: TransportError) -> bool:
+    """Return True if the given exception is a fatal HTTP error code.
+
+    Arguments:
+    e (RequestException):   The exception to check.
+    """
+    return 400 <= e.status_code < 500
 
 
 class ZWrapper:
@@ -100,7 +128,7 @@ class ZWrapper:
     def __init__(
         self,
         client: ClientType,
-        interface: InterfaceType,
+        interface: Interface,
         adapter: Pkcs12Adapter,
         cache: bool = True,
         test: bool = False,
@@ -111,7 +139,7 @@ class ZWrapper:
         client (ClientType):        The type of client to use. This can be either "bsp" (Balancing Service Provider) or
                                     "tso" (Transmission System Operator). This will determine which service endpoint to
                                     use.
-        interface (InterfaceType):  The type of interface to use. This can be either "omi" (Other Market Initiator) or
+        interface (Interface):      The type of interface to use. This can be either "omi" (Other Market Initiator) or
                                     "mi" (Market Initiator). This will determine which service endpoint to use as well
                                     as the service and port to use.
         adapter (Pkcs12Adapter):    The PKCS12 adapter containing the certificate and private key to use for
@@ -126,17 +154,16 @@ class ZWrapper:
 
         # We need to determine the service port and location of the WSDL file based on the given interface. If the
         # interface is neither "omi" nor "mi", we raise a ValueError.
-        if interface == "mi":
-            self._service_port = MI_WEBSERVICE_PORT
-            self._location = Path(__file__).parent.parent / "schemas" / "wsdl" / "mi-web-service-jbms.wsdl"
-        elif interface == "omi":
-            self._service_port = OMI_WEBSERVICE_PORT
-            self._location = Path(__file__).parent.parent / "schemas" / "wsdl" / "omi-web-service.wsdl"
+        self._interface = interface
+        if self._interface == Interface.MI:
+            location = Path(__file__).parent.parent / "schemas" / "wsdl" / "mi-web-service-jbms.wsdl"
+        elif self._interface == Interface.OMI:
+            location = Path(__file__).parent.parent / "schemas" / "wsdl" / "omi-web-service.wsdl"
         else:
-            raise ValueError(f"Invalid interface, '{interface}'. Only 'mi' and 'omi' are supported.")
+            raise ValueError(f"Invalid interface, '{self._interface}'. Only 'mi' and 'omi' are supported.")
 
         # Next, we need to select the correct service endpoint based on the given client and interface.
-        self._endpoint = URLS[client][interface]
+        self._endpoint = URLS[client][self._interface]
         self._endpoint.select(test=test)
 
         # Now, we need to create a new session and mount the PKCS12 adapter to it. This is necessary for
@@ -148,13 +175,35 @@ class ZWrapper:
         if not test:
             sess.mount(self._endpoint.backup, adapter)
 
-        # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings.
+        # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings and then,
+        # from that client, we create the SOAP service with the given service binding and selected endpoint.
         self._client = Client(
-            wsdl=str(self._location.resolve()),
+            wsdl=str(location.resolve()),
             transport=Transport(cache=SqliteCache() if cache else None, session=sess),
         )
+        self._create_service()
 
+    @on_exception(expo, TransportError, max_tries=3, giveup=fatal_code)  # type: ignore[arg-type]
     def submit(self, req: MmsRequest) -> MmsResponse:
         """Submit the given request to the MMS server and return the response."""
-        resp = self._client.service[self._service_port](req.model_dump(by_alias=True))
-        return MmsResponse.model_validate(resp)
+        try:
+
+            # Submit the request to the MMS server and retrieve the response
+            resp: CompoundValue = self._service["submitAttachment"](**req.to_arguments())
+
+            # Validate the response and return it
+            return MmsResponse.model_validate(resp.__values__)
+        except TransportError as e:
+            # If we got a server fault error, then we'll switch to the backup endpoint. In any case, we'll raise the
+            # exception so that our back-off can handle it or pass the exception up the stack.
+            if e.status_code >= 500:
+                self._endpoint.select(error=True)
+                self._create_service()
+            raise
+
+    def _create_service(self):
+        """Create a new SOAP service with the currently selected endpoint.
+
+        This is useful for switching between the main and backup endpoints in case of an error.
+        """
+        self._service = self._client.create_service(SERVICE_BINDINGS[self._interface], self._endpoint.selected)

@@ -21,7 +21,7 @@ def test_offer_submit_defaults():
         resource="FAKE_RESO",
         start=DateTime(2019, 8, 30, 3, 24, 15),
         end=DateTime(2019, 9, 30, 3, 24, 15),
-        direction=Direction.BUY,
+        direction=Direction.SELL,
     )
 
     # Next, convert the request to a dictionary
@@ -34,11 +34,11 @@ def test_offer_submit_defaults():
         "FAKE_RESO",
         DateTime(2019, 8, 30, 3, 24, 15),
         DateTime(2019, 9, 30, 3, 24, 15),
-        Direction.BUY,
+        Direction.SELL,
     )
     assert (
         data
-        == b"""<OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" Direction="2"><OfferStack StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100"/></OfferData>"""
+        == b"""<OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" Direction="1"><OfferStack StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100"/></OfferData>"""
     )
 
 
@@ -62,7 +62,7 @@ def test_offer_submit_full():
         resource="FAKE_RESO",
         start=DateTime(2019, 8, 30, 3, 24, 15),
         end=DateTime(2019, 9, 30, 3, 24, 15),
-        direction=Direction.BUY,
+        direction=Direction.SELL,
         pattern_number=12,
         bsp_participant="F100",
         company_short_name="偽会社",
@@ -83,7 +83,7 @@ def test_offer_submit_full():
         "FAKE_RESO",
         DateTime(2019, 8, 30, 3, 24, 15),
         DateTime(2019, 9, 30, 3, 24, 15),
-        Direction.BUY,
+        Direction.SELL,
         12,
         "F100",
         "偽会社",
@@ -95,7 +95,7 @@ def test_offer_submit_full():
     )
     assert data == (
         """<OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" """
-        """Direction="2" DrPatternNumber="12" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" """
+        """Direction="1" DrPatternNumber="12" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" """
         """Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2019-08-30T03:24:15"><OfferStack """
         """StackNumber="1" MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
         """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """

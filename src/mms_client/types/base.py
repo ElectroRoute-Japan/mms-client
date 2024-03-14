@@ -14,7 +14,15 @@ from pydantic_xml import BaseXmlModel
 from pydantic_xml import attr
 from pydantic_xml import element
 
-from mms_client.types.enums import ValidationStatus
+
+class ValidationStatus(Enum):
+    """Represents the status of the validation check done on an element."""
+
+    PASSED = "PASSED"  # The validation check for all data within the element has succeeded.
+    WARNING = "WARNING"  # There are data within the element that have triggered warnings during the validation check.
+    PASSED_PARTIAL = "PASSED_PARTIAL"  # Some data within the element has failed the validation check.
+    FAILED = "FAILED"  # The data inside the element failed the validation check.
+    NOT_DONE = "NOT_DONE"  # There are data with incomplete validation checks within the element.
 
 
 class Message(BaseXmlModel):
@@ -24,17 +32,17 @@ class Message(BaseXmlModel):
     code: str = attr(default="", name="Code", min_length=2, max_length=50, pattern=r"^[a-zA-Z_0-9\-]*$")
 
 
-class Messages(BaseXmlModel):
+class Messages(BaseXmlModel, search_mode="unordered"):
     """Represents a collection of messages returned with a payload."""
 
     # A list of information messages returned with a payload
-    information: List[Message] = element(default=[], tag="Information")
+    information: List[Message] = element(default=[], tag="Information", nillable=True)
 
     # A list of warning messages returned with a payload
-    warnings: List[Message] = element(default=[], tag="Warning")
+    warnings: List[Message] = element(default=[], tag="Warning", nillable=True)
 
     # A list of error messages returned with a payload
-    errors: List[Message] = element(default=[], tag="Error")
+    errors: List[Message] = element(default=[], tag="Error", nillable=True)
 
 
 class ProcessingStatistics(BaseXmlModel):
@@ -77,10 +85,10 @@ class ResponseCommon(BaseXmlModel):
 
     # The status of the validation check done on the element. This field is not required for requests, and will be
     # populated in responses. For responses, the default value is "NOT_DONE".
-    validation: Optional[ValidationStatus] = attr(default=None, name="ValidationStatus")
+    validation: Optional[ValidationStatus] = attr(default=None, name="Validation")
 
 
-class Payload(BaseXmlModel):
+class Payload(BaseXmlModel, search_mode="unordered"):
     """Represents the base fields for MMS request data."""
 
 
@@ -112,7 +120,7 @@ class PayloadBase(BaseXmlModel, nsmap={"xsi": "http://www.w3.org/2001/XMLSchema"
     location: SchemaType = attr(name="noNamespaceSchemaLocation", ns="xsi")
 
 
-class BaseResponse(PayloadBase, Generic[E], tag="BaseResponse"):
+class BaseResponse(BaseXmlModel, Generic[E], tag="BaseResponse"):
     """Contains the base data extracted from the MMS response in a format we can use."""
 
     # The processing statistics returned with the payload. This will not be present in requests, and will be populated
@@ -145,7 +153,8 @@ class BaseResponse(PayloadBase, Generic[E], tag="BaseResponse"):
         """Return the request payload."""
         return self._envelope
 
-    def set_envelope(self, value: E) -> None:
+    @envelope.setter
+    def envelope(self, value: E) -> None:
         """Set the request payload.
 
         Arguments:
@@ -158,7 +167,8 @@ class BaseResponse(PayloadBase, Generic[E], tag="BaseResponse"):
         """Return the validation information for the request payload."""
         return self._envelope_validation
 
-    def set_envelope_validation(self, value: ResponseCommon) -> None:
+    @envelope_validation.setter
+    def envelope_validation(self, value: ResponseCommon) -> None:
         """Set the validation information for the request payload.
 
         Arguments:
@@ -171,7 +181,8 @@ class BaseResponse(PayloadBase, Generic[E], tag="BaseResponse"):
         """Return the messages returned with the payload."""
         return self._messages
 
-    def set_messages(self, value: Dict[str, Messages]) -> None:
+    @messages.setter
+    def messages(self, value: Dict[str, Messages]) -> None:
         """Set the messages returned with the payload.
 
         Arguments:
@@ -197,17 +208,31 @@ class Response(BaseResponse[E], Generic[E, P]):
     # The payload data extracted from the response
     _payload_data: ResponseData[P] = PrivateAttr()
 
+    def __init__(self, **data):
+        """Create a new Response object.
+
+        Arguments:
+        **data:    The data to use to create the object.
+        """
+        super().__init__(**data)
+        self._payload_data = None
+
     @property
     def data(self) -> P:
         """Return the data extracted from the response."""
         return self._payload_data.data  # pylint: disable=no-member
 
-    @data.setter
-    def data(self, value: ResponseData[P]) -> None:
-        """Set the data extracted from the response.
+    @property
+    def payload(self) -> ResponseData[P]:
+        """Return the response payload."""
+        return self._payload_data
+
+    @payload.setter
+    def payload(self, value: ResponseData[P]) -> None:
+        """Set the payload extracted from the response.
 
         Arguments:
-        value (ResponseData[P]):    The data extracted from the response.
+        value (ResponseData[P]):    The payload extracted from the response.
         """
         self._payload_data = value
 
@@ -218,16 +243,30 @@ class MultiResponse(BaseResponse[E], Generic[E, P]):
     # The payload data extracted from the response
     _payload_data: List[ResponseData[P]] = PrivateAttr()
 
+    def __init__(self, **data):
+        """Create a new MultiResponse object.
+
+        Arguments:
+        **data:    The data to use to create the object.
+        """
+        super().__init__(**data)
+        self._payload_data = []
+
     @property
     def data(self) -> List[P]:
         """Return the data extracted from the response."""
         return [response.data for response in self._payload_data]  # pylint: disable=not-an-iterable
 
-    @data.setter
-    def data(self, value: List[ResponseData[P]]) -> None:
-        """Set the data extracted from the response.
+    @property
+    def payload(self) -> List[ResponseData[P]]:
+        """Return the response payload."""
+        return self._payload_data
+
+    @payload.setter
+    def payload(self, value: List[ResponseData[P]]) -> None:
+        """Set the payload extracted from the response.
 
         Arguments:
-        value (List[ResponseData[P]]):    The data extracted from the response.
+        value (List[ResponseData[P]]):    The payload extracted from the response.
         """
         self._payload_data = value[:]

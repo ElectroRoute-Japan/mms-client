@@ -48,7 +48,8 @@ class Direction(Enum):
     """Represents the reserve direction of the offer."""
 
     SELL = "1"  # Increasing the reserves (sell)
-    BUY = "2"  # Decreasing the reserves (buy)
+    # Note: Support for the BUY direction was removed from the MMS API
+    # BUY = "2"  # Decreasing the reserves (buy)
 
 
 class OfferStack(Payload):

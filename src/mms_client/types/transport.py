@@ -2,6 +2,7 @@
 
 from enum import Enum
 from typing import List
+from typing import Optional
 
 from pydantic import BaseModel
 from pydantic import Field
@@ -88,6 +89,18 @@ class MmsRequest(BaseModel):
     # the limit is 40.
     attachments: List[Attachment] = Field(default=[], alias="attachmentData")
 
+    def to_arguments(self) -> dict:
+        """Convert the request to a dictionary of arguments for use in the MMS client."""
+        # First, convert the type to a dictionary format
+        converted = self.model_dump(by_alias=True)
+
+        # Next, convert the enum types to their string representations
+        converted["requestType"] = converted["requestType"].value
+        converted["requestDataType"] = converted["requestDataType"].value
+
+        # Finally, return the converted dictionary
+        return converted
+
 
 class MmsResponse(BaseModel):
     """Base class for all MMS responses."""
@@ -108,7 +121,7 @@ class MmsResponse(BaseModel):
     data_type: ResponseDataType = Field(alias="responseDataType")
 
     # The filename assigned to the response (for pre-generated reports)
-    report_filename: str = Field(default="", alias="responseFilename")
+    report_filename: Optional[str] = Field(default=None, alias="responseFilename")
 
     # The base-64 encoded payload of the response
     payload: bytes = Field(alias="responseData")
