@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mms_client"
-version = "v0.2.0"
+version = "v0.3.0"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
@@ -9,6 +9,9 @@ packages = [{ include = "mms_client", from = "src" }]
 [tool.poetry.dependencies]
 python = "^3.11"
 requests = "^2.31.0"
+zeep = "^4.2.1"
+requests-pkcs12 = "^1.24"
+pydantic = "^2.6.3"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
@@ -24,6 +27,7 @@ pytest-cov = "^4.1.0"
 pytest-mock = "^3.12.0"
 mock = "^5.1.0"
 pyfakefs = "^5.3.5"
+lxml-stubs = "^0.5.1"
 
 [tool.black]
 line-length = 120
@@ -40,9 +44,8 @@ scripts_are_modules = true
 
 [[tool.mypy.overrides]]
 module = [
-  'shared.*',
-  'dagster_datadog.resources',
-  'boto3_type_annotations.s3'
+  'requests_pkcs12',
+  'mms_client.*'  # Not sure why mypy doesn't like our local imports but it doesn't
 ]
 ignore_missing_imports = true
 
