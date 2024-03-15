@@ -1,7 +1,5 @@
 """Contains objects for serialization and deserialization of MMS data."""
 
-from base64 import b64decode
-from base64 import b64encode
 from functools import lru_cache
 from io import BytesIO
 from pathlib import Path
@@ -57,7 +55,7 @@ class Serializer:
 
         Arguments:
         request_envelope (Envelope):    The envelope to be serialized.
-        request_data (BaseModel):       The data to be serialized.
+        request_data (Payload):         The data to be serialized.
 
         Returns:    A byte string containing the XML-formatted data to be sent to the MMS server.
         """
@@ -71,11 +69,8 @@ class Serializer:
         # Next, inject the payload and data into the payload class
         payload = payload_cls(request_envelope, request_data, self._xsd.value)
 
-        # Now, convert the payload to XML
-        xml = payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)
-
-        # Finally, convert the XML to a base64-encoded byte string and return it
-        return b64encode(xml)
+        # Finally, convert the payload to XML and return it
+        return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)
 
     def deserialize(self, data: bytes, envelope_type: Type[E], data_type: Type[P]) -> Response[E, P]:
         """Deserialize the data to a response object.
@@ -83,17 +78,11 @@ class Serializer:
         Arguments:
         data (bytes):                   The raw data to be deserialized.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
-        data_type (Type[BaseModel]):    The type of data to be constructed.
+        data_type (Type[Payload]):      The type of data to be constructed.
 
         Returns:    A response object containing the envelope and data extracted from the raw data.
         """
-        # First, decode the base64-encoded data
-        xml = b64decode(data)
-
-        # Next, convert the raw XML data to an element tree for conversion
-        tree = self._from_xml(xml)
-
-        # Finally, extract the response, envelope, and data from the XML tree and return them
+        tree = self._from_xml(data)
         return self._from_tree(tree, envelope_type, data_type)
 
     def deserialize_multi(self, data: bytes, envelope_type: Type[E], data_type: Type[P]) -> MultiResponse[E, P]:
@@ -102,17 +91,11 @@ class Serializer:
         Arguments:
         data (bytes):                   The raw data to be deserialized.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
-        data_type (Type[BaseModel]):    The type of data to be constructed.
+        data_type (Type[Payload]):      The type of data to be constructed.
 
         Returns:    A multi-response object containing the envelope and data extracted from the raw data.
         """
-        # First, decode the base64-encoded data
-        xml = b64decode(data)
-
-        # Next, convert the raw XML data to an element tree for conversion
-        tree = self._from_xml(xml)
-
-        # Finally, extract the response, envelope, and data from the XML tree and return them
+        tree = self._from_xml(data)
         return self._from_tree_multi(tree, envelope_type, data_type)
 
     def _from_tree(self, raw: Element, envelope_type: Type[E], data_type: Type[P]) -> Response[E, P]:
@@ -121,7 +104,7 @@ class Serializer:
         Arguments:
         raw (Element):                  The raw data to be converted.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
-        data_type (Type[BaseModel]):    The type of data to be constructed.
+        data_type (Type[Payload]):      The type of data to be constructed.
 
         Returns:    A response object containing the envelope and data extracted from the raw data.
         """
@@ -139,12 +122,16 @@ class Serializer:
 
         # Next, attempt to extract the envelope and data from within the response
         resp.envelope, resp.envelope_validation, envelope_node = self._from_tree_envelope(raw, envelope_type)
+
+        # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
+        # from within the envelope
+        self._verify_tree_data_tag(envelope_node, data_type)
         resp.payload = self._from_tree_data(envelope_node.find(data_type.__name__), data_type)
 
-        # Now, attempt to extract the messages from within the payload
+        # Finally, attempt to extract the messages from within the payload
         resp.messages = self._from_tree_messages(raw, envelope_type, data_type, self._payload_key, False)
 
-        # Finally, return the response
+        # Return the response
         return resp
 
     def _from_tree_multi(self, raw: Element, envelope_type: Type[E], data_type: Type[P]) -> MultiResponse[E, P]:
@@ -153,7 +140,7 @@ class Serializer:
         Arguments:
         raw (Element):                  The raw data to be converted.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
-        data_type (Type[BaseModel]):    The type of data to be constructed.
+        data_type (Type[Payload]):      The type of data to be constructed.
 
         Returns:    A multi-response object containing the envelope and data extracted from the raw data.
         """
@@ -174,9 +161,7 @@ class Serializer:
 
         # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
         # from within the envelope
-        data_tags = set(node.tag for node in envelope_node)
-        if not data_tags.issubset([data_type.__name__, "Messages"]):
-            raise ValueError(f"Expected data type '{data_type.__name__}' not found in response")
+        self._verify_tree_data_tag(envelope_node, data_type)
         resp.payload = [self._from_tree_data(item, data_type) for item in envelope_node.findall(data_type.__name__)]
 
         # Finally, attempt to extract the messages from within the payload
@@ -214,6 +199,20 @@ class Serializer:
             envelope_node,
         )
 
+    def _verify_tree_data_tag(self, raw: Element, data_type: Type[P]) -> None:
+        """Verify that no types other than the expected data type are present in the response.
+
+        Arguments:
+        raw (Element):              The raw data to be converted.
+        data_type (Type[Payload]):  The type of data to be constructed.
+
+        Raises:
+        ValueError:    If the expected data type is not found in the response.
+        """
+        data_tags = set(node.tag for node in raw)
+        if not data_tags.issubset([data_type.__name__, "Messages"]):
+            raise ValueError(f"Expected data type '{data_type.__name__}' not found in response")
+
     def _from_tree_data(self, raw: Optional[Element], data_type: Type[P]) -> ResponseData[P]:
         """Attempt to extract the data from within the payload.
 
@@ -228,7 +227,7 @@ class Serializer:
         # First, verify that the data type is present in the response; if it isn't then we'll raise an exception to
         # indicate that the data wasn't found.
         if raw is None:
-            raise ValueError(f"Expected data type '{data_type.__name__}' not found in response")
+            return None
 
         # Next, create a new data type that contains the data type with the appropriate XML tag. We have to do this
         common_cls = _create_response_common_type(data_type)  # type: ignore[arg-type]
@@ -491,5 +490,5 @@ def _find_or_fail(node: Element, tag: str) -> Element:
     """
     found = node.find(tag)
     if found is None:
-        raise ValueError(f"Expected tag '{tag}' not found in node")
+        raise ValueError(f"Expected tag '{tag}' not found in node")  # pragma: no cover
     return found

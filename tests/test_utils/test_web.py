@@ -15,26 +15,6 @@ from mms_client.utils.web import ZWrapper
 from tests.testutils import register_mms_request
 from tests.testutils import verify_mms_response
 
-# Test request XML payload we expect to receive
-REQUEST_XML = (
-    """<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope """
-    """xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Body><ns0:RequestAttInfo """
-    """xmlns:ns0="urn:abb.com:project/mms/types"><requestType>mp.info</requestType><adminRole>false"""
-    """</adminRole><requestDataCompressed>false</requestDataCompressed><requestDataType>XML"""
-    """</requestDataType><sendRequestDataOnSuccess>true</sendRequestDataOnSuccess><sendResponseDataCompressed>false"""
-    """</sendResponseDataCompressed><requestSignature>test</requestSignature><requestData>ZGVycA==</requestData>"""
-    """</ns0:RequestAttInfo></soap-env:Body></soap-env:Envelope>"""
-).encode("UTF-8")
-
-# Test response XML payload we will return
-RESPONSE_XML = (
-    """<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope """
-    """xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Body><ns0:ResponseAttInfo """
-    """xmlns:ns0="urn:abb.com:project/mms/types"><success>true</success><warnings>false</warnings><responseBinary>"""
-    """false</responseBinary><responseCompressed>false</responseCompressed><responseDataType>XML</responseDataType>"""
-    """<responseData>ZGVycA==</responseData></ns0:ResponseAttInfo></soap-env:Body></soap-env:Envelope>"""
-).encode("UTF-8")
-
 
 @pytest.mark.parametrize(
     "client, interface, error, test, expected",
@@ -108,8 +88,10 @@ def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
 def test_zwrapper_submit_server_error(mock_certificate):
     """Test that the submit method of the ZWrapper class handles server errors as expected."""
     # First, register our test responses with the responses library
-    register_mms_request(REQUEST_XML, b"", 500)
-    register_mms_request(REQUEST_XML, RESPONSE_XML, url="https://www3.tdgc.jp/axis2/services/MiWebService")
+    register_mms_request(RequestType.INFO, "test", b"derp", b"", 500)
+    register_mms_request(
+        RequestType.INFO, "test", b"derp", b"derp", url="https://www3.tdgc.jp/axis2/services/MiWebService"
+    )
 
     # Next, create our Zeep client
     z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
@@ -121,6 +103,7 @@ def test_zwrapper_submit_server_error(mock_certificate):
             requestDataType=RequestDataType.XML,
             requestSignature="test",
             requestData=b"derp",
+            sendRequestDataOnSuccess=False,
         )
     )
 
@@ -132,7 +115,7 @@ def test_zwrapper_submit_server_error(mock_certificate):
 def test_zwrapper_unrecoverable_error(mock_certificate):
     """Test that, in the event of a 4xx error, the ZWrapper class raises an exception."""
     # First, register our test responses with the responses library
-    register_mms_request(REQUEST_XML, b"", 400)
+    register_mms_request(RequestType.INFO, "test", b"derp", b"", 400)
 
     # Next, create our Zeep client
     z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
@@ -145,6 +128,7 @@ def test_zwrapper_unrecoverable_error(mock_certificate):
                 requestDataType=RequestDataType.XML,
                 requestSignature="test",
                 requestData=b"derp",
+                sendRequestDataOnSuccess=False,
             )
         )
 
@@ -157,7 +141,7 @@ def test_zwrapper_unrecoverable_error(mock_certificate):
 def test_zwrapper_submit_works(mock_certificate):
     """Test that the submit method of the ZWrapper class works as expected."""
     # First, register our test response with the responses library
-    register_mms_request(REQUEST_XML, RESPONSE_XML)
+    register_mms_request(RequestType.INFO, "test", b"derp", b"derp")
 
     # Next, create our Zeep client
     z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
@@ -169,6 +153,7 @@ def test_zwrapper_submit_works(mock_certificate):
             requestDataType=RequestDataType.XML,
             requestSignature="test",
             requestData=b"derp",
+            sendRequestDataOnSuccess=False,
         )
     )
 

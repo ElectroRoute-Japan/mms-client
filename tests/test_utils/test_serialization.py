@@ -1,6 +1,5 @@
 """Tests the functionality in the mms_client.utils.serialization module."""
 
-from base64 import b64decode
 from base64 import b64encode
 from datetime import date as Date
 from typing import Dict
@@ -28,7 +27,26 @@ from tests.test_types.test_offer import offer_stack_verifier
 from tests.test_types.test_offer import verify_offer_data
 
 # Test base-64 encoded XML payload
-TEST_XML_ENCODED = b"PD94bWwgdmVyc2lvbj0nMS4wJyBlbmNvZGluZz0ndXRmLTgnPz4KPE1hcmtldERhdGEgeG1sbnM6eHNpPSJodHRwOi8vd3d3LnczLm9yZy8yMDAxL1hNTFNjaGVtYSI+PFByb2Nlc3NpbmdTdGF0aXN0aWNzIFJlY2VpdmVkPSIxIiBWYWxpZD0iMSIgSW52YWxpZD0iMCIgU3VjY2Vzc2Z1bD0iMSIgVW5zdWNjZXNzZnVsPSIwIiBQcm9jZXNzaW5nVGltZU1zPSIxODciIFRyYW5zYWN0aW9uSWQ9ImRlcnBkZXJwIiBUaW1lU3RhbXA9IlR1ZSBNYXIgMTIgMTE6NDM6MzcgSlNUIDIwMjQiIFhtbFRpbWVTdGFtcD0iMjAyNC0wMy0xMlQxMTo0MzozNyIgLz48TWVzc2FnZXM+PEVycm9yIENvZGU9IkVycm9yQ29kZTEiIC8+PEVycm9yIENvZGU9IkVycm9yQ29kZTIiIC8+PFdhcm5pbmcgQ29kZT0iV2FybmluZzEiIC8+PFdhcm5pbmcgQ29kZT0iV2FybmluZzIiIC8+PEluZm9ybWF0aW9uIENvZGU9IkluZm8xIiAvPjxJbmZvcm1hdGlvbiBDb2RlPSJJbmZvMiIgLz48L01lc3NhZ2VzPjxNYXJrZXRTdWJtaXQgRGF0ZT0iMjAxOS0wOC0yOSIgUGFydGljaXBhbnROYW1lPSJGMTAwIiBVc2VyTmFtZT0iRkFLRVVTRVIiIE1hcmtldFR5cGU9IkRBTSIgTnVtT2ZEYXlzPSIxIiBWYWxpZGF0aW9uPSJQQVNTRUQiIFN1Y2Nlc3M9InRydWUiPjxNZXNzYWdlcz48RXJyb3IgQ29kZT0iRXJyb3JDb2RlMSIgLz48RXJyb3IgQ29kZT0iRXJyb3JDb2RlMiIgLz48V2FybmluZyBDb2RlPSJXYXJuaW5nMSIgLz48V2FybmluZyBDb2RlPSJXYXJuaW5nMiIgLz48SW5mb3JtYXRpb24gQ29kZT0iSW5mbzEiIC8+PEluZm9ybWF0aW9uIENvZGU9IkluZm8yIiAvPjwvTWVzc2FnZXM+PE9mZmVyRGF0YSBSZXNvdXJjZU5hbWU9IkZBS0VfUkVTTyIgU3RhcnRUaW1lPSIyMDE5LTA4LTMwVDAzOjI0OjE1IiBFbmRUaW1lPSIyMDE5LTA4LTMwVDExOjI0OjE1IiBEaXJlY3Rpb249IjEiIERyUGF0dGVybk51bWJlcj0iMTIiIEJzcFBhcnRpY2lwYW50TmFtZT0iRjEwMCIgQ29tcGFueVNob3J0TmFtZT0i5YG95Lya56S+IiBPcGVyYXRvckNvZGU9IkZBS0UiIEFyZWE9IjA0IiBSZXNvdXJjZVNob3J0TmFtZT0i5YG96Zu75YqbIiBTeXN0ZW1Db2RlPSJGU1lTMCIgU3VibWlzc2lvblRpbWU9IjIwMTktMDgtMjlUMDM6MjQ6MTUiIFZhbGlkYXRpb249IlBBU1NFRCIgU3VjY2Vzcz0idHJ1ZSI+PE1lc3NhZ2VzPjxFcnJvciBDb2RlPSJFcnJvckNvZGUxIiAvPjxFcnJvciBDb2RlPSJFcnJvckNvZGUyIiAvPjxXYXJuaW5nIENvZGU9Ildhcm5pbmcxIiAvPjxXYXJuaW5nIENvZGU9Ildhcm5pbmcyIiAvPjxJbmZvcm1hdGlvbiBDb2RlPSJJbmZvMSIgLz48SW5mb3JtYXRpb24gQ29kZT0iSW5mbzIiIC8+PC9NZXNzYWdlcz48T2ZmZXJTdGFjayBTdGFja051bWJlcj0iMSIgTWluaW11bVF1YW50aXR5SW5Ldz0iMTAwIiBQcmltYXJ5T2ZmZXJRdWFudGl0eUluS3c9IjE1MCIgU2Vjb25kYXJ5MU9mZmVyUXVhbnRpdHlJbkt3PSIyMDAiIFNlY29uZGFyeTJPZmZlclF1YW50aXR5SW5Ldz0iMjUwIiBUZXJ0aWFyeTFPZmZlclF1YW50aXR5SW5Ldz0iMzAwIiBUZXJ0aWFyeTJPZmZlclF1YW50aXR5SW5Ldz0iMzUwIiBPZmZlclVuaXRQcmljZT0iMTAwIiBPZmZlcklkPSJGQUtFX0lEIj48TWVzc2FnZXM+PEVycm9yIENvZGU9IkVycm9yQ29kZTEiIC8+PEVycm9yIENvZGU9IkVycm9yQ29kZTIiIC8+PFdhcm5pbmcgQ29kZT0iV2FybmluZzEiIC8+PFdhcm5pbmcgQ29kZT0iV2FybmluZzIiIC8+PEluZm9ybWF0aW9uIENvZGU9IkluZm8xIiAvPjxJbmZvcm1hdGlvbiBDb2RlPSJJbmZvMiIgLz48L01lc3NhZ2VzPjwvT2ZmZXJTdGFjaz48L09mZmVyRGF0YT48L01hcmtldFN1Ym1pdD48L01hcmtldERhdGE+"
+TEST_XML_ENCODED = (
+    """<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
+    """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
+    """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
+    """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" /><Warning """
+    """Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" />"""
+    """</Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" """
+    """NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" """
+    """/><Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" """
+    """/></Messages><OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-08-30T11:24:15" """
+    """Direction="1" DrPatternNumber="12" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" """
+    """Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2019-08-29T03:24:15" Validation="PASSED" """
+    """Success="true"><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" /><Warning Code="Warning1" />"""
+    """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages><OfferStack """
+    """StackNumber="1" MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
+    """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """
+    """OfferUnitPrice="100" OfferId="FAKE_ID"><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
+    """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" />"""
+    """</Messages></OfferStack></OfferData></MarketSubmit></MarketData>"""
+).encode("UTF-8")
 
 
 def test_serialize_data():
@@ -75,7 +93,7 @@ def test_serialize_data():
     data = serializer.serialize(request, offer)
 
     # Finally, verify that the request was serialized as we expect
-    assert b64decode(data) == (
+    assert data == (
         """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
         """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2019-08-29" ParticipantName="F100" """
         """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
@@ -182,6 +200,48 @@ def test_deserialize_works():
     )
 
 
+def test_deserialize_no_data_works():
+    """Test that the deserialize method works when there is no data to return."""
+    # First, create our serializer
+    serialzier = Serializer(SchemaType.MARKET, "MarketData")
+
+    # Create our test XML payload
+    encoded_data = (
+        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
+        """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
+        """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
+        """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
+        """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information """
+        """Code="Info2" /></Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" """
+        """MarketType="DAM" NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" />"""
+        """<Error Code="ErrorCode2" /><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
+        """Code="Info1" /><Information Code="Info2" /></Messages></MarketSubmit></MarketData>"""
+    ).encode("UTF-8")
+
+    # Next, attempt to deserialize the payload as a market submit request and offer data
+    resp = serialzier.deserialize(encoded_data, MarketSubmit, OfferData)
+
+    # Finally, verify that the response is as we expect
+    assert not resp.data
+    verify_market_submit(resp.envelope, Date(2019, 8, 29), "F100", "FAKEUSER", MarketType.DAY_AHEAD, 1)
+    verify_response_common(resp.envelope_validation, True, ValidationStatus.PASSED)
+    verify_messages(
+        resp.messages,
+        {
+            "MarketData": messages_verifier(
+                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
+                [code_verifier("Warning1"), code_verifier("Warning2")],
+                [code_verifier("Info1"), code_verifier("Info2")],
+            ),
+            "MarketData.MarketSubmit": messages_verifier(
+                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
+                [code_verifier("Warning1"), code_verifier("Warning2")],
+                [code_verifier("Info1"), code_verifier("Info2")],
+            ),
+        },
+    )
+
+
 def test_deserialize_multi_payload_key_invalid():
     """Test that the deserialize_multi method raises an error when the payload key is invalid."""
     # First, create our serializer
@@ -278,24 +338,22 @@ def test_deserialize_multi_works():
 
 
 def test_deserialize_multi_no_data_works():
-    """Test that, if no errors occur, then the deserialize_multi method will return the expected data."""
+    """Test that the deserialize_multi method works when there is no data to return."""
     # First, create our serializer
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Create our test XML payload
-    encoded_data = b64encode(
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-            """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-            """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
-            """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
-            """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information """
-            """Code="Info2" /></Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" """
-            """MarketType="DAM" NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" />"""
-            """<Error Code="ErrorCode2" /><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages></MarketSubmit></MarketData>"""
-        ).encode("UTF-8")
-    )
+    encoded_data = (
+        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
+        """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
+        """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
+        """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
+        """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information """
+        """Code="Info2" /></Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" """
+        """MarketType="DAM" NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" />"""
+        """<Error Code="ErrorCode2" /><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
+        """Code="Info1" /><Information Code="Info2" /></Messages></MarketSubmit></MarketData>"""
+    ).encode("UTF-8")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
     resp = serialzier.deserialize_multi(encoded_data, MarketSubmit, OfferData)

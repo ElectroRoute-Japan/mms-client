@@ -218,9 +218,9 @@ class Response(BaseResponse[E], Generic[E, P]):
         self._payload_data = None
 
     @property
-    def data(self) -> P:
+    def data(self) -> Optional[P]:
         """Return the data extracted from the response."""
-        return self._payload_data.data  # pylint: disable=no-member
+        return self._payload_data.data if self._payload_data else None  # pylint: disable=no-member
 
     @property
     def payload(self) -> ResponseData[P]:

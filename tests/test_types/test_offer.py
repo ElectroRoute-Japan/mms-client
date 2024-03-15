@@ -11,6 +11,10 @@ from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
+from tests.testutils import offer_stack_verifier
+from tests.testutils import verify_offer_cancel
+from tests.testutils import verify_offer_data
+from tests.testutils import verify_offer_query
 
 
 def test_offer_submit_defaults():
@@ -117,13 +121,12 @@ def test_offer_cancel():
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    assert request.resource == "FAKE_RESO"
-    assert request.start == DateTime(2019, 8, 30, 3, 24, 15)
-    assert request.end == DateTime(2019, 9, 30, 3, 24, 15)
-    assert request.market_type == MarketType.WEEK_AHEAD
-    assert (
-        data
-        == b"""<OfferCancel ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" MarketType="WAM"/>"""
+    verify_offer_cancel(
+        request, "FAKE_RESO", DateTime(2019, 8, 30, 3, 24, 15), DateTime(2019, 9, 30, 3, 24, 15), MarketType.WEEK_AHEAD
+    )
+    assert data == (
+        b"""<OfferCancel ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" """
+        b"""MarketType="WAM"/>"""
     )
 
 
@@ -151,86 +154,3 @@ def test_offer_query_full():
     # Finally, verify that the request was created with the correct parameters
     verify_offer_query(request, MarketType.WEEK_AHEAD, AreaCode.CHUBU, "FAKE_RESO")
     assert data == b"""<OfferQuery MarketType="WAM" ResourceName="FAKE_RESO" Area="04"/>"""
-
-
-def verify_offer_data(
-    request: OfferData,
-    stack_verifiers: list,
-    resource: str,
-    start: DateTime,
-    end: DateTime,
-    direction: Direction,
-    pattern: Optional[int] = None,
-    bsp_participant: Optional[str] = None,
-    company_short_name: Optional[str] = None,
-    operator: Optional[str] = None,
-    area: Optional[AreaCode] = None,
-    resource_short_name: Optional[str] = None,
-    system_code: Optional[str] = None,
-    submission_time: Optional[DateTime] = None,
-):
-    """Verify that the given offer data request has the expected parameters."""
-    assert request.resource == resource
-    assert request.start == start
-    assert request.end == end
-    assert request.direction == direction
-    assert len(request.stack) == len(stack_verifiers)
-    for stack, verifier in zip(request.stack, stack_verifiers):
-        verifier(stack)
-    verify_offer_data_optional(
-        request,
-        pattern_number=pattern,
-        bsp_participant=bsp_participant,
-        company_short_name=company_short_name,
-        operator=operator,
-        area=area,
-        resource_short_name=resource_short_name,
-        system_code=system_code,
-        submission_time=submission_time,
-    )
-
-
-def verify_offer_data_optional(request: OfferData, **kwargs):
-    """Verify that the given offer data request has the expected parameters."""
-    for field, info in request.model_fields.items():
-        if not info.is_required():
-            if field in kwargs:
-                assert getattr(request, field) == kwargs[field]
-            else:
-                assert getattr(request, field) is None
-
-
-def offer_stack_verifier(
-    number: int,
-    price: float,
-    quantity: float,
-    primary: Optional[float] = None,
-    seconday_1: Optional[float] = None,
-    secondary_2: Optional[float] = None,
-    tertiary_1: Optional[float] = None,
-    tertiary_2: Optional[float] = None,
-    id: Optional[str] = None,
-):
-    """Verify that the given offer stack has the expected parameters."""
-
-    def inner(stack: OfferStack):
-        assert stack.number == number
-        assert stack.unit_price == price
-        assert stack.minimum_quantity_kw == quantity
-        assert stack.primary_qty_kw == primary
-        assert stack.secondary_1_qty_kw == seconday_1
-        assert stack.secondary_2_qty_kw == secondary_2
-        assert stack.tertiary_1_qty_kw == tertiary_1
-        assert stack.tertiary_2_qty_kw == tertiary_2
-        assert stack.id == id
-
-    return inner
-
-
-def verify_offer_query(
-    req: OfferQuery, market_type: MarketType, area: Optional[AreaCode] = None, resource: Optional[str] = None
-):
-    """Verify that the OfferQuery was created with the correct parameters."""
-    assert req.market_type == market_type
-    assert req.area == area
-    assert req.resource == resource

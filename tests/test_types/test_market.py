@@ -43,9 +43,8 @@ def test_market_query_full():
 
     # Finally, verify that the request was created with the correct parameters
     verify_market_query(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.WEEK_AHEAD, 4)
-    assert (
-        data
-        == b"""<MarketQuery Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"/>"""
+    assert data == (
+        b"""<MarketQuery Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"/>"""
     )
 
 
