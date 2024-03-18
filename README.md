@@ -165,4 +165,14 @@ This client is not complete. Currently, it supports the following endpoints:
 We can add support for additional endpoints as time goes on, and independent contribution is, of course, welcome. However, support for attachments is currently limited because none of the endpoints we support currently require them. We have implemented attachment support up to the client level, but we haven't developed an architecture for submitting them through an endpoint yet.
 
 # Installation
-We currently
+We have a package on PyPI so installation is as easy as doing:
+
+```
+pip install mms-client
+```
+
+or
+
+```
+poetry add mms-client
+```
