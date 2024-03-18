@@ -76,16 +76,16 @@ class ProcessingStatistics(BaseXmlModel):
     timestamp_xml: Optional[DateTime] = attr(default=None, name="XmlTimeStamp")
 
 
-class ResponseCommon(BaseXmlModel):
+class ResponseCommon(BaseXmlModel, search_mode="unordered"):
     """Contains fields common to many (but not all) market DTOs."""
 
     # Whether the request was successful. This field will certainly be present in responses, but should not be present
     # in requests.
-    success: Optional[bool] = attr(default=None, name="Success")
+    success: bool = attr(default=True, name="Success")
 
     # The status of the validation check done on the element. This field is not required for requests, and will be
     # populated in responses. For responses, the default value is "NOT_DONE".
-    validation: Optional[ValidationStatus] = attr(default=None, name="Validation")
+    validation: ValidationStatus = attr(default=ValidationStatus.NOT_DONE, name="Validation")
 
 
 class Payload(BaseXmlModel, search_mode="unordered"):

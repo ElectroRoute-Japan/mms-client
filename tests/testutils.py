@@ -1,7 +1,9 @@
 """Contains utility functions for testing the MMS client."""
 
 from base64 import b64encode
+from datetime import date as Date
 from typing import Callable
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -11,7 +13,13 @@ from pendulum import DateTime
 from requests import PreparedRequest
 from responses.matchers import header_matcher
 
+from mms_client.types.base import Message
+from mms_client.types.base import Messages
 from mms_client.types.enums import AreaCode
+from mms_client.types.market import BaseMarketRequest
+from mms_client.types.market import MarketCancel
+from mms_client.types.market import MarketQuery
+from mms_client.types.market import MarketSubmit
 from mms_client.types.market import MarketType
 from mms_client.types.offer import Direction
 from mms_client.types.offer import OfferCancel
@@ -88,6 +96,74 @@ def attachment_verifier(name: str, data: bytes, signature: str):
         assert att.signature == signature
 
     return inner
+
+
+def code_verifier(code: str):
+    """Return a function that verifies a message has the expected code."""
+
+    def inner(message: Message):
+        assert message.code == code
+
+    return inner
+
+
+def messages_verifier(errors: list, warnings: list, infos: list):
+    """Return a function that verifies that a message has the expected errors, warnings, and information."""
+
+    def inner(messages: Messages):
+        assert len(messages.errors) == len(errors)
+        assert len(messages.warnings) == len(warnings)
+        assert len(messages.information) == len(infos)
+        for i, error in enumerate(errors):
+            error(messages.errors[i])
+        for i, warning in enumerate(warnings):
+            warning(messages.warnings[i])
+        for i, info in enumerate(infos):
+            info(messages.information[i])
+
+    return inner
+
+
+def verify_messages(messages: Dict[str, Messages], verifiers: dict):
+    """Verify that the messages are as we expect."""
+    assert len(messages) == len(verifiers)
+    print(messages)
+    for key, verifier in verifiers.items():
+        verifier(messages[key])
+
+
+def verify_market_query(
+    req: MarketQuery, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
+):
+    """Verify that the MarketQuery was created with the correct parameters."""
+    verify_base_market_request(req, date, participant, user, market_type)
+    assert req.days == days
+
+
+def verify_market_submit(
+    req: MarketSubmit, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
+):
+    """Verify that the MarketSubmit was created with the correct parameters."""
+    verify_base_market_request(req, date, participant, user, market_type)
+    assert req.days == days
+
+
+def verify_market_cancel(
+    req: MarketCancel, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
+):
+    """Verify that the MarketCancel was created with the correct parameters."""
+    verify_base_market_request(req, date, participant, user, market_type)
+    assert req.days == days
+
+
+def verify_base_market_request(
+    req: BaseMarketRequest, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None
+):
+    """Verify that the BaseMarketRequest was created with the correct parameters."""
+    assert req.date == date
+    assert req.participant == participant
+    assert req.user == user
+    assert req.market_type == market_type
 
 
 def verify_offer_data(
@@ -188,13 +264,14 @@ def register_mms_request(
     response: bytes,
     status: int = 200,
     url: str = "https://www2.tdgc.jp/axis2/services/MiWebService",
+    **kwargs,
 ):
     """Register a new MMS request and response with the responses library."""
     responses.add(
         responses.Response(
             method="POST",
             url=url,
-            body=create_response(response) if status == 200 else b"",
+            body=create_response(response, **kwargs) if status == 200 else b"",
             status=status,
             content_type="text/xml; charset=utf-8",
             auto_calculate_content_length=True,
@@ -206,15 +283,26 @@ def register_mms_request(
     )
 
 
-def create_response(data: bytes) -> bytes:
+def create_response(
+    data: bytes,
+    data_type: ResponseDataType = ResponseDataType.XML,
+    success: bool = True,
+    warnings: bool = False,
+    compressed: bool = False,
+) -> bytes:
     """Create a new MMS response with the given data."""
+
+    def to_bool(value: bool) -> str:
+        return "true" if value else "false"
+
     return (
         """<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope """
         """xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/"><soap-env:Body><ns0:ResponseAttInfo """
-        """xmlns:ns0="urn:abb.com:project/mms/types"><success>true</success><warnings>false</warnings>"""
-        """<responseBinary>false</responseBinary><responseCompressed>false</responseCompressed><responseDataType>XML"""
-        f"""</responseDataType><responseData>{b64encode(data).decode("UTF-8")}</responseData></ns0:ResponseAttInfo>"""
-        """</soap-env:Body></soap-env:Envelope>"""
+        f"""xmlns:ns0="urn:abb.com:project/mms/types"><success>{to_bool(success)}</success><warnings>"""
+        f"""{to_bool(warnings)}</warnings><responseBinary>false</responseBinary><responseCompressed>"""
+        f"""{to_bool(compressed)}</responseCompressed><responseDataType>{data_type.value}</responseDataType>"""
+        f"""<responseData>{b64encode(data).decode("UTF-8")}</responseData></ns0:ResponseAttInfo></soap-env:Body>"""
+        """</soap-env:Envelope>"""
     ).encode("UTF-8")
 
 

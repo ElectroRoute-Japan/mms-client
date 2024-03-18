@@ -12,14 +12,22 @@ from typing import Type
 
 from mms_client.security.crypto import Certificate
 from mms_client.security.crypto import CryptoWrapper
+from mms_client.types.base import BaseResponse
 from mms_client.types.base import E
 from mms_client.types.base import MultiResponse
 from mms_client.types.base import P
 from mms_client.types.base import Response
+from mms_client.types.base import ResponseCommon
+from mms_client.types.base import ValidationStatus
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
+from mms_client.types.transport import MmsResponse
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
+from mms_client.types.transport import ResponseDataType
+from mms_client.utils.errors import AudienceError
+from mms_client.utils.errors import MMSClientError
+from mms_client.utils.errors import MMSValidationError
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
@@ -307,10 +315,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             f"{config.allowed_client.name if config.allowed_client else 'Any'}."
         )
         if config.allowed_client and self._client_type != config.allowed_client:
-            raise ValueError(
-                f"Invalid client type, '{self._client_type.name}' provided. Only '{config.allowed_client.name}' "
-                "is supported.",
-            )
+            raise AudienceError(config.name, config.allowed_client, self._client_type)
 
     def request_one(
         self,
@@ -333,22 +338,24 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         )
         request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, data))
 
-        # Next, submit the request to the MMS server and get the response.
+        # Next, submit the request to the MMS server and get and verify the response.
         resp = self._get_wrapper(config.service).submit(request)
+        self._verify_mms_response(resp, config)
 
         # Now, extract the attachments from the response
         attachments = {a.name: a.data for a in resp.attachments}
 
-        # Finally, deserialize the response and return it.
+        # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
         data_type = config.response_data_type or type(data)
+        data = config.service.serializer.deserialize(resp.payload, envelope_type, data_type)
+        self._verify_response(data, config)
+
+        # Return the response data and any attachments
         self._logger.debug(
             f"{config.name}: Returning response. Envelope: {envelope_type.__name__}, Data: {data_type.__name__}",
         )
-        return (
-            config.service.serializer.deserialize(resp.payload, envelope_type, data_type),
-            attachments,
-        )
+        return data, attachments
 
     def request_many(
         self,
@@ -371,19 +378,24 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         )
         request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, data))
 
-        # Next, submit the request to the MMS server and get the response.
+        # Next, submit the request to the MMS server and get and verify the response.
         resp = self._get_wrapper(config.service).submit(request)
+        self._verify_mms_response(resp, config)
 
         # Now, extract the attachments from the response
         attachments = {a.name: a.data for a in resp.attachments}
 
-        # Finally, deserialize the response and return it.
+        # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
         data_type = config.response_data_type or type(data)
+        data = config.service.serializer.deserialize_multi(resp.payload, envelope_type, data_type)
+        self._verify_multi_response(data, config)
+
+        # Return the response data and any attachments
         self._logger.debug(
             f"{config.name}: Returning multi-response. Envelope: {envelope_type.__name__}, Data: {data_type.__name__}",
         )
-        return config.service.serializer.deserialize_multi(resp.payload, envelope_type, data_type), attachments
+        return data, attachments
 
     def _to_mms_request(
         self,
@@ -423,6 +435,140 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             requestData=data,
             attachmentData=attachment_data,
         )
+
+    def _verify_mms_response(self, resp: MmsResponse, config: EndpointConfiguration) -> None:
+        """Verify that the given MMS response is valid.
+
+        Arguments:
+        resp (MmsResponse):     The MMS response to verify.
+
+        Raises:
+        MMSClientError: If the response is not valid.
+        """
+        # Verify that the response is in the correct format. If it's not, raise an error.
+        if resp.data_type != ResponseDataType.XML:
+            raise MMSClientError(
+                config.name,
+                f"Invalid MMS response data type: {resp.data_type.name}. Only XML is supported.",
+            )
+        if resp.compressed:
+            raise MMSClientError(config.name, "Invalid MMS response. Compressed responses are not supported.")
+
+        # Check the response status flags and log any warnings or errors
+        if resp.warnings:
+            self._logger.warning(f"{config.name}: MMS response contained warnings.")
+        if not resp.success:
+            self._logger.error(f"{config.name}: MMS response was unsuccessful.")
+
+    def _verify_response(self, resp: Response[E, P], config: EndpointConfiguration) -> None:
+        """Verify that the given response is valid.
+
+        Arguments:
+        resp (Response):    The response to verify.
+
+        Raises:
+        MMSValidationError: If the response is not valid.
+        """
+        # First, verify the base response data to make sure we haven't missed some request details
+        valid = self._verify_base_response(resp, config)
+
+        # Next, if we received data back with the request then verify that it's valid
+        if resp.payload:
+            valid = valid and self._verify_response_common(config, type(resp.data), resp.payload.data_validation)
+
+        # Now, log any messages that were returned with the response
+        self._verify_messages(config, resp)
+
+        # Finally, if the response is not valid, raise an error
+        if not valid:
+            raise MMSValidationError(config.name, resp.envelope, resp.data, resp.messages)
+
+    def _verify_multi_response(self, resp: MultiResponse[E, P], config: EndpointConfiguration) -> None:
+        """Verify that the given multi-response is valid.
+
+        Arguments:
+        resp (MultiResponse):   The multi-response to verify.
+
+        Raises:
+        MMSValidationError: If the response is not valid.
+        """
+        # First, verify the base response data to make sure we haven't missed some request details
+        valid = self._verify_base_response(resp, config)
+
+        # Next, if we received data back with the request then verify that it's valid
+        if resp.payload:
+            valid = valid and all(
+                self._verify_response_common(config, type(data), resp.payload[i].data_validation, i)
+                for i, data in enumerate(resp.data)
+            )
+
+        # Now, log any messages that were returned with the response
+        self._verify_messages(config, resp)
+
+        # Finally, if the response is not valid, raise an error
+        if not valid:
+            raise MMSValidationError(config.name, resp.envelope, resp.data, resp.messages)
+
+    def _verify_base_response(self, resp: BaseResponse[E], config: EndpointConfiguration) -> bool:
+        """Verify that the given base response is valid.
+
+        Arguments:
+        resp (BaseResponse):            The base response to verify.
+        config (EndpointConfiguration): The configuration for the endpoint.
+
+        Returns:    True to indicate that the response is valid, False otherwise.
+        """
+        # Log the request's processing statistics
+        self._logger.info(
+            f"{config.name} ({resp.statistics.timestamp_xml}): Recieved {resp.statistics.received}, "
+            f"Valid: {resp.statistics.valid}, Invalid: {resp.statistics.invalid}, "
+            f"Successful: {resp.statistics.successful}, Unsuccessful: {resp.statistics.unsuccessful} "
+            f"in {resp.statistics.time_ms}ms"
+        )
+
+        # Check if the response is invalid and if the envelope had any validation issues. If not, then we have a
+        # valid base response so return True. Otherwise, return False.
+        return resp.statistics.invalid == 0 and self._verify_response_common(
+            config, type(resp.envelope), resp.envelope_validation
+        )
+
+    def _verify_messages(self, config: EndpointConfiguration, resp: BaseResponse[E]) -> None:
+        """Verify the messages in the given response.
+
+        Arguments:
+        config (EndpointConfiguration): The configuration for the endpoint.
+        resp (BaseResponse):            The response to verify.
+        """
+        for path, messages in resp.messages.items():
+            for info in messages.information:
+                self._logger.info(f"{config.name} - {path}: {info.code}")
+            for warning in messages.warnings:
+                self._logger.warning(f"{config.name} - {path}: {warning.code}")
+            for error in messages.errors:
+                self._logger.error(f"{config.name} - {path}: {error.code}")
+
+    def _verify_response_common(
+        self, config: EndpointConfiguration, payload_type: type, resp: ResponseCommon, index: Optional[int] = None
+    ) -> bool:
+        """Verify the common response data in the given response.
+
+        Arguments:
+        config (EndpointConfiguration): The configuration for the endpoint.
+        payload_type (type):            The type of payload that was sent with the request.
+        resp (ResponseCommon):          The common response data to verify.
+        index (int):                    The index of the response in the multi-response. This is None for single
+                                        responses.
+
+        Returns:    True to indicate that the response is valid, False otherwise.
+        """
+        # Log the status of the response validation
+        self._logger.info(
+            f"{config.name}: {payload_type.__name__}{f'[{index}]' if index is not None else ''} was valid? "
+            f"{resp.success} ({resp.validation.value})",
+        )
+
+        # Verify that the response was successful and that the validation status is not a failed status
+        return resp.success and (resp.validation not in (ValidationStatus.FAILED, ValidationStatus.PASSED_PARTIAL))
 
     def _get_wrapper(self, service: ServiceConfiguration) -> ZWrapper:
         """Get the wrapper for the given service.
