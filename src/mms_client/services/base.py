@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from logging import Logger
 from logging import getLogger
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Protocol
 from typing import Tuple
@@ -207,7 +208,7 @@ def mms_multi_endpoint(
 
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
-        def wrapper(self: ClientProto, *args, **kwargs) -> P:
+        def wrapper(self: ClientProto, *args, **kwargs) -> List[P]:
             self.logger.info(f"{config.name}: Called with args: {args[1:]}...")
 
             # First, verify that the client type is allowed
