@@ -1,3 +1,5 @@
+[![Unit Tests Status](https://github.com/ElectroRoute-Japan/mms-client/actions/workflows/check.yml/badge.svg)](https://github.com/ElectroRoute-Japan/mms-client/actions)
+
 # Overview
 This repository contains a Python client that is capable of communication with the Market Management System (MMS), which handles requests related to Flex or Virtual Power Plant (VPP) trading. The underlying library is relies on SOAP communication, which is a pain to work with at the best of times. This particular SOAP API adds its own special layer of obnoxiousness, however. As such, it was deemed useful to have a client which would obfuscate most, if not all of this away from the user.
 
