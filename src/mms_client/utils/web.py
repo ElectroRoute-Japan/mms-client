@@ -1,6 +1,7 @@
 """Contains the HTTP/web layer for communicating with the MMS server."""
 
 from enum import Enum
+from logging import Logger
 from pathlib import Path
 
 from backoff import expo
@@ -130,6 +131,7 @@ class ZWrapper:
         client: ClientType,
         interface: Interface,
         adapter: Pkcs12Adapter,
+        logger: Logger,
         cache: bool = True,
         test: bool = False,
     ):
@@ -144,6 +146,7 @@ class ZWrapper:
                                     as the service and port to use.
         adapter (Pkcs12Adapter):    The PKCS12 adapter containing the certificate and private key to use for
                                     authenticating with the MMS server.
+        logger (Logger):            The logger to use for instrumentation.
         cache (bool):               If True, use a cache for the Zeep client. This is useful for avoiding repeated
                                     lookups of the WSDL file, which should result in lower latency.
         test (bool):                If True, use the test service endpoint. This is useful for testing the client.
@@ -177,6 +180,7 @@ class ZWrapper:
 
         # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings and then,
         # from that client, we create the SOAP service with the given service binding and selected endpoint.
+        self._logger = logger
         self._client = Client(
             wsdl=str(location.resolve()),
             transport=Transport(cache=SqliteCache() if cache else None, session=sess),
@@ -187,6 +191,7 @@ class ZWrapper:
     def submit(self, req: MmsRequest) -> MmsResponse:
         """Submit the given request to the MMS server and return the response."""
         try:
+            self._logger.debug(f"Submitting MMS request request to {self._interface.name} service")
 
             # Submit the request to the MMS server and retrieve the response
             resp: CompoundValue = self._service["submitAttachment"](**req.to_arguments())
@@ -196,7 +201,12 @@ class ZWrapper:
         except TransportError as e:
             # If we got a server fault error, then we'll switch to the backup endpoint. In any case, we'll raise the
             # exception so that our back-off can handle it or pass the exception up the stack.
+            self._logger.error(
+                f"MMS request to {self._interface.name} service failed with status code: {e.status_code}",
+                exc_info=e,
+            )
             if e.status_code >= 500:
+                self._logger.warning(f"MMS server error, switching to backup endpoint: {self._endpoint.backup}")
                 self._endpoint.select(error=True)
                 self._create_service()
             raise
@@ -206,4 +216,5 @@ class ZWrapper:
 
         This is useful for switching between the main and backup endpoints in case of an error.
         """
+        self._logger.debug(f"Creating new {self._interface.name} service with endpoint: {self._endpoint.selected}")
         self._service = self._client.create_service(SERVICE_BINDINGS[self._interface], self._endpoint.selected)
