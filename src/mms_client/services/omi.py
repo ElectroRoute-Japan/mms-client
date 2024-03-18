@@ -6,7 +6,7 @@ from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import Interface
 
 
-class OMIClientMixin:
+class OMIClientMixin:  # pylint: disable=unused-argument
     """OMI client for the MMS server."""
 
     # The configuration for the OMI service

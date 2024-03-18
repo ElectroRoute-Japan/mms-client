@@ -6,7 +6,7 @@ from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import Interface
 
 
-class RegistrationClientMixin:
+class RegistrationClientMixin:  # pylint: disable=unused-argument
     """Registration client for the MMS server."""
 
     # The configuration for the registration service

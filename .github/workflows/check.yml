@@ -1,11 +1,13 @@
 on:
-  workflow_dispatch:
   push:
-    tags: ["v*"]
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 permissions:
   contents: read
   actions: read
+  pull-requests: write
   security-events: write
 
 jobs:
@@ -40,23 +42,3 @@ jobs:
       - uses: pre-commit/action@v3.0.0
       - name: Unit Tests
         run: poetry run pytest -n auto
-  deployment:
-    runs-on: ubuntu-latest
-    environment: release
-    needs: [version-check, check]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: "1.5.1"
-      - name: Poetry Version
-        run: poetry --version
-      - name: Install Dependencies
-        run: poetry install
-      - name: Configure Poetry
-        run: poetry config pypi-token.pypi ${{ vars.PYPI_TOKEN }}
-      - name: Build and Publish PyPI Package
-        run: poetry publish --build

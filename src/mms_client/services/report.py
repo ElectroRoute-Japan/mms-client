@@ -6,7 +6,7 @@ from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import Interface
 
 
-class ReportClientMixin:
+class ReportClientMixin:  # pylint: disable=unused-argument
     """Report client for the MMS server."""
 
     # The configuration for the report service

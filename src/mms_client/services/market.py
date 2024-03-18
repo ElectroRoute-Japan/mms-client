@@ -6,6 +6,8 @@ from typing import Optional
 
 from mms_client.services.base import ClientProto
 from mms_client.services.base import ServiceConfiguration
+from mms_client.services.base import mms_endpoint
+from mms_client.services.base import mms_multi_endpoint
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
@@ -20,12 +22,13 @@ from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
 
 
-class MarketClientMixin:
+class MarketClientMixin:  # pylint: disable=unused-argument
     """Market client for the MMS server."""
 
     # The configuration for the market service
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData"))
 
+    @mms_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, ClientType.BSP)
     def put_offer(
         self: ClientProto, request: OfferData, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> OfferData:
@@ -42,17 +45,17 @@ class MarketClientMixin:
 
         Returns:    The offer that has been registered with the MMS server.
         """
-        self.verify_audience(ClientType.BSP)
-        envelope = MarketSubmit(
+        return MarketSubmit(
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
             market_type=market_type,
             days=days,
         )
-        resp, _ = self.request_one(envelope, request, MarketClientMixin.config, RequestType.INFO)
-        return resp.data
 
+    @mms_multi_endpoint(
+        "MarketQuery_OfferQuery", config, RequestType.INFO, resp_envelope_type=MarketSubmit, resp_data_type=OfferData
+    )
     def query_offers(
         self: ClientProto, request: OfferQuery, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> List[OfferData]:
@@ -69,19 +72,15 @@ class MarketClientMixin:
 
         Returns:    A list of offers that match the query.
         """
-        self.verify_audience()
-        envelope = MarketQuery(
+        return MarketQuery(
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
             market_type=market_type,
             days=days,
         )
-        resp, _ = self.request_many(
-            envelope, request, MarketClientMixin.config, RequestType.INFO, MarketSubmit, OfferData
-        )
-        return resp.data
 
+    @mms_endpoint("MarketCancel_OfferCancel", config, RequestType.INFO, ClientType.BSP)
     def cancel_offer(
         self: ClientProto, request: OfferCancel, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> OfferCancel:
@@ -96,13 +95,10 @@ class MarketClientMixin:
         date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                     current date.
         """
-        self.verify_audience(ClientType.BSP)
-        envelope = MarketCancel(
+        return MarketCancel(
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
             market_type=market_type,
             days=days,
         )
-        resp, _ = self.request_one(envelope, request, MarketClientMixin.config, RequestType.INFO)
-        return resp.data

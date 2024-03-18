@@ -1,13 +1,14 @@
 """Tests the functionality in the mms_client.types.market module."""
 
 from datetime import date as Date
-from typing import Optional
 
-from mms_client.types.market import BaseMarketRequest
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
 from mms_client.types.market import MarketType
+from tests.testutils import verify_market_cancel
+from tests.testutils import verify_market_query
+from tests.testutils import verify_market_submit
 
 
 def test_market_query_defaults():
@@ -124,37 +125,3 @@ def test_market_cancel_full():
         data
         == b"""<MarketCancel Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"/>"""
     )
-
-
-def verify_market_query(
-    req: MarketQuery, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
-):
-    """Verify that the MarketQuery was created with the correct parameters."""
-    verify_base_market_request(req, date, participant, user, market_type)
-    assert req.days == days
-
-
-def verify_market_submit(
-    req: MarketSubmit, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
-):
-    """Verify that the MarketSubmit was created with the correct parameters."""
-    verify_base_market_request(req, date, participant, user, market_type)
-    assert req.days == days
-
-
-def verify_market_cancel(
-    req: MarketCancel, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
-):
-    """Verify that the MarketCancel was created with the correct parameters."""
-    verify_base_market_request(req, date, participant, user, market_type)
-    assert req.days == days
-
-
-def verify_base_market_request(
-    req: BaseMarketRequest, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None
-):
-    """Verify that the BaseMarketRequest was created with the correct parameters."""
-    assert req.date == date
-    assert req.participant == participant
-    assert req.user == user
-    assert req.market_type == market_type

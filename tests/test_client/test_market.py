@@ -16,6 +16,7 @@ from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
 from mms_client.types.transport import RequestType
+from mms_client.utils.errors import AudienceError
 from mms_client.utils.web import ClientType
 from tests.testutils import offer_stack_verifier
 from tests.testutils import register_mms_request
@@ -38,11 +39,11 @@ def test_put_offer_invalid_client(mock_certificate):
     )
 
     # Now, attempt to put an offer with the invalid client type; this should fail
-    with pytest.raises(ValueError) as ex_info:
+    with pytest.raises(AudienceError) as ex_info:
         _ = client.put_offer(request, MarketType.DAY_AHEAD, 1)
 
     # Finvally, verify the details of the raised exception
-    assert str(ex_info.value) == "Invalid client type, 'TSO' provided. Only 'BSP' is supported."
+    assert str(ex_info.value) == "MarketSubmit_OfferData: Invalid client type, 'TSO' provided. Only 'BSP' is supported."
 
 
 @responses.activate
@@ -98,6 +99,7 @@ def test_put_offer_works(mock_certificate):
             """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages>"""
             """</OfferStack></OfferData></MarketSubmit></MarketData>"""
         ).encode("UTF-8"),
+        warnings=True,
     )
 
     # Now, attempt to put an offer with the valid client type; this should succeed
@@ -167,6 +169,7 @@ def test_query_offers_works(mock_certificate):
             """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages>"""
             """</OfferStack></OfferData></MarketSubmit></MarketData>"""
         ).encode("UTF-8"),
+        warnings=True,
     )
 
     # Now, attempt to query offers with the valid client type; this should succeed
@@ -206,11 +209,13 @@ def test_cancel_offer_invalid_client(mock_certificate):
     )
 
     # Now, attempt to cancel an offer with the invalid client type; this should fail
-    with pytest.raises(ValueError) as ex_info:
+    with pytest.raises(AudienceError) as ex_info:
         _ = client.cancel_offer(request, MarketType.DAY_AHEAD, 1)
 
     # Finvally, verify the details of the raised exception
-    assert str(ex_info.value) == "Invalid client type, 'TSO' provided. Only 'BSP' is supported."
+    assert (
+        str(ex_info.value) == "MarketCancel_OfferCancel: Invalid client type, 'TSO' provided. Only 'BSP' is supported."
+    )
 
 
 @responses.activate
@@ -258,6 +263,7 @@ def test_cancel_offer_works(mock_certificate):
             """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" MarketType="DAM"/></MarketCancel>"""
             """</MarketData>"""
         ).encode("UTF-8"),
+        warnings=True,
     )
 
     # Now, attempt to cancel an offer with the valid client type; this should succeed

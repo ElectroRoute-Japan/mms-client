@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mms_client"
-version = "v0.4.0"
+version = "v1.0.0"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
