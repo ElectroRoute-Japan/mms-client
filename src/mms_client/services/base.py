@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from logging import Logger
 from logging import getLogger
 from typing import Dict
+from typing import Generic
 from typing import List
 from typing import Optional
 from typing import Protocol
@@ -49,7 +50,7 @@ class ServiceConfiguration:
 
 
 @dataclass
-class EndpointConfiguration:
+class EndpointConfiguration(Generic[E, P]):
     """Configuration for an endpoint on the MMS server."""
 
     # The name of the endpoint
@@ -162,7 +163,7 @@ def mms_endpoint(
 
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
-        def wrapper(self: ClientProto, *args, **kwargs) -> P:
+        def wrapper(self: ClientProto, *args, **kwargs) -> Optional[P]:
 
             # First, verify that the client type is allowed
             self.verify_audience(config)
@@ -320,23 +321,23 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
     def request_one(
         self,
         envelope: E,
-        data: P,
-        config: EndpointConfiguration,
+        payload: P,
+        config: EndpointConfiguration[E, P],
     ) -> Tuple[Response[E, P], Dict[str, bytes]]:
         """Submit a request to the MMS server and return the response.
 
         Arguments:
         envelope (Envelope):            The payload envelope to submit to the MMS server.
-        data (Payload):                 The data to submit to the MMS server.
+        payload (Payload):              The data to submit to the MMS server.
         config (EndpointConfiguration): The configuration for the endpoint.
 
         Returns:    The response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
         self._logger.debug(
-            f"{config.name}: Starting request. Envelope: {type(envelope).__name__}, Data: {type(data).__name__}",
+            f"{config.name}: Starting request. Envelope: {type(envelope).__name__}, Data: {type(payload).__name__}",
         )
-        request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, data))
+        request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, payload))
 
         # Next, submit the request to the MMS server and get and verify the response.
         resp = self._get_wrapper(config.service).submit(request)
@@ -347,8 +348,8 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
-        data_type = config.response_data_type or type(data)
-        data = config.service.serializer.deserialize(resp.payload, envelope_type, data_type)
+        data_type = config.response_data_type or type(payload)
+        data: Response[E, P] = config.service.serializer.deserialize(resp.payload, envelope_type, data_type)
         self._verify_response(data, config)
 
         # Return the response data and any attachments
@@ -360,23 +361,26 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
     def request_many(
         self,
         envelope: E,
-        data: P,
-        config: EndpointConfiguration,
+        payload: P,
+        config: EndpointConfiguration[E, P],
     ) -> Tuple[MultiResponse[E, P], Dict[str, bytes]]:
         """Submit a request to the MMS server and return the multi-response.
 
         Arguments:
         envelope (Envelope):            The payload envelope to submit to the MMS server.
-        data (Payload):                 The data to submit to the MMS server.
+        payload (Payload):              The data to submit to the MMS server.
         config (EndpointConfiguration): The configuration for the endpoint.
 
         Returns:    The multi-response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
         self._logger.debug(
-            f"{config.name}: Starting multi-request. Envelope: {type(envelope).__name__}, Data: {type(data).__name__}",
+            (
+                f"{config.name}: Starting multi-request. Envelope: {type(envelope).__name__}, "
+                f"Data: {type(payload).__name__}"
+            ),
         )
-        request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, data))
+        request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, payload))
 
         # Next, submit the request to the MMS server and get and verify the response.
         resp = self._get_wrapper(config.service).submit(request)
@@ -387,8 +391,8 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
-        data_type = config.response_data_type or type(data)
-        data = config.service.serializer.deserialize_multi(resp.payload, envelope_type, data_type)
+        data_type = config.response_data_type or type(payload)
+        data: MultiResponse[E, P] = config.service.serializer.deserialize_multi(resp.payload, envelope_type, data_type)
         self._verify_multi_response(data, config)
 
         # Return the response data and any attachments
@@ -416,7 +420,10 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         """
         # Convert the attachments to the correct the MMS format
         attachment_data = (
-            [Attachment(signature=self._signer.sign(data), name=name, data=data) for name, data in attachments.items()]
+            [
+                Attachment(signature=self._signer.sign(data), name=name, binaryData=data)
+                for name, data in attachments.items()
+            ]
             if attachments
             else []
         )

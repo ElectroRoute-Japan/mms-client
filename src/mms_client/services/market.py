@@ -45,7 +45,8 @@ class MarketClientMixin:  # pylint: disable=unused-argument
 
         Returns:    The offer that has been registered with the MMS server.
         """
-        return MarketSubmit(
+        # Note: the return type does not match the method definition but the decorator will return the correct type
+        return MarketSubmit(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
@@ -72,7 +73,8 @@ class MarketClientMixin:  # pylint: disable=unused-argument
 
         Returns:    A list of offers that match the query.
         """
-        return MarketQuery(
+        # Note: the return type does not match the method definition but the decorator will return the correct type
+        return MarketQuery(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
@@ -95,7 +97,8 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                     current date.
         """
-        return MarketCancel(
+        # Note: the return type does not match the method definition but the decorator will return the correct type
+        return MarketCancel(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,

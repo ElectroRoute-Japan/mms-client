@@ -206,7 +206,7 @@ class Response(BaseResponse[E], Generic[E, P]):
     """Contains all the data extracted from the MMS response in a format we can use."""
 
     # The payload data extracted from the response
-    _payload_data: ResponseData[P] = PrivateAttr()
+    _payload_data: Optional[ResponseData[P]] = PrivateAttr()
 
     def __init__(self, **data):
         """Create a new Response object.
@@ -223,12 +223,12 @@ class Response(BaseResponse[E], Generic[E, P]):
         return self._payload_data.data if self._payload_data else None  # pylint: disable=no-member
 
     @property
-    def payload(self) -> ResponseData[P]:
+    def payload(self) -> Optional[ResponseData[P]]:
         """Return the response payload."""
         return self._payload_data
 
     @payload.setter
-    def payload(self, value: ResponseData[P]) -> None:
+    def payload(self, value: Optional[ResponseData[P]]) -> None:
         """Set the payload extracted from the response.
 
         Arguments:
@@ -263,10 +263,10 @@ class MultiResponse(BaseResponse[E], Generic[E, P]):
         return self._payload_data
 
     @payload.setter
-    def payload(self, value: List[ResponseData[P]]) -> None:
+    def payload(self, values: List[Optional[ResponseData[P]]]) -> None:
         """Set the payload extracted from the response.
 
         Arguments:
-        value (List[ResponseData[P]]):    The payload extracted from the response.
+        values (List[ResponseData[P]]): The payload extracted from the response.
         """
-        self._payload_data = value[:]
+        self._payload_data = [value for value in values if value]

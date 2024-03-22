@@ -1,6 +1,9 @@
 """Contains error classes for the MMS client."""
 
 from typing import Dict
+from typing import List
+from typing import Optional
+from typing import Union
 
 from mms_client.types.base import E
 from mms_client.types.base import Messages
@@ -44,7 +47,7 @@ class MMSClientError(RuntimeError):
 class MMSValidationError(RuntimeError):
     """Error raised when a request fails validation."""
 
-    def __init__(self, method: str, envelope: E, request: P, messages: Dict[str, Messages]):
+    def __init__(self, method: str, envelope: E, request: Optional[Union[P, List[P]]], messages: Dict[str, Messages]):
         """Initialize the validation error.
 
         Arguments:

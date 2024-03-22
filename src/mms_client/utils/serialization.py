@@ -67,10 +67,13 @@ class Serializer:
         )
 
         # Next, inject the payload and data into the payload class
-        payload = payload_cls(request_envelope, request_data, self._xsd.value)
+        # Note: this returns a type that inherits from PayloadBase and the arguments provided to the initializer
+        # here are correct, but mypy thinks they are incorrect because it doesn't understand the the inherited type
+        payload = payload_cls(request_envelope, request_data, self._xsd.value)  # type: ignore[call-arg, misc]
 
         # Finally, convert the payload to XML and return it
-        return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)
+        # Note: we provided the encoding here so this will return bytes, not a string
+        return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)  # type: ignore[return-value]
 
     def deserialize(self, data: bytes, envelope_type: Type[E], data_type: Type[P]) -> Response[E, P]:
         """Deserialize the data to a response object.
@@ -112,13 +115,13 @@ class Serializer:
         # Otherwise, we'll attempt to construct the response from the raw data.
         if self._payload_key != raw.tag:
             raise ValueError(f"Expected payload key '{self._payload_key}' not found in response")
-        payload_cls = _create_response_payload_type(
+        cls: Response[E, P] = _create_response_payload_type(  # type: ignore[assignment]
             self._payload_key,
             envelope_type,  # type: ignore[arg-type]
             data_type,  # type: ignore[arg-type]
             False,
         )
-        resp = payload_cls.from_xml_tree(raw)
+        resp = cls.from_xml_tree(raw)  # type: ignore[arg-type]
 
         # Next, attempt to extract the envelope and data from within the response
         resp.envelope, resp.envelope_validation, envelope_node = self._from_tree_envelope(raw, envelope_type)
@@ -148,21 +151,24 @@ class Serializer:
         # Otherwise, we'll attempt to construct the response from the raw data.
         if self._payload_key != raw.tag:
             raise ValueError(f"Expected payload key '{self._payload_key}' not found in response")
-        payload_cls = _create_response_payload_type(
+        cls: MultiResponse[E, P] = _create_response_payload_type(  # type: ignore[assignment]
             self._payload_key,
             envelope_type,  # type: ignore[arg-type]
             data_type,  # type: ignore[arg-type]
             True,
         )
-        resp = payload_cls.from_xml_tree(raw)
+        resp = cls.from_xml_tree(raw)  # type: ignore[arg-type]
 
         # Next, attempt to extract the envelope from the response
-        resp.envelope, resp.envelope_validation, envelope_node = self._from_tree_envelope(raw, envelope_type)
+        resp.envelope, resp.envelope_validation, env_node = self._from_tree_envelope(raw, envelope_type)
 
         # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
         # from within the envelope
-        self._verify_tree_data_tag(envelope_node, data_type)
-        resp.payload = [self._from_tree_data(item, data_type) for item in envelope_node.findall(data_type.__name__)]
+        # Note: apparently, mypy doesn't know about setter-getter properties either...
+        self._verify_tree_data_tag(env_node, data_type)
+        resp.payload = [
+            self._from_tree_data(item, data_type) for item in env_node.findall(data_type.__name__)  # type: ignore[misc]
+        ]
 
         # Finally, attempt to extract the messages from within the payload
         resp.messages = self._from_tree_messages(raw, envelope_type, data_type, self._payload_key, True)
@@ -194,8 +200,8 @@ class Serializer:
 
         # Finally, parse and return the envelope data and validation information
         return (
-            envelope_type.from_xml_tree(envelope_node),
-            common_cls.from_xml_tree(envelope_node),
+            envelope_type.from_xml_tree(envelope_node),  # type: ignore[arg-type]
+            common_cls.from_xml_tree(envelope_node),  # type: ignore[arg-type]
             envelope_node,
         )
 
@@ -213,7 +219,7 @@ class Serializer:
         if not data_tags.issubset([data_type.__name__, "Messages"]):
             raise ValueError(f"Expected data type '{data_type.__name__}' not found in response")
 
-    def _from_tree_data(self, raw: Optional[Element], data_type: Type[P]) -> ResponseData[P]:
+    def _from_tree_data(self, raw: Optional[Element], data_type: Type[P]) -> Optional[ResponseData[P]]:
         """Attempt to extract the data from within the payload.
 
         Arguments:
@@ -234,12 +240,12 @@ class Serializer:
 
         # Finally, parse and return the data and validation information
         return ResponseData[P](
-            data_type.from_xml_tree(raw),
-            common_cls.from_xml_tree(raw),
+            data_type.from_xml_tree(raw),  # type: ignore[arg-type]
+            common_cls.from_xml_tree(raw),  # type: ignore[arg-type]
         )
 
     def _from_tree_messages(
-        self, raw: Element, envelope_type: E, current_type: P, root: str, multi: bool
+        self, raw: Element, envelope_type: Type[E], current_type: Type[P], root: str, multi: bool
     ) -> Dict[str, Messages]:
         """Attempt to extract the messages from within the payload.
 
@@ -263,7 +269,7 @@ class Serializer:
         # level of the response and set it to the root key
         messages = {}
         if message_node is not None:
-            messages[root] = Messages.from_xml_tree(message_node)
+            messages[root] = Messages.from_xml_tree(message_node)  # type: ignore[arg-type]
 
         # Next, we need to call this method recursively, depending on where we are in the response object. If we are
         # at the root of the response, we need to call this method for the envelope type. If we are at the envelope
@@ -295,15 +301,24 @@ class Serializer:
 
                 # Next, check if the annotation is a subclass of Payload or else if it's a collection of Payload. If
                 # neither of these is the case, we can skip this field.
+                # Note: all our fields are annotated so there's no need to check if they're not
                 if not (
                     (has_args and issubclass(args[0], Payload))
-                    or (not has_args and issubclass(field.annotation, Payload))
+                    or (not has_args and issubclass(field.annotation, Payload))  # type: ignore[arg-type]
                 ):
                     continue
 
                 # Finally, call this method recursively for the field and update the messages with the results
+                # Note: All our fields are annotated as XmlEntityInfo, so they have the "path" attribute
                 messages.update(
-                    self._from_tree_messages_inner(raw, envelope_type, args[0], root, field.path, origin is list)
+                    self._from_tree_messages_inner(
+                        raw,
+                        envelope_type,
+                        args[0],
+                        root,
+                        field.path,  # type: ignore[attr-defined]
+                        origin is list,
+                    )
                 )
 
         # Finally, return our dictionary of messages
@@ -367,10 +382,12 @@ class Serializer:
         return doc.getroot()
 
 
+# Create the response payload type
+PayloadType = Type[Union[Response[E, P], MultiResponse[E, P]]]
+
+
 @lru_cache(maxsize=None)
-def _create_response_payload_type(
-    key: str, envelope_type: Type[E], data_type: Type[P], multi: bool
-) -> Type[Union[Response[E, P], MultiResponse[E, P]]]:
+def _create_response_payload_type(key: str, envelope_type: Type[E], data_type: Type[P], multi: bool) -> PayloadType:
     """Create a new payload type for the given envelope and data types.
 
     This method is intended to save us the overhead of writing a new class for each payload type. Instead, we can
@@ -390,7 +407,9 @@ def _create_response_payload_type(
     Returns:    The base response type that will be used for deserialization.
     """
     # First, create our base response type depending on whether we are creating a multi-response or not
-    base_type = MultiResponse[envelope_type, data_type] if multi else Response[envelope_type, data_type]
+    base_type: PayloadType = Response[envelope_type, data_type]  # type: ignore[valid-type]
+    if multi:
+        base_type = MultiResponse[envelope_type, data_type]  # type: ignore[valid-type]
 
     # Next, create a new payload type that contains the envelope and data types with the appropriate XML tag
     class RSPayload(base_type, tag=key):  # type: ignore[call-arg, valid-type, misc]
@@ -439,7 +458,7 @@ def _create_request_payload_type(key: str, envelope_type: Type[E], data_type: Ty
     Returns:    A new payload type that can be used for serialization.
     """  # fmt: skip
     # First, create a wrapper for our data type that will be used to store the data in the payload
-    class Envelope(envelope_type):
+    class Envelope(envelope_type):  # type: ignore[valid-type, misc]
         """Wrapper for the data type that will be used to store the data in the payload."""
 
         # The data to be stored in the payload
