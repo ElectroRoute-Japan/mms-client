@@ -19,12 +19,11 @@ class AudienceError(ValueError):
         allowed (str):  The allowed audience.
         audience (str): The invalid audience.
         """
-        super().__init__(
-            f"{method}: Invalid client type, '{audience.name}' provided. Only '{allowed.name}' is supported.",
-        )
         self.method = method
+        self.message = f"{method}: Invalid client type, '{audience.name}' provided. Only '{allowed.name}' is supported."
         self.allowed = allowed
         self.audience = audience
+        super().__init__(self.message)
 
 
 class MMSClientError(RuntimeError):
@@ -55,9 +54,10 @@ class MMSValidationError(RuntimeError):
         request (P):                    The request data.
         messages (Dict[str, Messages]): The messages returned with the payload.
         """
-        super().__init__(
+        self.message = (
             f"{method}: Request of type {type(envelope).__name__} containing data {type(request).__name__} "
             f"failed validation. See the logs for more information."
         )
         self.method = method
         self.messages = messages
+        super().__init__(self.message)
