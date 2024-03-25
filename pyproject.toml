@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mms_client"
-version = "v1.0.0"
+version = "v1.0.1"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
@@ -27,7 +27,7 @@ pylint = "^3.1.0"
 xenon = "^0.9.1"
 pydocstyle = "^6.3.0"
 pre-commit = "^3.6.2"
-pytest = "^8.1.0"
+pytest = "~8.0"
 pytest-xdist = "^3.5.0"
 pytest-cov = "^4.1.0"
 pytest-mock = "^3.12.0"
@@ -36,6 +36,7 @@ lxml-stubs = "^0.5.1"
 pyfakefs = "^5.3.5"
 pydantic-extra-types = "^2.6.0"
 responses = "^0.25.0"
+types-urllib3 = "^1.26.25.14"
 
 [tool.black]
 line-length = 120
@@ -56,8 +57,7 @@ plugins = [
 [[tool.mypy.overrides]]
 module = [
   'requests_pkcs12',
-  'dicttoxml.*',
-  'mms_client.*'  # Not sure why mypy doesn't like our local imports but it doesn't
+  'dicttoxml.*'
 ]
 ignore_missing_imports = true
 
