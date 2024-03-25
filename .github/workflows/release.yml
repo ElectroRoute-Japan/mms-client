@@ -53,4 +53,3 @@ jobs:
           poetry_version: "1.5.1"
           pypi_token: ${{ secrets.PYPI_TOKEN }}
           poetry_install_options: "--without dev"
-          poetry_publish_options: "--build"
