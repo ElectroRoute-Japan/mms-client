@@ -50,6 +50,6 @@ jobs:
         uses: JRubics/poetry-publish@v2.0
         with:
           python_version: "3.11.7"
-          poetry_version: "1.5.1"
+          poetry_version: "==1.5.1"
           pypi_token: ${{ secrets.PYPI_TOKEN }}
           poetry_install_options: "--without dev"
