@@ -46,17 +46,10 @@ jobs:
     needs: [version-check, check]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Publish PyPI Package
+        uses: JRubics/poetry-publish@v2.0
         with:
-          python-version: "3.11"
-      - uses: abatilo/actions-poetry@v2
-        with:
-          poetry-version: "1.5.1"
-      - name: Poetry Version
-        run: poetry --version
-      - name: Install Dependencies
-        run: poetry install
-      - name: Configure Poetry
-        run: poetry config pypi-token.pypi ${{ vars.PYPI_TOKEN }}
-      - name: Build and Publish PyPI Package
-        run: poetry publish --build
+          python_version: "3.11.7"
+          pypi_token: ${{ secrets.PYPI_TOKEN }}
+          poetry_install_options: "--without dev"
+          poetry_publish_options: "--build"
