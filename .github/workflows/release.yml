@@ -57,6 +57,6 @@ jobs:
       - name: Install Dependencies
         run: poetry install
       - name: Configure Poetry
-        run: poetry config pypi-token.mms-client ${{ vars.PYPI_TOKEN }}
+        run: poetry config pypi-token.pypi ${{ vars.PYPI_TOKEN }}
       - name: Build and Publish PyPI Package
         run: poetry publish --build
