@@ -44,12 +44,20 @@ jobs:
     runs-on: ubuntu-latest
     environment: release
     needs: [version-check, check]
+    permissions:
+      # IMPORTANT: this permission is mandatory for trusted publishing
+      id-token: write
     steps:
       - uses: actions/checkout@v3
-      - name: Publish PyPI Package
-        uses: JRubics/poetry-publish@v2.0
+      - uses: actions/setup-python@v4
         with:
-          python_version: "3.11.7"
-          poetry_version: "==1.5.1"
-          pypi_token: ${{ secrets.PYPI_TOKEN }}
-          poetry_install_options: "--without dev"
+          python-version: "3.11"
+      - uses: abatilo/actions-poetry@v2
+        with:
+          poetry-version: "1.5.1"
+      - name: Install Dependencies
+        run: poetry install --without dev
+      - name: Build Package
+        run: poetry build
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
