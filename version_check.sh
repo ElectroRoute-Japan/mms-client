@@ -4,10 +4,10 @@
 ver=$(cat pyproject.toml | grep -Po '(version\s*=\s*")\K[^"]*')
 
 # Check if the project version is less than or equal to the GitHub tag; if it is then raise an error
-if [ $ver <= "$1" ]
+if [ $ver > "$1" ]
 then
+    echo "Project version $ver is greater than $1"
+else
     echo "Expected version $ver to be greater than current version of $1"
     exit 1
-else
-    echo "Project version $ver is greater than $1"
 fi
