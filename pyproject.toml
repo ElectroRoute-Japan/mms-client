@@ -5,6 +5,20 @@ description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
 packages = [{ include = "mms_client", from = "src" }]
+homepage = "https://github.com/ElectroRoute-Japan/mms-client"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pydantic :: 2",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: The Unlicense (Unlicense)",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -98,6 +112,9 @@ omit = ["*/__init__.py"]
 
 [tool.coverage.report]
 fail_under = 100
+
+[tool.coverage.html]
+directory = "coverage_html_report"
 
 [build-system]
 requires = ["poetry-core"]
