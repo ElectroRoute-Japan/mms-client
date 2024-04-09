@@ -61,13 +61,24 @@ class OfferStack(Payload):
         mandatory.
     """
 
-    # A number used to identify this PQ pair within the offer
+    # A number used to identify this PQ pair within the offer. Ensure that there are no duplicates of the combination
+    # of the same resource, pattern number, start date and time, and bid management number in the submitted data. In
+    # case of multiple bids in the same time slot and for the same resource, each bid must have a unique number. Enter
+    # '1' for a single bid.
     number: int = attr(name="StackNumber", ge=1, le=20)
 
-    # The minimum quantity that must be provided before the offer can be awarded
+    # The minimum quantity that must be provided before the offer can be awarded. For resources with dedicated line
+    # control or monitoring methods, must be 5000kW or higher. For resources with simple command (online) control
+    # or monitoring methods, must be 1000kW or higher.
     minimum_quantity_kw: int = power_positive("MinimumQuantityInKw")
 
-    # The primary bid quantity in kW
+    # The primary bid quantity in kW. Must be equal to or greater than minimum_quantity_kw. For non-VPP resources, the
+    # total bid volume of all records with the same resource and start date and time must be below the maximum supply
+    # capacity for the corresponding product category of the power source. However, in the case of tertiary adjustment
+    # power 2, it must be the value obtained by subtracting the total agreed capacity of effective tertiary adjustment
+    # power 1. For VPP power sources, the total bid volume of all records with the same power source code and start
+    # date and time must be below the maximum supply capacity registered for the corresponding product category in the
+    # pattern number.
     primary_qty_kw: Optional[int] = power_positive("PrimaryOfferQuantityInKw", True)
 
     # The first secondary bid quantity in kW
@@ -107,7 +118,8 @@ class OfferData(Payload):
     # The direction of the offer (buy, sell)
     direction: Direction = attr(name="Direction")
 
-    # The type of market for which the offer is being submitted
+    # The type of market for which the offer is being submitted. Must be a valid pattern number for the submission date
+    # Required for VPP resources. Ensure there are no duplicate pattern numbers for the same resource and start time.
     pattern_number: Optional[int] = dr_patter_number("DrPatternNumber", True)
 
     # The name of the BSP participant submitting the offer
