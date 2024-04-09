@@ -1,6 +1,7 @@
 """Contains enums common to all MMS types."""
 
 from enum import Enum
+from enum import IntEnum
 
 
 class AreaCode(Enum):
@@ -16,3 +17,10 @@ class AreaCode(Enum):
     SHIKOKU = "08"
     KYUSHU = "09"
     OKINAWA = "10"
+
+
+class Frequency(IntEnum):
+    """Represents the frequency of power sources."""
+
+    EAST = 50
+    WEST = 60

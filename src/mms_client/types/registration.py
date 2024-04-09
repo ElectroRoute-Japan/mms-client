@@ -9,6 +9,8 @@ from typing import Optional
 from pydantic_xml import attr
 
 from mms_client.types.base import Envelope
+from mms_client.types.base import Payload
+from mms_client.types.fields import participant
 
 
 class QueryAction(Enum):
@@ -31,7 +33,9 @@ class RegistrationSubmit(Envelope):
 class RegistrationQuery(Envelope):
     """Represents the base fields for a registration query."""
 
-    # The query type being made
+    # The query type being made.
+    # NORMAL: Retrieve all records that match the specified conditions.
+    # LATEST: Retrieve only the latest record that matches the specified conditions.
     action: QueryAction = attr(default=QueryAction.NORMAL, name="Action")
 
     # The type of data being queried
@@ -43,3 +47,10 @@ class RegistrationQuery(Envelope):
 
 class RegistrationApproval(Envelope):
     """Represents the base fields for a registration approval request."""
+
+
+class RegistrationBase(Payload):
+    """Base class for all registration DTOs."""
+
+    # The MMS code of the business entity to which the registration applies
+    participant: str = participant("ParticipantName")

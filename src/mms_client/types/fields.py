@@ -4,7 +4,13 @@ from pydantic_core import PydanticUndefined
 from pydantic_xml import attr
 
 # Describes the regular expression required by the MMS API for Japanese text
-JAPANESE_TEXT = r"^[\u3000-\u30FF\uFF00-\uFF60\uFFA0-\uFFEF\u4E00-\u9FEA]*$"
+JAPANESE_TEXT = r"[\u3000-\u30FF\uFF00-\uFF60\uFFA0-\uFFEF\u4E00-\u9FEA]*"
+
+# Describes the regular expression required by the MMS API for ASCII text
+ASCII_TEXT = r"[a-zA-Z0-9 ~!@#$*()_+}{:?>`='/.,%;\^\|\-\]\[\\&lt;&amp;&quot;]*"
+
+# Describes the regular expression required by the MMS API for Japanese or ASCII text
+JAPANESE_ASCII_TEXT = f"{JAPANESE_TEXT}|{ASCII_TEXT}"
 
 
 def participant(alias: str, optional: bool = False):
@@ -43,8 +49,8 @@ def operator_code(alias: str, optional: bool = False):
     )
 
 
-def capacity(alias: str, optional: bool = False):
-    """Create a field for a capacity value.
+def transaction_id(alias: str, optional: bool = False):
+    """Create a field for a transaction ID.
 
     Arguments:
     alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
@@ -52,9 +58,30 @@ def capacity(alias: str, optional: bool = False):
     optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
                         required, with no default.
 
+    Returns:    A Pydantic Field object for the transaction ID.
+    """
+    return attr(
+        default=None if optional else PydanticUndefined,
+        name=alias,
+        min_length=8,
+        max_length=10,
+        pattern=r"^[a-zA-Z0-9]{8,10}$",
+    )
+
+
+def capacity(alias: str, minimum: int, optional: bool = False):
+    """Create a field for a capacity value.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    minimum (int):      The minimum value for the capacity field.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
     Returns:    A Pydantic Field object for the capacity value.
     """
-    return attr(default=None if optional else PydanticUndefined, name=alias, gt=0, le=10000000)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=minimum, le=10000000)
 
 
 def power_positive(alias: str, optional: bool = False):
@@ -83,6 +110,20 @@ def price(alias: str, optional: bool = False):
     Returns:    A Pydantic Field object for the price value.
     """
     return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.00, le=10000.00, decimal_places=2)
+
+
+def percentage(alias: str, optional: bool = False):
+    """Create a field for a percentage value.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the percentage value.
+    """
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.0, le=100.0, decimal_places=1)
 
 
 def dr_patter_number(alias: str, optional: bool = False):
@@ -128,6 +169,44 @@ def company_short_name(alias: str, optional: bool = False):
     """
     return attr(
         default=None if optional else PydanticUndefined, name=alias, min_length=1, max_length=10, pattern=JAPANESE_TEXT
+    )
+
+
+def address(alias: str, optional: bool = False):
+    """Create a field for an address.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the address.
+    """
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, min_length=1, max_length=50, pattern=JAPANESE_TEXT
+    )
+
+
+def phone(alias: str, first_part: bool, optional: bool = False):
+    """Create a field for a phone number.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    first_part (bool):  If True, the field will be the first part of the phone number. If False, the field will be the
+                        second part of the phone number.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the phone number.
+    """
+    return attr(
+        default=None if optional else PydanticUndefined,
+        name=alias,
+        min_length=1,
+        max_length=5 if first_part else 4,
+        pattern=r"^[0-9]*$",
     )
 
 
@@ -182,32 +261,41 @@ def system_code(alias: str, optional: bool = False):
         default=None if optional else PydanticUndefined, name=alias, min_length=5, max_length=5, pattern=r"^[A-Z0-9]*$"
     )
 
+
 def minute(alias: str, optional: bool = False):
     """Create a field for a minute value.
-    
+
     Arguments:
     alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
                         to the JSON/XML key.
     optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
                         required, with no default.
-    
+
     Returns:    A Pydantic Field object for the minute value.
     """
     return attr(
-        default=None if optional else PydanticUndefined, name=alias, ge=0, le=99,
+        default=None if optional else PydanticUndefined,
+        name=alias,
+        ge=0,
+        le=99,
     )
+
 
 def hour(alias: str, optional: bool = False):
     """Create a field for an hour value.
-    
+
     Arguments:
     alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
                         to the JSON/XML key.
     optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
                         required, with no default.
-    
+
     Returns:    A Pydantic Field object for the hour value.
     """
     return attr(
-        default=None if optional else PydanticUndefined, name=alias, ge=0.0, lt=100.0, decimal_places=1,
-   )
+        default=None if optional else PydanticUndefined,
+        name=alias,
+        ge=0.0,
+        lt=100.0,
+        decimal_places=1,
+    )
