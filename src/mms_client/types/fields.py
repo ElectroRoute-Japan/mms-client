@@ -109,7 +109,7 @@ def price(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the price value.
     """
-    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.00, le=10000.00, decimal_places=2)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.00, lt=10000.00, decimal_places=2)
 
 
 def percentage(alias: str, optional: bool = False):

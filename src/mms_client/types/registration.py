@@ -9,8 +9,6 @@ from typing import Optional
 from pydantic_xml import attr
 
 from mms_client.types.base import Envelope
-from mms_client.types.base import Payload
-from mms_client.types.fields import participant
 
 
 class QueryAction(Enum):
@@ -47,10 +45,3 @@ class RegistrationQuery(Envelope):
 
 class RegistrationApproval(Envelope):
     """Represents the base fields for a registration approval request."""
-
-
-class RegistrationBase(Payload):
-    """Base class for all registration DTOs."""
-
-    # The MMS code of the business entity to which the registration applies
-    participant: str = participant("ParticipantName")

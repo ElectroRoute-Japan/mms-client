@@ -2,11 +2,13 @@
 
 from base64 import b64encode
 from datetime import date as Date
+from decimal import Decimal
 from typing import Callable
 from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
+from typing import Union
 
 import responses
 from pendulum import DateTime
@@ -29,6 +31,17 @@ from mms_client.types.offer import OfferStack
 from mms_client.types.registration import QueryAction
 from mms_client.types.registration import QueryType
 from mms_client.types.registration import RegistrationQuery
+from mms_client.types.resource import AfcMinimumOutput
+from mms_client.types.resource import OutputBand
+from mms_client.types.resource import ResourceData
+from mms_client.types.resource import ResourceQuery
+from mms_client.types.resource import ShutdownEvent
+from mms_client.types.resource import ShutdownPattern
+from mms_client.types.resource import StartupEvent
+from mms_client.types.resource import StartupEventType
+from mms_client.types.resource import StartupPattern
+from mms_client.types.resource import StopEventType
+from mms_client.types.resource import SwitchOutput
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
@@ -58,7 +71,7 @@ def verify_mms_request(
     assert request.response_compressed == resp_compressed
     assert request.signature == signature
     assert request.subsystem == subsystem
-    verify_attachments(request.attachments, verifiers)
+    verify_list(request.attachments, verifiers)
 
 
 def verify_mms_response(
@@ -80,14 +93,7 @@ def verify_mms_response(
     assert response.is_binary == binary
     assert response.compressed == compressed
     assert response.warnings == warnings
-    verify_attachments(response.attachments, verifiers)
-
-
-def verify_attachments(attachments: List[Attachment], verifiers: List[Callable]):
-    """Verify that the given attachments were created with the correct parameters."""
-    assert len(attachments) == len(verifiers)
-    for i, verifier in enumerate(verifiers):
-        verifier(attachments[i])
+    verify_list(response.attachments, verifiers)
 
 
 def attachment_verifier(name: str, data: bytes, signature: str):
@@ -114,15 +120,9 @@ def messages_verifier(errors: list, warnings: list, infos: list):
     """Return a function that verifies that a message has the expected errors, warnings, and information."""
 
     def inner(messages: Messages):
-        assert len(messages.errors) == len(errors)
-        assert len(messages.warnings) == len(warnings)
-        assert len(messages.information) == len(infos)
-        for i, error in enumerate(errors):
-            error(messages.errors[i])
-        for i, warning in enumerate(warnings):
-            warning(messages.warnings[i])
-        for i, info in enumerate(infos):
-            info(messages.information[i])
+        verify_list(messages.errors, errors)
+        verify_list(messages.warnings, warnings)
+        verify_list(messages.information, infos)
 
     return inner
 
@@ -199,9 +199,7 @@ def verify_offer_data(
     assert request.start == start
     assert request.end == end
     assert request.direction == direction
-    assert len(request.stack) == len(stack_verifiers)
-    for stack, verifier in zip(request.stack, stack_verifiers):
-        verifier(stack)
+    verify_list(request.stack, stack_verifiers)
     verify_offer_data_optional(
         request,
         pattern_number=pattern,
@@ -267,6 +265,114 @@ def verify_offer_cancel(req: OfferCancel, resource: str, start: DateTime, end: D
     assert req.start == start
     assert req.end == end
     assert req.market_type == market_type
+
+
+def verify_resource_data(
+    req: ResourceData,
+    output_band_verifiers: list = None,
+    switch_verifiers: list = None,
+    afc_minimum_verifiers: list = None,
+    startup_verifiers: list = None,
+    shutdown_verifiers: list = None,
+    **kwargs,
+):
+    """Verify that the given resource data request has the expected parameters."""
+    # Verify the list sub-types
+    verify_list(req.output_bands, output_band_verifiers)
+    verify_list(req.switch_outputs, switch_verifiers)
+    verify_list(req.afc_minimum_outputs, afc_minimum_verifiers)
+    verify_list(req.startup_patterns, startup_verifiers)
+    verify_list(req.shutdown_patterns, shutdown_verifiers)
+
+    # Verify the remaining fields
+    for field in req.model_fields.keys():
+        if field not in [
+            "output_bands",
+            "switch_outputs",
+            "afc_minimum_outputs",
+            "startup_patterns",
+            "shutdown_patterns",
+        ]:
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def output_band_verifier(
+    output: int,
+    gf_bandwidth: int,
+    lfc_bandwidth: int,
+    lfc_variation_speed: int,
+    edc_change_rate: int,
+    edc_lfc_change_rate: int,
+):
+    """Verify that the given output band has the expected parameters."""
+
+    def inner(band: OutputBand):
+        assert band.output_kW == output
+        assert band.gf_bandwidth_kW == gf_bandwidth
+        assert band.lfc_bandwidth_kW == lfc_bandwidth
+        assert band.lfc_variation_speed_kW_min == lfc_variation_speed
+        assert band.edc_change_rate_kW_min == edc_change_rate
+        assert band.edc_lfc_change_rate_kW_min == edc_lfc_change_rate
+
+    return inner
+
+
+def switch_output_verifier(output: int, switch_time: int):
+    """Verify that the given switch output has the expected parameters."""
+
+    def inner(switch: SwitchOutput):
+        assert switch.output_kW == output
+        assert switch.switch_time_min == switch_time
+
+    return inner
+
+
+def afc_minimum_output_verifier(output: int, operation_time: Decimal, variation_speed: int):
+    """Verify that the given AFC minimum output has the expected parameters."""
+
+    def inner(afc: AfcMinimumOutput):
+        assert afc.output_kW == output
+        assert afc.operation_time_hr == operation_time
+        assert afc.variation_speed_kW_min == variation_speed
+
+    return inner
+
+
+def pattern_verifier(name: str, events: list):
+    """Verify that a StartupPattern has the expected parameters."""
+
+    def inner(pattern: Union[StartupPattern, ShutdownPattern]):
+        assert pattern.pattern_name == name
+        assert len(pattern.events) == len(events)
+        for event, verifier in zip(pattern.events, events):
+            verifier(event)
+
+    return inner
+
+
+def event_verifier(name, charge_time: str, output: int):
+    """Verify that a StartupEvent or ShutdownEvent has the expected parameters."""
+
+    def inner(event: Union[StartupEvent, ShutdownEvent]):
+        assert event.name == name
+        assert event.charge_time == charge_time
+        assert event.output_kw == output
+
+    return inner
+
+
+def verify_list(items: list = None, verifiers: list = None):
+    """Verify that the given list of items was created with the correct parameters."""
+    print(items)
+    if items is None or verifiers is None:
+        assert items is None and verifiers is None
+        return
+    assert len(items) == len(verifiers)
+    for item, verifier in zip(items, verifiers):
+        verifier(item)
 
 
 def register_mms_request(

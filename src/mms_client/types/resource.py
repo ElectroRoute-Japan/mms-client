@@ -24,7 +24,7 @@ from mms_client.types.fields import address
 from mms_client.types.fields import capacity
 from mms_client.types.fields import hour
 from mms_client.types.fields import minute
-from mms_client.types.fields import participant
+from mms_client.types.fields import participant as participant_name
 from mms_client.types.fields import pattern_name
 from mms_client.types.fields import percentage
 from mms_client.types.fields import phone
@@ -33,7 +33,6 @@ from mms_client.types.fields import resource_name
 from mms_client.types.fields import resource_short_name
 from mms_client.types.fields import system_code
 from mms_client.types.fields import transaction_id
-from mms_client.types.registration import RegistrationBase
 
 
 def output(alias: str, optional: bool = False):
@@ -259,7 +258,7 @@ class Status(Enum):
     DENIED = "DECLINED"
 
 
-class OutputBand(Payload):
+class OutputBand(Payload, tag="OutputBandInfo"):
     """Output band contract.
 
     The contract type is mandatory for THERMAL (thermal power generation), HYDRO (hydroelectric power generation), and
@@ -302,7 +301,7 @@ class OutputBand(Payload):
     edc_lfc_change_rate_kW_min: int = capacity("AfcOtmVariationSpeed", 0)
 
 
-class SwitchOutput(Payload):
+class SwitchOutput(Payload, tag="SwitchOutputInfo"):
     """Switching contract.
 
     Switching output refers to the amount of electrical power generated when switching power supply between different
@@ -321,7 +320,7 @@ class SwitchOutput(Payload):
     switch_time_min: int = minute("SwitchTime")
 
 
-class AfcMinimumOutput(Payload):
+class AfcMinimumOutput(Payload, tag="OutputRangeBelowAfcInfo"):
     """Minimum Output - EDC/LFC Operable Minimum Output contract.
 
     Contains data related to the minimum power output capability of a power generation unit, specifically concerning
@@ -369,7 +368,7 @@ class StartupEvent(Payload):
     output_kw: int = capacity("Output", 0)
 
 
-class StartupPattern(Payload):
+class StartupPattern(Payload, tag="StartupPatternInfo"):
     """Describes the startup pattern of a power generation unit.
 
     Refers to the specific parameters or configurations associated with the process of starting up the unit for power
@@ -407,7 +406,7 @@ class ShutdownEvent(Payload):
     output_kw: int = capacity("Output", 0)
 
 
-class ShutdownPattern(Payload):
+class ShutdownPattern(Payload, tag="StopPatternInfo"):
     """Describes the stop pattern of a power generation unit.
 
     Refers to the specific parameters or configurations associated with the process of shutting down the unit for power
@@ -428,32 +427,39 @@ class ShutdownPattern(Payload):
     events: List[ShutdownEvent] = element(tag="StopPatternEvent", min_length=2, max_length=21)
 
 
-class ResourceData(RegistrationBase, tag="Resource"):
+class ResourceData(Payload, tag="Resource"):
     """Contains the data common to both resource requests and responses."""
 
     # The output bands associated with this resource
-    output_bands: List[OutputBand] = wrapped(path="OutputBand/OutputBandInfo", min_length=0, max_length=20)
+    output_bands: Optional[List[OutputBand]] = wrapped(default=None, path="OutputBand", min_length=1, max_length=20)
 
     # The switching outputs associated with this resource
-    switch_outputs: List[SwitchOutput] = wrapped(path="SwitchOutput/SwitchOutputInfo", min_length=0, max_length=20)
+    switch_outputs: Optional[List[SwitchOutput]] = wrapped(
+        default=None, path="SwitchOutput", min_length=1, max_length=20
+    )
 
     # The minimum EDC/LFC outputs associated with this resource
-    afc_minimum_outputs: List[AfcMinimumOutput] = wrapped(
-        path="OutputRangeBelowAfc/OutputRangeBelowAfcInfo", min_length=0, max_length=20
+    afc_minimum_outputs: Optional[List[AfcMinimumOutput]] = wrapped(
+        default=None, path="OutputRangeBelowAfc", min_length=1, max_length=20
     )
 
     # The startup patterns associated with this resource
-    startup_patterns: List[StartupPattern] = wrapped(
-        path="StartupPattern/StartupPatternInfo", min_length=0, max_length=20
+    startup_patterns: Optional[List[StartupPattern]] = wrapped(
+        default=None, path="StartupPattern", min_length=1, max_length=20
     )
 
     # The stop patterns associated with this resource
-    shutdown_patterns: List[ShutdownPattern] = wrapped(path="StopPattern/StopPatternInfo", min_length=0, max_length=20)
+    shutdown_patterns: Optional[List[ShutdownPattern]] = wrapped(
+        default=None, path="StopPattern", min_length=1, max_length=20
+    )
 
     # Any comments attached to the resource
     comments: Optional[str] = element(
         default=None, tag="Comments", min_length=1, max_length=128, pattern=JAPANESE_ASCII_TEXT
     )
+
+    # The MMS code of the business entity to which the registration applies
+    participant: str = participant_name("ParticipantName")
 
     # A code that uniquely identifies the power generation unit
     name: str = resource_name("ResourceName")
@@ -720,7 +726,7 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # tertiary_2_remaining_reserve_utilization is set to AVAILABLE_FOR_UP_ONLY, AVAILABLE_FOR_DOWN_ONLY, or
     # AVAILABLE_FOR_UP_AND_DOWN, this field must be set. If tertiary_2_remaining_reserve_utilization is set to
     # NOT_AVAILABLE, this field must not be set.
-    tertiary_2_remaining_reserve_capacity_kW: Optional[int] = capacity("Ter2RemResvMaximumSupplyQuantity", True)
+    tertiary_2_remaining_reserve_capacity_kW: Optional[int] = capacity("Ter2RemResvMaximumSupplyQuantity", 0, True)
 
     # Primary-Secondary 1 command-and-control and monitoring method. Refers to the methodology or system utilized for
     # regulating and overseeing power generation units' operations in response to external commands or signals. This
@@ -755,7 +761,7 @@ class ResourceData(RegistrationBase, tag="Resource"):
     has_contract: Optional[BooleanFlag] = attr(default=None, name="ContractExistence")
 
     # The maximum bid price for POWER_SUPPLY_1 power, in JPY/kW/hr
-    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", True)] | None
+    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", True)]
 
     # Presence of voltage regulation function.
     voltage_adjustable: Optional[BooleanFlag] = attr(default=None, name="VoltageAdjustment")
@@ -799,20 +805,18 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # Rated voltage, in kV. Refers to the nominal voltage level at which a power generation unit is designed to operate.
     # If the contract_type is anything other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is
     # mandatory. Otherwise, it cannot be set.
-    rated_voltage_kV: (
-        Annotated[Decimal, attr(default=None, name="RatedVoltage", ge=0.0, le=1000.0, decimal_places=1)] | None
-    )
+    rated_voltage_kV: Annotated[Decimal, attr(default=None, name="RatedVoltage", ge=0.0, le=1000.0, decimal_places=1)]
 
     # Continuous operation voltage as a percentage of the rated voltage. Refers to the voltage level at which a power
     # generation unit can operate continuously without exceeding its design limits. If the contract_type is anything
     # other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is mandatory. Otherwise, it cannot be set.
-    continuous_operation_voltage: Annotated[Decimal, percentage("ContinuousOperationVoltage", True)] | None
+    continuous_operation_voltage: Annotated[Decimal, percentage("ContinuousOperationVoltage", True)]
 
     # Rated power factor. Refers to the ratio of real power to apparent power in an electrical system. It indicates the
     # efficiency of power transfer between the power generation unit and the electrical grid. If the contract_type is
     # anything other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is mandatory. Otherwise, it
     # cannot be set.
-    rated_power_factor: Annotated[Decimal, percentage("RatedPowerFactor", True)] | None
+    rated_power_factor: Annotated[Decimal, percentage("RatedPowerFactor", True)]
 
     # Frequency of the power generation unit. Refers to the number of cycles per second at which the power generation
     # unit operates. It is an essential parameter for ensuring the synchronization of power generation units within the
@@ -832,9 +836,9 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # reliable operation. The lower limit of continuous operation frequency ensures that the system can sustain its
     # operation without dropping below a certain frequency threshold, which could lead to equipment failure or
     # instability in the power grid.
-    minimum_continuous_operation_frequency: (
-        Annotated[Decimal, continuous_operation_frequency("ContinuousOperationFrequencyLower", True)] | None
-    )
+    minimum_continuous_operation_frequency: Annotated[
+        Decimal, continuous_operation_frequency("ContinuousOperationFrequencyLower", True)
+    ]
 
     # The upper bound of the continuous operation frequency. Refers to the maximum frequency at which a power generation
     # unit or system can operate continuously without experiencing issues or damage. In electrical power systems,
@@ -843,9 +847,9 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # without exceeding a certain frequency threshold, which could lead to equipment failure or instability in the power
     # grid. If contract_type is anything other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is
     # mandatory. Otherwise, it cannot be set.
-    maximum_continuous_operation_frequency: (
-        Annotated[Decimal, continuous_operation_frequency("ContinuousOperationFrequencyUpper", True)] | None
-    )
+    maximum_continuous_operation_frequency: Annotated[
+        Decimal, continuous_operation_frequency("ContinuousOperationFrequencyUpper", True)
+    ]
 
     # Whether or not the power generation unit can be started in black start mode. Black start refers to the process of
     # restarting a power generation unit or system without relying on external power sources. It is a critical
@@ -915,18 +919,18 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # its maximum generation or discharge capacity without any constraints or limitations, in hours. If contract_type
     # is anything other than ONLY_POWER_SUPPLY_1 and resource_type is PUMP or BATTERY, then this field is mandatory.
     # For other types of power generation units, this field should not be set.
-    full_generation_time_hr: Annotated[Decimal, hour("FullGenerationTime", True)] | None
+    full_generation_time_hr: Annotated[Decimal, hour("FullGenerationTime", True)]
 
     # The duration for which the power generation unit can operate continuously without interruption or the need for
     # rest or maintenance, in hours. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is
     # PUMP, then this field is mandatory. For other types of power generation units, this field should not be set.
-    continuous_operation_time: Annotated[Decimal, hour("ContinuousOperationTime", True)] | None
+    continuous_operation_time: Annotated[Decimal, hour("ContinuousOperationTime", True)]
 
     # The maximum duration for which the power generation unit can continue operating under specific limitations or
     # constraints, in hours. This could include factors such as environmental conditions, equipment maintenance
     # requirements, or regulatory restrictions. If contract_type is ONLY_POWER_SUPPLY_1, then this field cannot be
     # set. Otherwise, this field is optional.
-    limitd_continuous_operation_time: Annotated[Decimal, hour("LimitedContinuousOperationTime", True)] | None
+    limitd_continuous_operation_time: Annotated[Decimal, hour("LimitedContinuousOperationTime", True)]
 
     # Phase locking is a method used in power systems to synchronize the phase angles of multiple alternating current
     # (AC) sources. In this mode of operation, the frequency and phase of the generated voltage are adjusted to match
@@ -994,17 +998,17 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # The maximum power output generated by a power plant when it operates in overpower mode, in kW. If contract_type
     # is anything other than ONLY_POWER_SUPPLY_1, resource_type is THERMAL and has_overpower_operation is YES, this
     # field is mandatory. However, for other types of power sources, this field cannot be set.
-    overpower_maximum_output_kW: Optional[int] = capacity("OverPowerOperationMaximumOutput", True)
+    overpower_maximum_output_kW: Optional[int] = capacity("OverPowerOperationMaximumOutput", 0, True)
 
     # The maximum power output generated by a power plant when it operates in peak mode, in kW. If contract_type is
     # anything other than ONLY_POWER_SUPPLY_1, resource_type is THERMAL and has_peak_mode_operation is YES, this field
     # is mandatory. However, for other types of power sources, this field cannot be set.
-    peak_mode_maximum_output_kW: Optional[int] = capacity("PeakModeOperationMaximumOutput", True)
+    peak_mode_maximum_output_kW: Optional[int] = capacity("PeakModeOperationMaximumOutput", 0, True)
 
     # The duration during which a power generation unit can effectively operate or generate electricity without
     # interruption, in hours. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is THERMAL,
     # then this field is mandatory. For other types of power generation units, this field should not be set.
-    operation_time_hr: Annotated[Decimal, hour("OperationTime", True)] | None
+    operation_time_hr: Annotated[Decimal, hour("OperationTime", True)]
 
     # The maximum allowable number of times a power generation unit can be started within a specified period. If
     # contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is THERMAL, then this field is
@@ -1021,17 +1025,17 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # in response to changes in grid frequency. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and
     # resource_type is THERMAL, HYDRO, OR PUMP; then this field is mandatory. For other types of power generation units,
     # this field should not be set.
-    gf_variation_rate: Annotated[Decimal, percentage("GfVariationRate", True)] | None
+    gf_variation_rate: Annotated[Decimal, percentage("GfVariationRate", True)]
 
     # The range within which a power generation unit can modulate its output beyond its rated output, in kW.
-    gf_width_outside_rated_output_kW: Optional[int] = capacity("GfWidthOutOfRatedOutput", True)
+    gf_width_outside_rated_output_kW: Optional[int] = capacity("GfWidthOutOfRatedOutput", 0, True)
 
     # Whether or not the power generation facility is being transferred to another entity.
     will_transfer: Optional[bool] = attr(default=None, name="Transfer")
 
     # The previous participant this power generation unit was associated with. This will only be populated if
     # will_transfer is True.
-    previous_participant: Optional[str] = participant("PreviousParticipantName", True)
+    previous_participant: Optional[str] = participant_name("PreviousParticipantName", True)
 
     # The previous code for this power generation unit. This will only be populated if will_transfer is True.
     previous_name: Optional[str] = resource_name("PreviousResourceName", True)
@@ -1047,11 +1051,14 @@ class ResourceData(RegistrationBase, tag="Resource"):
     transaction_id: Optional[str] = transaction_id("TransactionId", True)
 
 
-class ResourceQuery(RegistrationBase):
+class ResourceQuery(Payload):
     """The query parameters for a power generation unit."""
 
-    # A code that uniquely identifies the power generation unit
-    name: str = resource_name("ResourceName")
+    # The MMS code of the business entity to which the registration applies
+    participant: Optional[str] = participant_name("ParticipantName", True)
 
-    # The status of the resource submission. This is automatically set.
-    status: Status = attr(default=Status.IN_PROGRESS, name="RecordStatus")
+    # A code that uniquely identifies the power generation unit
+    name: Optional[str] = resource_name("ResourceName", True)
+
+    # The status of the resources being queried.
+    status: Optional[Status] = attr(default=None, name="RecordStatus")

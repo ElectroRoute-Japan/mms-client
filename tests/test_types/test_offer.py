@@ -47,7 +47,7 @@ def test_offer_submit_defaults():
 
 
 def test_offer_submit_full():
-    """Test that the OfferData class initializes and converts to a dictionary as we expect."""
+    """Test that the OfferData class initializes and converts to XML as we expect."""
     # First, create a new offer data request
     request = OfferData(
         stack=[
@@ -77,7 +77,7 @@ def test_offer_submit_full():
         submission_time=DateTime(2019, 8, 30, 3, 24, 15),
     )
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
@@ -108,7 +108,7 @@ def test_offer_submit_full():
 
 
 def test_offer_cancel():
-    """Test that the OfferCancel class initializes and converts to a dictionary as we expect."""
+    """Test that the OfferCancel class initializes and converts to XML as we expect."""
     # First, create a new offer cancel request
     request = OfferCancel(
         resource="FAKE_RESO",
@@ -117,7 +117,7 @@ def test_offer_cancel():
         market_type=MarketType.WEEK_AHEAD,
     )
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
@@ -131,11 +131,11 @@ def test_offer_cancel():
 
 
 def test_offer_query_defaults():
-    """Test that the OfferQuery class initializes and converts to a dictionary as we expect."""
+    """Test that the OfferQuery class initializes and converts to XML as we expect."""
     # First, create a new offer query request
     request = OfferQuery(market_type=MarketType.WEEK_AHEAD)
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
@@ -144,11 +144,11 @@ def test_offer_query_defaults():
 
 
 def test_offer_query_full():
-    """Test that the OfferQuery class initializes and converts to a dictionary as we expect."""
+    """Test that the OfferQuery class initializes and converts to XML as we expect."""
     # First, create a new offer query request
     request = OfferQuery(market_type=MarketType.WEEK_AHEAD, area=AreaCode.CHUBU, resource="FAKE_RESO")
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
