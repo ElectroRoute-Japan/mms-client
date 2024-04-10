@@ -65,13 +65,13 @@ def test_put_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "HsVd+Dqo/c/LYNpa8/yKNn0I6hZIz1DxKR0QLZFjWEUX4Kvj3WEqU700m6yJvZpg0LjcgDFfJsnMPwEZ8QkkenMRlYBa9Q1M2oeG7PMWS"
-            "r82KoRP9howcq0Ad4a0UHaB8WwZKztyWf4P/cALqNydosrRy1m7j54wKyanQfMnnVLGMSpEFbvF6oem0q71MUhoT2jJ0xMDTTzs7W41qp"
-            "bgDhcvFMKzRlFGZe/i3EMMWglACvTpQmp/5r5RjQ00DLZ+/VZnf2+NlE6sTetYWmcLyfWp737Z7e68Sk4Lb0+KgkAXziq7EA7nSAYDLgB"
-            "DbQNSvNK8snlTsirY2V/HVrH5ETz+hduWyKRzYF91AHCgOOpBXyrEbeGvcsnNNujFxT36Re5mL7ngrTb087wfb1wHk8iHwawH0L7VVdMS"
-            "8BJi+yofljmaAqZVGNQEfC5Q2hZsRhMRp5H4SJCHvbO8ZFdXD8lJGPqThmqr7hB5ttY+XqGKIsr0fv6V5OVEqrMWy64vQAMWSiC+jlhFy"
-            "vTFw7h6hOQAcZXIQ/kdfqz6JvpjnzPjmDHVj3HGCKaw5afZJpUSDjiZjih+L+KBwJSiA02EBrvlCY/2lXKSo9xj5nU6bnso+rKt8Rwsqo"
-            "qaNAR0x76pNcODGg3oxQQa+/kjxW0Wk/014sWhvkPC0vAUqYoTJCs="
+            "uU52ZMls11Bw0mVTVVXgBoqfbLqtL4af3SZq0kbEIMLrVUYDuRtmgQ2hasCCg3wz2STJy64lfU4uw3j9ZYR+oLcE1WY9URhr5+udDEB4B"
+            "n9lo+jWju+GH5+wV8SOEWYs325ymPheDqOhuVcUt5oVKAwd88RKxtnjzlV5boc+O1OEcaOlJt1M8qmpub8y2LAk1HKwb5Wo83UP0CMe+C"
+            "QRKQ2fXBhsBiVDa0nHToRq5QpIWv6pnC9brGBO2R0KoZh0j6J6t6s6QqfCjUPShZbsiGDB9ju377l87YnwgkiFKRMzGlxzFo0Ayr6WHc0"
+            "bN9/qZuqVkhLoKTs+0oK0kouJkiqsrfbdrqEN//zHpjCmD7IxmM1R8LXXSeljZXMntaABG7hPPUik7MkSN41V3pn6OkI1n7UdA+ZWmqjk"
+            "/At+C2v4XtfPKaXtT7mMgu7UdNB4n64nJg1eR0BOw7clpkmWwaZzgTS5QXoW05gjnnkqKoorx0pGPcWUw8QC3jJWnnJ4H54iB5+MBlnJC"
+            "thBeOefq16bmqQnTw6ETKxVRkbAkB3OqPpkw/zJXEoeVJK4abyuCNPHz8bzaZR8VloqLlFnYkSUUvWK0iqrg8ZzUtiuKMUS9t8cvRiOTn"
+            "JiabuhKc863mxe2L+Baft7QCY4dHWjldY3uVwCrEXfWOCVyGQIpbQ="
         ),
         (
             """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
@@ -137,13 +137,13 @@ def test_query_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "SgqlN5rgyyA3JcbvilHB7Zbz+2HpmUQYmbG/7HDHDTAijg2ZOCB+uZo3D5ol7OPB5+o3PuxZkZ5GrUefeu88rh5efWSBHEItL5E+h0wR4"
-            "/Sq9hPSrQ3JsMuzfNig9YCTcVVfFBLibb2FacwKe7hjXK13GqahJT9Fe45BCy2H8CSGU+alx4c2iGE7RdSTCRt0wOcArZ1TnrkN9jW1XL"
-            "1YAP3XOZ0ItHxVyKIT5dk7ZuN9PQG5P6QrDFUDRTyQ52oP26PPHCTt65F61DMBkeOvxrhdnWDQlSvyFlCT9KPlTkjFtDxEqQYoAiSDGYC"
-            "wHIHjCrRocd1V8LMy1LGLnuhLtvBSKw92kS3eV1FJ061W6SQoQ0LCaAAGxV+gGNTFpULY1MUp7Zekyn/Nb/JRXQAbsIDJiVUd0zg2Vy8S"
-            "IAhx4ZiF/YlAF3psRL+Kn5HNgX5K/2ebeg1zDm3Jiurt+oR3P1V8XkVU+fOmxZ63AwXLjoFU8BHbqYZO9ATcuDkmE1PWlg39smxm8l/Uu"
-            "KmMN7IxlzwN2Yg0sTq9Lwws6doHqnsiF3PCclHuUZKI48KFqz9jl9QxlLMUVDv6Bi5cIGCOUc34hcd/9ePILQSLCqczcplAn0AE8/19H/"
-            "TZu1VSAXJznHH59JyaZRDADDgmglqjudtp0ryq/yZIZZO4Gi1vU8I="
+            "HXD+EdcN+NJi6vlVZ3OirpncAxvwoy3YxMABLPpEKnHGv2+NB51TBujizFeKoxROy6nQEKtuGQYRKiPSnpuSJKF2PhaVBAteEz5w/C1We"
+            "HriBDOTnl6j0zBJbi896T7gLTwp3Zj94GTwhVh1Hnc0ZIGb+W0cpcZo6XDu4844zBtnRbjkE5UDbOp1Sm0mDVZ0BiwAC7DR+NFkpUrMNQ"
+            "qHor9HHMiXIT1blLP0TkioIo2l//1pEqd8NibHvjAYM5dZuDmz6ucxQivMrNgInlgXivINCzj3zkbfy66PqLUX1WJmEIlejOskC7qxuP6"
+            "JSywtV4kWUBqKBXHSHjB0Ie6JS3hoqVFOvC9lZhDiU3Geb054wZqk50+CldWeGzIsub5a9vgZZK/+6MbNVh8N5k2vZSyXS3GWhxHW/WCK"
+            "NkT6UZ4PHsaGI6eSyj2jqpGKJlZ8N9h/DDm9saBBLnqcdWQOubGDvrhloph/WIkqcYJJx6uzCOsIeZDI/Q0dSIMjtF4wpo3D6nD1rGvr+"
+            "E/Sxw7AyD2vAK6K999N3b4U/sdnfJncFldeOXJMRTxDeSRBHnSmkrQteKIJ91K53nQuhC3XaAGYaKgbSMeLV/WzWO85DoUSvWJrljhMWi"
+            "Uxn0ZMj46wrnJqU9KxZpNzvqHyrIoCnry+xJMSTJn2HtiqxywieOQ="
         ),
         (
             """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
@@ -236,13 +236,13 @@ def test_cancel_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "jKFHk8iwfL5wMjJ4a7Rz4pmQB8i0kprjlMG5+BxMXddOUk6geyKbiIu+5/BVgU7lfoepiYDQ5x2dN6XunKFV8F3jI13LECwxhPqnPL/eg"
-            "kDInPbbMk4Oab9KvecrgdyLHx6Fu9sBoar/zTCjnRDxMxbKBw5VU0XG+QW0q/X+1ZlbYQnYl+kY+UgNm2DxcblKD3l9xZaPfMCpIvzcUh"
-            "Z/E8henn+MHmUiojpxZ+OeXgdAYEbtsBRXOCy2LYdTczeFMDw3aFjCoZATU8cZHbuAcJd3xiKfbqOuaVQi5w3o90SiUgZJHG9BnvabSEi"
-            "tp3a3QTnNnPSfH318jndI7ydArO051QsBlvT1HycwQ56T8NUhuHn306kZE70s4G0kQ2Lp24PuH4D1NXhK3lLukWu2Mc0JdtAnhnU63SFG"
-            "eZCpjpb4Uv/pAW/4Q506iULy11ho09+xoiyr7yHumMIkedMo3+cIBvAwbYthCmzfQZFBd6rMzKEjfkjcJslu5MdRbVv16cPOsElqlcM5O"
-            "NrzNFQgJzhffmOxk/hmI6DwVFRczXCOXaB9yFj19Xissy10uwhF0UiBp5AX/oMxemn62nDJcIer45DlLeZwKUUzsrrdeX/iDv9iuj/RrK"
-            "EMNJNNv0t9VZ2v/y0+N9IXpxQeCnjwPnI0550KIU+K40Gcfa6w7f4="
+            "tYViRBY8lgXK7ud/sYswT6UtC4QTFLYxToRgbhxqLL6uQYa2cD7pKJfgfj4iSFrf/jLfNvR+6f+FqXvalRcijdYEH29hdKJQ1lsZ5rLic"
+            "iRiw6cq7a40hTVOG8NqTlhgak6i3A0Xa3wgPF8UTAjo4a5Orx70zZitkUITVrKY70Z2u+drMQM/BAs3R8/7kRKNPwzLpi9BNcrAMWqt0w"
+            "23S5UoiC6EgXFCkt2VabGLUsmoXNabgR41e4n7A5a8C79ydmz3JVy6NHm34lOQWp9y8/QSNfA3I4lWWoLOLpNJXso4fD2CEHGPG2nonf5"
+            "AjdC53EflgK/fwKQHZQo7GfhFIh1blSPnEY4Oiz9UJhpTvYHgwITM354X3VEousJ5is0EtD9hG3+8rM3LAQirCOyuJXEUfF5z30LXFwlQ"
+            "dx5rFfYho3Z1fjhrbNLjg8cPnFwvfUa4+xueAxomN4O//E1VIceUW6ns9CGzR7VvqYaEGmX6gEcixXQ/lQ5kaeJtNhBHpFMDBbWZGiCON"
+            "KOP1hGW9wI5QtWZeyHTJbcbXBbeuRXAIHPKYqEMADFWzKZyJeEspKGUTyCegRudLRwQgzDvq9XzRUsW4uH84CuUaPgsUK29Bjy8H7lYL/"
+            "aAlcB/daZWmWd/5noHKMfokRgYQir1zHEgjBlrev9c4fk0ckRaNEw="
         ),
         (
             """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """

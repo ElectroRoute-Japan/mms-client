@@ -26,6 +26,9 @@ from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
+from mms_client.types.registration import QueryAction
+from mms_client.types.registration import QueryType
+from mms_client.types.registration import RegistrationQuery
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
@@ -164,6 +167,15 @@ def verify_base_market_request(
     assert req.participant == participant
     assert req.user == user
     assert req.market_type == market_type
+
+
+def verify_registration_query(
+    req: RegistrationQuery, action: QueryAction, query_type: QueryType, date: Optional[Date] = None
+):
+    """Verify that the RegistrationQuery was created with the correct parameters."""
+    assert req.action == action
+    assert req.query_type == query_type
+    assert req.date == date
 
 
 def verify_offer_data(

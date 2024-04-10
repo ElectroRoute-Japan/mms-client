@@ -13,7 +13,6 @@ from mms_client.types.base import MultiResponse
 from mms_client.types.base import ProcessingStatistics
 from mms_client.types.base import Response
 from mms_client.types.base import ResponseData
-from mms_client.types.base import SchemaType
 
 
 def test_response_base_validate_defaults_works():
@@ -33,7 +32,7 @@ def test_response_base_validate_full_works():
     """Test that the ResponseBase class can be converted from an XML payload as expected."""
 
     # First, create our test XML payload
-    raw = b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema"><ProcessingStatistics Received="1" Valid="2" Invalid="3" Successful="4" Unsuccessful="5" ProcessingTimeMs="6" TransactionID="derpderp" TimeStamp="Mon Aug 30 03:25:41 JST 2019" XmlTimeStamp="2019-08-30T03:25:41Z"/></BaseResponse>"""
+    raw = b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema"><ProcessingStatistics Received="1" Valid="2" Invalid="3" Successful="4" Unsuccessful="5" ProcessingTimeMs="6" TransactionId="derpderp" TimeStamp="Mon Aug 30 03:25:41 JST 2019" XmlTimeStamp="2019-08-30T03:25:41Z"/></BaseResponse>"""
 
     # Next, attempt to validate it against our ResponseBase model
     data = BaseResponse[Envelope].from_xml(raw)

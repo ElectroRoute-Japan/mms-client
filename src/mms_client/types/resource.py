@@ -5,6 +5,7 @@
 from datetime import date as Date
 from decimal import Decimal
 from enum import Enum
+from typing import Annotated
 from typing import List
 from typing import Optional
 
@@ -754,7 +755,7 @@ class ResourceData(RegistrationBase, tag="Resource"):
     has_contract: Optional[BooleanFlag] = attr(default=None, name="ContractExistence")
 
     # The maximum bid price for POWER_SUPPLY_1 power, in JPY/kW/hr
-    declared_maximum_unit_price_kWh: Optional[Decimal] = price("DeclaredMaximumUnitPrice", True)
+    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", True)] | None
 
     # Presence of voltage regulation function.
     voltage_adjustable: Optional[BooleanFlag] = attr(default=None, name="VoltageAdjustment")
@@ -786,7 +787,7 @@ class ResourceData(RegistrationBase, tag="Resource"):
     )
 
     # The model designation associated with this power generation unit.
-    model_name: Optional[str] = attr(
+    model: Optional[str] = attr(
         default=None, name="ModelName", min_length=1, max_length=50, pattern=JAPANESE_ASCII_TEXT
     )
 
@@ -798,18 +799,20 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # Rated voltage, in kV. Refers to the nominal voltage level at which a power generation unit is designed to operate.
     # If the contract_type is anything other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is
     # mandatory. Otherwise, it cannot be set.
-    rated_voltage_kV: Optional[Decimal] = attr(default=None, name="RatedVoltage", ge=0.0, le=1000.0, decimal_places=1)
+    rated_voltage_kV: (
+        Annotated[Decimal, attr(default=None, name="RatedVoltage", ge=0.0, le=1000.0, decimal_places=1)] | None
+    )
 
     # Continuous operation voltage as a percentage of the rated voltage. Refers to the voltage level at which a power
     # generation unit can operate continuously without exceeding its design limits. If the contract_type is anything
     # other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is mandatory. Otherwise, it cannot be set.
-    continuous_operation_voltage: Optional[Decimal] = percentage("ContinuousOperationVoltage", True)
+    continuous_operation_voltage: Annotated[Decimal, percentage("ContinuousOperationVoltage", True)] | None
 
     # Rated power factor. Refers to the ratio of real power to apparent power in an electrical system. It indicates the
     # efficiency of power transfer between the power generation unit and the electrical grid. If the contract_type is
     # anything other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is mandatory. Otherwise, it
     # cannot be set.
-    rated_power_factor: Optional[Decimal] = percentage("RatedPowerFactor", True)
+    rated_power_factor: Annotated[Decimal, percentage("RatedPowerFactor", True)] | None
 
     # Frequency of the power generation unit. Refers to the number of cycles per second at which the power generation
     # unit operates. It is an essential parameter for ensuring the synchronization of power generation units within the
@@ -829,8 +832,8 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # reliable operation. The lower limit of continuous operation frequency ensures that the system can sustain its
     # operation without dropping below a certain frequency threshold, which could lead to equipment failure or
     # instability in the power grid.
-    minimum_continuous_operation_frequency: Optional[Decimal] = continuous_operation_frequency(
-        "ContinuousOperationFrequencyLower", True
+    minimum_continuous_operation_frequency: (
+        Annotated[Decimal, continuous_operation_frequency("ContinuousOperationFrequencyLower", True)] | None
     )
 
     # The upper bound of the continuous operation frequency. Refers to the maximum frequency at which a power generation
@@ -840,8 +843,8 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # without exceeding a certain frequency threshold, which could lead to equipment failure or instability in the power
     # grid. If contract_type is anything other than ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is
     # mandatory. Otherwise, it cannot be set.
-    maximum_continuous_operation_frequency: Optional[Decimal] = continuous_operation_frequency(
-        "ContinuousOperationFrequencyUpper", True
+    maximum_continuous_operation_frequency: (
+        Annotated[Decimal, continuous_operation_frequency("ContinuousOperationFrequencyUpper", True)] | None
     )
 
     # Whether or not the power generation unit can be started in black start mode. Black start refers to the process of
@@ -912,18 +915,18 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # its maximum generation or discharge capacity without any constraints or limitations, in hours. If contract_type
     # is anything other than ONLY_POWER_SUPPLY_1 and resource_type is PUMP or BATTERY, then this field is mandatory.
     # For other types of power generation units, this field should not be set.
-    full_generation_time_hr: Optional[Decimal] = hour("FullGenerationTime", True)
+    full_generation_time_hr: Annotated[Decimal, hour("FullGenerationTime", True)] | None
 
     # The duration for which the power generation unit can operate continuously without interruption or the need for
     # rest or maintenance, in hours. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is
     # PUMP, then this field is mandatory. For other types of power generation units, this field should not be set.
-    continuous_operation_time: Optional[Decimal] = hour("ContinuousOperationTime", True)
+    continuous_operation_time: Annotated[Decimal, hour("ContinuousOperationTime", True)] | None
 
     # The maximum duration for which the power generation unit can continue operating under specific limitations or
     # constraints, in hours. This could include factors such as environmental conditions, equipment maintenance
     # requirements, or regulatory restrictions. If contract_type is ONLY_POWER_SUPPLY_1, then this field cannot be
     # set. Otherwise, this field is optional.
-    limitd_continuous_operation_time: Optional[Decimal] = hour("LimitedContinuousOperationTime", True)
+    limitd_continuous_operation_time: Annotated[Decimal, hour("LimitedContinuousOperationTime", True)] | None
 
     # Phase locking is a method used in power systems to synchronize the phase angles of multiple alternating current
     # (AC) sources. In this mode of operation, the frequency and phase of the generated voltage are adjusted to match
@@ -1001,7 +1004,7 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # The duration during which a power generation unit can effectively operate or generate electricity without
     # interruption, in hours. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is THERMAL,
     # then this field is mandatory. For other types of power generation units, this field should not be set.
-    operation_time_hr: Optional[Decimal] = hour("OperationTime", True)
+    operation_time_hr: Annotated[Decimal, hour("OperationTime", True)] | None
 
     # The maximum allowable number of times a power generation unit can be started within a specified period. If
     # contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is THERMAL, then this field is
@@ -1018,7 +1021,7 @@ class ResourceData(RegistrationBase, tag="Resource"):
     # in response to changes in grid frequency. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and
     # resource_type is THERMAL, HYDRO, OR PUMP; then this field is mandatory. For other types of power generation units,
     # this field should not be set.
-    gf_variation_rate: Optional[Decimal] = percentage("GfVariationRate", True)
+    gf_variation_rate: Annotated[Decimal, percentage("GfVariationRate", True)] | None
 
     # The range within which a power generation unit can modulate its output beyond its rated output, in kW.
     gf_width_outside_rated_output_kW: Optional[int] = capacity("GfWidthOutOfRatedOutput", True)
