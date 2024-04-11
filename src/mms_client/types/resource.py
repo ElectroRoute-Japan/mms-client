@@ -1051,7 +1051,7 @@ class ResourceData(Payload, tag="Resource"):
     transaction_id: Optional[str] = transaction_id("TransactionId", True)
 
 
-class ResourceQuery(Payload):
+class ResourceQuery(Payload, tag="Resource"):
     """The query parameters for a power generation unit."""
 
     # The MMS code of the business entity to which the registration applies

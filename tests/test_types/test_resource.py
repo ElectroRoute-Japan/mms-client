@@ -32,6 +32,7 @@ from tests.testutils import output_band_verifier
 from tests.testutils import pattern_verifier
 from tests.testutils import switch_output_verifier
 from tests.testutils import verify_resource_data
+from tests.testutils import verify_resource_query
 
 
 def test_resource_data_defaults():
@@ -405,3 +406,33 @@ def test_resource_data_full():
         status=Status.IN_PROGRESS,
         transaction_id="derpderp",
     )
+
+
+def test_resource_query_defaults():
+    """Test that the ResourceQuery class initializes and converts to XML as expected."""
+    # First, create a new resource query request
+    request = ResourceQuery()
+
+    # Next, convert the request to XML
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
+
+    # Finally, verify that the request was created with the correct parameters
+    assert data == b"<Resource/>"
+    verify_resource_query(request)
+
+
+def test_resource_query_full():
+    """Test that the ResourceQuery class initializes and converts to XML as expected."""
+    # First, create a new resource query request
+    request = ResourceQuery(
+        participant="F100",
+        name="FAKE_RESO",
+        status=Status.APPROVED,
+    )
+
+    # Next, convert the request to XML
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
+
+    # Finally, verify that the request was created with the correct parameters
+    assert data == b"""<Resource ParticipantName="F100" ResourceName="FAKE_RESO" RecordStatus="APPROVED"/>"""
+    verify_resource_query(request, "F100", "FAKE_RESO", Status.APPROVED)

@@ -38,9 +38,8 @@ from mms_client.types.resource import ResourceQuery
 from mms_client.types.resource import ShutdownEvent
 from mms_client.types.resource import ShutdownPattern
 from mms_client.types.resource import StartupEvent
-from mms_client.types.resource import StartupEventType
 from mms_client.types.resource import StartupPattern
-from mms_client.types.resource import StopEventType
+from mms_client.types.resource import Status
 from mms_client.types.resource import SwitchOutput
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
@@ -297,6 +296,15 @@ def verify_resource_data(
                 assert getattr(req, field) == kwargs[field]
             else:
                 assert getattr(req, field) is None
+
+
+def verify_resource_query(
+    req: ResourceQuery, participant: Optional[str] = None, name: Optional[str] = None, status: Optional[Status] = None
+):
+    """Verify that the ResourceQuery was created with the correct parameters."""
+    assert req.participant == participant
+    assert req.name == name
+    assert req.status == status
 
 
 def output_band_verifier(
