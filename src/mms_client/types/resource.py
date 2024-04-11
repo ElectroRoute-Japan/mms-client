@@ -183,13 +183,13 @@ class ContractType(Enum):
 class ResourceType(Enum):
     """How the power generation unit produces electricity."""
 
-    THERMAL = "1"
-    HYDRO = "2"
-    PUMP = "3"
-    BATTERY = "4"
-    VPP_GEN = "5"
-    VPP_GEN_AND_DEM = "6"
-    VPP_DEM = "7"
+    THERMAL = "01"
+    HYDRO = "02"
+    PUMP = "03"
+    BATTERY = "04"
+    VPP_GEN = "05"
+    VPP_GEN_AND_DEM = "06"
+    VPP_DEM = "07"
 
 
 class RemainingReserveAvailability(Enum):
@@ -359,8 +359,8 @@ class StartupEvent(Payload):
     name: StartupEventType = attr(name="EventName")
 
     # the time required to complete the event, within -99:59 to 99:59. The time is in the format "HH:MM" or "-HH:MM".
-    charge_time: str = attr(
-        name="ChargeTime",
+    change_time: str = attr(
+        name="ChangeTime",
         pattern=r"^([0-9]{2}:[0-5][0-9])|(-00:(([0-5][1-9])|([1-5][0-9])))|(-(([0-9][1-9])|([1-9][0-9])):[0-5][0-9])$",
     )
 
@@ -397,8 +397,8 @@ class ShutdownEvent(Payload):
     name: StopEventType = attr(name="EventName")
 
     # The time required to complete the event, within -99:59 to 00:00. The time is in the format "-HH:MM".
-    charge_time: str = attr(
-        name="ChargeTime",
+    change_time: str = attr(
+        name="ChangeTime",
         pattern=r"^00:00|(-00:(([0-5][1-9])|([1-5][0-9])))|(-(([0-9][1-9])|([1-9][0-9])):[0-5][0-9])$",
     )
 
@@ -471,7 +471,7 @@ class ResourceData(Payload, tag="Resource"):
     resource_type: ResourceType = attr(name="ResourceType")
 
     # The region in which the power generation unit is located and in which its energy will be traded
-    area: AreaCode = attr(name="AreaCode")
+    area: AreaCode = attr(name="Area")
 
     # The date from which the power generation unit is available to trade
     start: Date = attr(name="StartDate")
@@ -827,7 +827,7 @@ class ResourceData(Payload, tag="Resource"):
     # The internal efficiency of the power generation unit. If the contract_type is anything other than
     # ONLY_POWER_SUPPLY_1 and resource_type is not VPP, this field is mandatory. Otherwise, it cannot be set.
     internal_efficiency: Optional[str] = attr(
-        default=None, name="InternalEfficiency", min_length=1, max_length=100, pattern=JAPANESE_ASCII_TEXT
+        default=None, name="InPlantRate", min_length=1, max_length=100, pattern=JAPANESE_ASCII_TEXT
     )
 
     # The lower bound of the continuous operation frequency. Refers to the minimum frequency at which a power
@@ -919,7 +919,7 @@ class ResourceData(Payload, tag="Resource"):
     # its maximum generation or discharge capacity without any constraints or limitations, in hours. If contract_type
     # is anything other than ONLY_POWER_SUPPLY_1 and resource_type is PUMP or BATTERY, then this field is mandatory.
     # For other types of power generation units, this field should not be set.
-    full_generation_time_hr: Annotated[Decimal, hour("FullGenerationTime", True)]
+    full_generation_time_hr: Annotated[Decimal, hour("FullPowerGenerationTime", True)]
 
     # The duration for which the power generation unit can operate continuously without interruption or the need for
     # rest or maintenance, in hours. If contract_type is anything other than ONLY_POWER_SUPPLY_1, and resource_type is
@@ -930,7 +930,7 @@ class ResourceData(Payload, tag="Resource"):
     # constraints, in hours. This could include factors such as environmental conditions, equipment maintenance
     # requirements, or regulatory restrictions. If contract_type is ONLY_POWER_SUPPLY_1, then this field cannot be
     # set. Otherwise, this field is optional.
-    limitd_continuous_operation_time: Annotated[Decimal, hour("LimitedContinuousOperationTime", True)]
+    limitd_continuous_operation_time: Annotated[Decimal, hour("ContinuousOperationTimeLimited", True)]
 
     # Phase locking is a method used in power systems to synchronize the phase angles of multiple alternating current
     # (AC) sources. In this mode of operation, the frequency and phase of the generated voltage are adjusted to match
@@ -938,7 +938,7 @@ class ResourceData(Payload, tag="Resource"):
     # with the grid, allowing for seamless integration and stable operation. If contract_type is anything other than
     # ONLY_POWER_SUPPLY_1 and resource_type is PUMP or HYDRO, then this field is mandatory. For other types of power
     # generation units, this field should not be set.
-    is_phase_locked: Optional[BooleanFlag] = attr(default=None, name="PhaseLocked")
+    is_phase_locked: Optional[BooleanFlag] = attr(default=None, name="PhaseModifyingOperation")
 
     # Quantity of water consumed, in cubic meters per second. If contract_type is anything other than
     # ONLY_POWER_SUPPLY_1 and resource_type is PUMP or HYDRO, then this field is mandatory. For other types of power

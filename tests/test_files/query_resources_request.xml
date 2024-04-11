@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<RegistrationData xmlns:xsi="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="mpr.xsd">
+    <RegistrationQuery Action="NORMAL" DateType="TRADE" Date="2024-04-11">
+        <Resource ParticipantName="F100" ResourceName="FAKE_RESO" RecordStatus="APPROVED"/>
+    </RegistrationQuery>
+</RegistrationData>

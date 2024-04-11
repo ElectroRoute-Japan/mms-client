@@ -3,6 +3,7 @@
 from base64 import b64encode
 from datetime import date as Date
 from decimal import Decimal
+from pathlib import Path
 from typing import Callable
 from typing import Dict
 from typing import List
@@ -47,6 +48,24 @@ from mms_client.types.transport import MmsResponse
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
+
+
+def read_file(file: str) -> bytes:
+    """Read the contents of the given file."""
+    with open(Path(__file__).parent / "test_files" / file, "rb") as f:
+        return f.read()
+
+
+def read_request_file(file: str, leave_one: bool = True) -> bytes:
+    """Read the contents of the given XML request file."""
+    base = read_file(file).decode("UTF-8")
+    base = base.replace("    ", "").replace("\t", "")
+    if leave_one:
+        index = base.find("\n") + 1
+        base = base[:index] + base[index:].replace("\n", "")
+    else:
+        base = base.replace("\n", "")
+    return base.encode("UTF-8")
 
 
 def verify_mms_request(
@@ -277,6 +296,7 @@ def verify_resource_data(
 ):
     """Verify that the given resource data request has the expected parameters."""
     # Verify the list sub-types
+    print(req)
     verify_list(req.output_bands, output_band_verifiers)
     verify_list(req.switch_outputs, switch_verifiers)
     verify_list(req.afc_minimum_outputs, afc_minimum_verifiers)
@@ -366,7 +386,7 @@ def event_verifier(name, charge_time: str, output: int):
 
     def inner(event: Union[StartupEvent, ShutdownEvent]):
         assert event.name == name
-        assert event.charge_time == charge_time
+        assert event.change_time == charge_time
         assert event.output_kw == output
 
     return inner

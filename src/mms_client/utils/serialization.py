@@ -129,7 +129,7 @@ class Serializer:
         # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
         # from within the envelope
         self._verify_tree_data_tag(envelope_node, data_type)
-        resp.payload = self._from_tree_data(envelope_node.find(data_type.__name__), data_type)
+        resp.payload = self._from_tree_data(envelope_node.find(get_tag(data_type)), data_type)
 
         # Finally, attempt to extract the messages from within the payload
         resp.messages = self._from_tree_messages(raw, envelope_type, data_type, self._payload_key, False)
@@ -167,7 +167,7 @@ class Serializer:
         # Note: apparently, mypy doesn't know about setter-getter properties either...
         self._verify_tree_data_tag(env_node, data_type)
         resp.payload = [
-            self._from_tree_data(item, data_type) for item in env_node.findall(data_type.__name__)  # type: ignore[misc]
+            self._from_tree_data(item, data_type) for item in env_node.findall(get_tag(data_type))  # type: ignore[misc]
         ]
 
         # Finally, attempt to extract the messages from within the payload
@@ -216,7 +216,7 @@ class Serializer:
         ValueError:    If the expected data type is not found in the response.
         """
         data_tags = set(node.tag for node in raw)
-        if not data_tags.issubset([data_type.__name__, "Messages"]):
+        if not data_tags.issubset([data_type.__name__, data_type.__xml_tag__, "Messages"]):
             raise ValueError(f"Expected data type '{data_type.__name__}' not found in response")
 
     def _from_tree_data(self, raw: Optional[Element], data_type: Type[P]) -> Optional[ResponseData[P]]:
@@ -291,8 +291,7 @@ class Serializer:
             )
         else:
             # Iterate over each field on the current type...
-            for name, field in current_type.model_fields.items():
-                print(f"Checking field {name} with type {field.annotation}...")
+            for field in current_type.model_fields.values():
 
                 # First, get the arguments and origin of the field's annotation
                 args = get_args(field.annotation)
@@ -420,7 +419,7 @@ def _create_response_payload_type(key: str, envelope_type: Type[E], data_type: T
 
 
 @lru_cache(maxsize=None)
-def _create_response_common_type(tag_type: Type) -> Type[ResponseCommon]:
+def _create_response_common_type(tag_type: Type[Union[E, P]]) -> Type[ResponseCommon]:
     """Create a new wrapper for the ResponseCommon type with the given tag.
 
     This method is intended to save us the overhead of writing a new class for each tag type. Instead, we can
@@ -432,7 +431,7 @@ def _create_response_common_type(tag_type: Type) -> Type[ResponseCommon]:
     Returns:    The wrapper type that will be used for deserialization.
     """  # fmt: skip
     # First, create a new wrapper type that contains the ResponseCommon type with the appropriate XML tag
-    class Wrapper(ResponseCommon, tag=tag_type.__name__):  # type: ignore[call-arg]
+    class Wrapper(ResponseCommon, tag=get_tag(tag_type)):  # type: ignore[call-arg]
         """Wrapper for the validation object with the proper XML tag."""
 
     # Finally, return the wrapper type so we can instantiate it
@@ -462,7 +461,7 @@ def _create_request_payload_type(key: str, envelope_type: Type[E], data_type: Ty
         """Wrapper for the data type that will be used to store the data in the payload."""
 
         # The data to be stored in the payload
-        data: data_type = element(tag=data_type.__name__)  # type: ignore[valid-type]
+        data: data_type = element(tag=get_tag(data_type))  # type: ignore[valid-type]
 
         def __init__(self, envelope: envelope_type, data: data_type):  # type: ignore[valid-type]
             """Create a new envelope to store payload data.
@@ -511,3 +510,14 @@ def _find_or_fail(node: Element, tag: str) -> Element:
     if found is None:
         raise ValueError(f"Expected tag '{tag}' not found in node")  # pragma: no cover
     return found
+
+
+def get_tag(data_type: Type[P]) -> str:
+    """Get the tag for the given data type.
+
+    Arguments:
+    data_type (Type[Payload]):  The data type to get the tag for.
+
+    Returns:    The tag for the given data type.
+    """
+    return data_type.__xml_tag__ or data_type.__name__
