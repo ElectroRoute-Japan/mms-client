@@ -54,6 +54,32 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
+    @mms_multi_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, ClientType.BSP)
+    def put_offers(
+        self: ClientProto, requests: List[OfferData], market_type: MarketType, days: int, date: Optional[Date] = None
+    ) -> List[OfferData]:
+        """Submit multiple offers to the MMS server.
+
+        This endpoint is only accessible to BSPs.
+
+        Arguments:
+        requests (List[OfferData]): The offers to submit to the MMS server.
+        market_type (MarketType):   The type of market for which the offers are being submitted.
+        days (int):                 The number of days ahead for which the offers are being submitted.
+        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                    current date.
+
+        Returns:    A list of offers that have been registered with the MMS server.
+        """
+        # Note: the return type does not match the method definition but the decorator will return the correct type
+        return MarketSubmit(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
+            market_type=market_type,
+            days=days,
+        )
+
     @mms_multi_endpoint(
         "MarketQuery_OfferQuery", config, RequestType.INFO, resp_envelope_type=MarketSubmit, resp_data_type=OfferData
     )
