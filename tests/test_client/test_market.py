@@ -147,7 +147,7 @@ def test_put_offers_invalid_client(mock_certificate):
 
 
 @responses.activate
-def test_put_offer_works(mock_certificate):
+def test_put_offers_works(mock_certificate):
     """Test that the put_offer method works as expected."""
     # First, create our test MMS client
     client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
@@ -165,13 +165,13 @@ def test_put_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "HsVd+Dqo/c/LYNpa8/yKNn0I6hZIz1DxKR0QLZFjWEUX4Kvj3WEqU700m6yJvZpg0LjcgDFfJsnMPwEZ8QkkenMRlYBa9Q1M2oeG7PMWS"
-            "r82KoRP9howcq0Ad4a0UHaB8WwZKztyWf4P/cALqNydosrRy1m7j54wKyanQfMnnVLGMSpEFbvF6oem0q71MUhoT2jJ0xMDTTzs7W41qp"
-            "bgDhcvFMKzRlFGZe/i3EMMWglACvTpQmp/5r5RjQ00DLZ+/VZnf2+NlE6sTetYWmcLyfWp737Z7e68Sk4Lb0+KgkAXziq7EA7nSAYDLgB"
-            "DbQNSvNK8snlTsirY2V/HVrH5ETz+hduWyKRzYF91AHCgOOpBXyrEbeGvcsnNNujFxT36Re5mL7ngrTb087wfb1wHk8iHwawH0L7VVdMS"
-            "8BJi+yofljmaAqZVGNQEfC5Q2hZsRhMRp5H4SJCHvbO8ZFdXD8lJGPqThmqr7hB5ttY+XqGKIsr0fv6V5OVEqrMWy64vQAMWSiC+jlhFy"
-            "vTFw7h6hOQAcZXIQ/kdfqz6JvpjnzPjmDHVj3HGCKaw5afZJpUSDjiZjih+L+KBwJSiA02EBrvlCY/2lXKSo9xj5nU6bnso+rKt8Rwsqo"
-            "qaNAR0x76pNcODGg3oxQQa+/kjxW0Wk/014sWhvkPC0vAUqYoTJCs="
+            "uU52ZMls11Bw0mVTVVXgBoqfbLqtL4af3SZq0kbEIMLrVUYDuRtmgQ2hasCCg3wz2STJy64lfU4uw3j9ZYR+oLcE1WY9URhr5+udDEB4B"
+            "n9lo+jWju+GH5+wV8SOEWYs325ymPheDqOhuVcUt5oVKAwd88RKxtnjzlV5boc+O1OEcaOlJt1M8qmpub8y2LAk1HKwb5Wo83UP0CMe+C"
+            "QRKQ2fXBhsBiVDa0nHToRq5QpIWv6pnC9brGBO2R0KoZh0j6J6t6s6QqfCjUPShZbsiGDB9ju377l87YnwgkiFKRMzGlxzFo0Ayr6WHc0"
+            "bN9/qZuqVkhLoKTs+0oK0kouJkiqsrfbdrqEN//zHpjCmD7IxmM1R8LXXSeljZXMntaABG7hPPUik7MkSN41V3pn6OkI1n7UdA+ZWmqjk"
+            "/At+C2v4XtfPKaXtT7mMgu7UdNB4n64nJg1eR0BOw7clpkmWwaZzgTS5QXoW05gjnnkqKoorx0pGPcWUw8QC3jJWnnJ4H54iB5+MBlnJC"
+            "thBeOefq16bmqQnTw6ETKxVRkbAkB3OqPpkw/zJXEoeVJK4abyuCNPHz8bzaZR8VloqLlFnYkSUUvWK0iqrg8ZzUtiuKMUS9t8cvRiOTn"
+            "JiabuhKc863mxe2L+Baft7QCY4dHWjldY3uVwCrEXfWOCVyGQIpbQ="
         ),
         (
             """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
@@ -208,7 +208,7 @@ def test_put_offer_works(mock_certificate):
     # Finally, verify the offer
     assert len(offers) == 1
     verify_offer_data(
-        offers,
+        offers[0],
         [offer_stack_verifier(1, 100, 100, id="FAKE_ID")],
         "FAKE_RESO",
         DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),

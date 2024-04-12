@@ -51,7 +51,7 @@ class Serializer:
         with open(XSD_DIR / self._xsd.value, "rb") as f:
             self._schema = XMLSchema(parse(f))
 
-    def serialize(self, request_envelope: E, request_data: Union[P, List[P]]) -> bytes:
+    def serialize(self, request_envelope: E, request_data: P) -> bytes:
         """Serialize the envelope and data to a byte string for sending to the MMS server.
 
         Arguments:
@@ -63,8 +63,33 @@ class Serializer:
         # First, create our payload class from the payload and data types
         payload_cls = _create_request_payload_type(
             self._payload_key,
-            type(request_envelope),  # type: ignore[arg-type]
-            type(request_data),  # type: ignore[arg-type]
+            type(request_envelope),
+            type(request_data),
+            False,  # type: ignore[arg-type]
+        )
+
+        # Next, inject the payload and data into the payload class
+        # Note: this returns a type that inherits from PayloadBase and the arguments provided to the initializer
+        # here are correct, but mypy thinks they are incorrect because it doesn't understand the the inherited type
+        payload = payload_cls(request_envelope, request_data, self._xsd.value)  # type: ignore[call-arg, misc]
+
+        # Finally, convert the payload to XML and return it
+        # Note: we provided the encoding here so this will return bytes, not a string
+        return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)  # type: ignore[return-value]
+
+    def serialize_multi(self, request_envelope: E, request_data: List[P], request_type: Type[P]) -> bytes:
+        """Serialize the envelope and data to a byte string for sending to the MMS server.
+
+        Arguments:
+        request_envelope (Envelope):    The envelope to be serialized.
+        request_data (List[Payload]):    The data to be serialized.
+        request_type (Type[Payload]):    The type of data to be serialized.
+
+        Returns:    A byte string containing the XML-formatted data to be sent to the MMS server.
+        """
+        # First, create our payload class from the payload and data types
+        payload_cls = _create_request_payload_type(
+            self._payload_key, type(request_envelope), request_type, True  # type: ignore[arg-type]
         )
 
         # Next, inject the payload and data into the payload class
@@ -441,7 +466,10 @@ def _create_response_common_type(tag_type: Type[Union[E, P]]) -> Type[ResponseCo
 
 @lru_cache(maxsize=None)
 def _create_request_payload_type(
-    key: str, envelope_type: Type[E], data_type: Type[Union[P, List[P]]]
+    key: str,
+    envelope_type: Type[E],
+    data_type: Type[Union[P, List[P]]],
+    multi: bool,
 ) -> Type[PayloadBase]:
     """Create a new payload type for the given payload and data types.
 
@@ -456,20 +484,21 @@ def _create_request_payload_type(
     key: str                        The tag to use for the parent element of the payload.
     envelope_type (Type[Envelope]): The type of payload to be constructed.
     data_type (Type[Payload]):      The type of data to be constructed.
+    multi (bool):                   If True, the payload will be a list; otherwise, it will be a singleton.
 
     Returns:    A new payload type that can be used for serialization.
     """  # fmt: skip
-    # First, get the inner data type for the payload
-    inner_type = get_args(type(data_type))[0] if issubclass(data_type, list) else type(data_type)
+    # First, create our data type
+    payload_type = List[data_type] if multi else data_type  # type: ignore[valid-type]
 
-    # First, create a wrapper for our data type that will be used to store the data in the payload
+    # Next, create a wrapper for our data type that will be used to store the data in the payload
     class Envelope(envelope_type):  # type: ignore[valid-type, misc]
         """Wrapper for the data type that will be used to store the data in the payload."""
 
         # The data to be stored in the payload
-        data: data_type = element(tag=get_tag(inner_type))  # type: ignore[valid-type]
+        data: payload_type = element(tag=get_tag(data_type))  # type: ignore[valid-type, type-var]
 
-        def __init__(self, envelope: envelope_type, data: data_type):  # type: ignore[valid-type]
+        def __init__(self, envelope: envelope_type, data: payload_type):  # type: ignore[valid-type]
             """Create a new envelope to store payload data.
 
             Arguments:
@@ -480,14 +509,14 @@ def _create_request_payload_type(
             obj["data"] = data
             super().__init__(**obj)
 
-    # Next, create our payload type that actually contains all the XML data
+    # Now, create our payload type that actually contains all the XML data
     class RQPayload(PayloadBase, tag=key):  # type: ignore[call-arg]
         """The payload type that will be used for serialization."""
 
         # The payload containing our request object and any data
         envelope: Envelope = element(tag=envelope_type.__name__)
 
-        def __init__(self, envelope: envelope_type, data: data_type, schema: str):  # type: ignore[valid-type]
+        def __init__(self, envelope: envelope_type, data: payload_type, schema: str):  # type: ignore[valid-type]
             """Create a new payload containing the request object and any data.
 
             Arguments:

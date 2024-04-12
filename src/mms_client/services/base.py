@@ -11,7 +11,6 @@ from typing import Protocol
 from typing import Tuple
 from typing import Type
 from typing import Union
-from typing import get_args
 
 from mms_client.security.crypto import Certificate
 from mms_client.security.crypto import CryptoWrapper
@@ -376,14 +375,20 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Returns:    The multi-response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
-        data_type = get_args(type(payload))[0] if isinstance(payload, list) else type(payload)
+        is_list = isinstance(payload, list)
+        data_type = type(payload[0]) if is_list else type(payload)  # type: ignore[index]
         self._logger.debug(
             (
                 f"{config.name}: Starting multi-request. Envelope: {type(envelope).__name__}, "
                 f"Data: {data_type.__name__}"
             ),
         )
-        request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, payload))
+        serialized = (
+            config.service.serializer.serialize_multi(envelope, payload, data_type)  # type: ignore[arg-type]
+            if is_list
+            else config.service.serializer.serialize(envelope, payload)  # type: ignore[type-var]
+        )
+        request = self._to_mms_request(config.request_type, serialized)
 
         # Next, submit the request to the MMS server and get and verify the response.
         resp = self._get_wrapper(config.service).submit(request)
@@ -395,7 +400,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
         data_type = config.response_data_type or data_type
-        data: MultiResponse[E, P] = config.service.serializer.deserialize_multi(resp.payload, envelope_type, data_type)
+        data: MultiResponse[E, P] = config.service.serializer.deserialize_multi(
+            resp.payload,
+            envelope_type,
+            data_type,  # type: ignore[arg-type]
+        )
         self._verify_multi_response(data, config)
 
         # Return the response data and any attachments

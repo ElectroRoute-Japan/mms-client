@@ -107,7 +107,7 @@ def test_serialize_data():
     ).encode("UTF-8")
 
 
-def test_serialize_list():
+def test_serialize_multi_data():
     """Test that the Serializer class serializes data as we expect, when provided with a list."""
     # First, create a new offer data object
     offer = OfferData(
@@ -148,7 +148,7 @@ def test_serialize_list():
     )
 
     serializer = Serializer(SchemaType.MARKET, "MarketData")
-    data = serializer.serialize(request, [offer])
+    data = serializer.serialize_multi(request, [offer], OfferData)
 
     # Finally, verify that the request was serialized as we expect
     assert data == (
