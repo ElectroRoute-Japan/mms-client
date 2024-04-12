@@ -107,6 +107,63 @@ def test_serialize_data():
     ).encode("UTF-8")
 
 
+def test_serialize_multi_data():
+    """Test that the Serializer class serializes data as we expect, when provided with a list."""
+    # First, create a new offer data object
+    offer = OfferData(
+        stack=[
+            OfferStack(
+                number=1,
+                minimum_quantity_kw=100,
+                primary_qty_kw=150,
+                secondary_1_qty_kw=200,
+                secondary_2_qty_kw=250,
+                tertiary_1_qty_kw=300,
+                tertiary_2_qty_kw=350,
+                unit_price=100,
+                id="FAKE_ID",
+            )
+        ],
+        resource="FAKE_RESO",
+        start=DateTime(2019, 8, 30, 3, 24, 15),
+        end=DateTime(2019, 8, 30, 11, 24, 15),
+        direction=Direction.SELL,
+        pattern_number=12,
+        bsp_participant="F100",
+        company_short_name="偽会社",
+        operator="FAKE",
+        area=AreaCode.CHUBU,
+        resource_short_name="偽電力",
+        system_code="FSYS0",
+        submission_time=DateTime(2019, 8, 29, 3, 24, 15),
+    )
+
+    # Next, create an associated market submit request
+    request = MarketSubmit(
+        date=Date(2019, 8, 29),
+        market_type=MarketType.DAY_AHEAD,
+        participant="F100",
+        user="FAKEUSER",
+        days=1,
+    )
+
+    serializer = Serializer(SchemaType.MARKET, "MarketData")
+    data = serializer.serialize_multi(request, [offer], OfferData)
+
+    # Finally, verify that the request was serialized as we expect
+    assert data == (
+        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
+        """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2019-08-29" ParticipantName="F100" """
+        """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
+        """StartTime="2019-08-30T03:24:15" EndTime="2019-08-30T11:24:15" Direction="1" DrPatternNumber="12" """
+        """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" ResourceShortName="偽電力" """
+        """SystemCode="FSYS0" SubmissionTime="2019-08-29T03:24:15"><OfferStack StackNumber="1" """
+        """MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
+        """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """
+        """OfferUnitPrice="100" OfferId="FAKE_ID"/></OfferData></MarketSubmit></MarketData>"""
+    ).encode("UTF-8")
+
+
 def test_deserialize_payload_key_invalid():
     """Test that the deserialize method raises an error when the payload key is invalid."""
     # First, create our serializer

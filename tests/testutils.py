@@ -59,7 +59,7 @@ def read_file(file: str) -> bytes:
 def read_request_file(file: str, leave_one: bool = True) -> bytes:
     """Read the contents of the given XML request file."""
     base = read_file(file).decode("UTF-8")
-    base = base.replace("    ", "").replace("\t", "")
+    base = base.replace("    ", "").replace("\t", "").replace("\r", "")
     if leave_one:
         index = base.find("\n") + 1
         base = base[:index] + base[index:].replace("\n", "")
