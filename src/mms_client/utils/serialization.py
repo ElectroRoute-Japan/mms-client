@@ -4,6 +4,7 @@ from functools import lru_cache
 from io import BytesIO
 from pathlib import Path
 from typing import Dict
+from typing import List
 from typing import Optional
 from typing import Tuple
 from typing import Type
@@ -50,7 +51,7 @@ class Serializer:
         with open(XSD_DIR / self._xsd.value, "rb") as f:
             self._schema = XMLSchema(parse(f))
 
-    def serialize(self, request_envelope: E, request_data: P) -> bytes:
+    def serialize(self, request_envelope: E, request_data: Union[P, List[P]]) -> bytes:
         """Serialize the envelope and data to a byte string for sending to the MMS server.
 
         Arguments:
@@ -440,7 +441,9 @@ def _create_response_common_type(tag_type: Type) -> Type[ResponseCommon]:
 
 
 @lru_cache(maxsize=None)
-def _create_request_payload_type(key: str, envelope_type: Type[E], data_type: Type[P]) -> Type[PayloadBase]:
+def _create_request_payload_type(
+    key: str, envelope_type: Type[E], data_type: Type[Union[P, List[P]]]
+) -> Type[PayloadBase]:
     """Create a new payload type for the given payload and data types.
 
     This method is intended to save us the overhead of writing a new class for each payload type. Instead, we can
@@ -457,12 +460,15 @@ def _create_request_payload_type(key: str, envelope_type: Type[E], data_type: Ty
 
     Returns:    A new payload type that can be used for serialization.
     """  # fmt: skip
+    # First, get the inner data type for the payload
+    inner_type = get_args(type(data_type))[0] if issubclass(data_type, list) else type(data_type)
+
     # First, create a wrapper for our data type that will be used to store the data in the payload
     class Envelope(envelope_type):  # type: ignore[valid-type, misc]
         """Wrapper for the data type that will be used to store the data in the payload."""
 
         # The data to be stored in the payload
-        data: data_type = element(tag=data_type.__name__)  # type: ignore[valid-type]
+        data: data_type = element(tag=inner_type.__name__)  # type: ignore[valid-type]
 
         def __init__(self, envelope: envelope_type, data: data_type):  # type: ignore[valid-type]
             """Create a new envelope to store payload data.

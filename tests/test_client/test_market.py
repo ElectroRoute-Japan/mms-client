@@ -124,6 +124,107 @@ def test_put_offer_works(mock_certificate):
     )
 
 
+def test_put_offers_invalid_client(mock_certificate):
+    """Test that the put_offers method raises a ValueError when called by an invalid client type."""
+    # First, create our test MMS client
+    client = MmsClient("F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
+
+    # Next, create our test offer data
+    request = OfferData(
+        stack=[OfferStack(number=1, unit_price=100, minimum_quantity_kw=100)],
+        resource="FAKE_RESO",
+        start=DateTime(2019, 8, 30, 3, 24, 15),
+        end=DateTime(2019, 9, 30, 3, 24, 15),
+        direction=Direction.SELL,
+    )
+
+    # Now, attempt to put an offer with the invalid client type; this should fail
+    with pytest.raises(AudienceError) as ex_info:
+        _ = client.put_offers([request], MarketType.DAY_AHEAD, 1)
+
+    # Finvally, verify the details of the raised exception
+    assert str(ex_info.value) == "MarketSubmit_OfferData: Invalid client type, 'TSO' provided. Only 'BSP' is supported."
+
+
+@responses.activate
+def test_put_offer_works(mock_certificate):
+    """Test that the put_offer method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test offer data
+    request = OfferData(
+        stack=[OfferStack(number=1, unit_price=100, minimum_quantity_kw=100)],
+        resource="FAKE_RESO",
+        start=DateTime(2024, 3, 15, 12),
+        end=DateTime(2024, 3, 15, 21),
+        direction=Direction.SELL,
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.INFO,
+        (
+            "HsVd+Dqo/c/LYNpa8/yKNn0I6hZIz1DxKR0QLZFjWEUX4Kvj3WEqU700m6yJvZpg0LjcgDFfJsnMPwEZ8QkkenMRlYBa9Q1M2oeG7PMWS"
+            "r82KoRP9howcq0Ad4a0UHaB8WwZKztyWf4P/cALqNydosrRy1m7j54wKyanQfMnnVLGMSpEFbvF6oem0q71MUhoT2jJ0xMDTTzs7W41qp"
+            "bgDhcvFMKzRlFGZe/i3EMMWglACvTpQmp/5r5RjQ00DLZ+/VZnf2+NlE6sTetYWmcLyfWp737Z7e68Sk4Lb0+KgkAXziq7EA7nSAYDLgB"
+            "DbQNSvNK8snlTsirY2V/HVrH5ETz+hduWyKRzYF91AHCgOOpBXyrEbeGvcsnNNujFxT36Re5mL7ngrTb087wfb1wHk8iHwawH0L7VVdMS"
+            "8BJi+yofljmaAqZVGNQEfC5Q2hZsRhMRp5H4SJCHvbO8ZFdXD8lJGPqThmqr7hB5ttY+XqGKIsr0fv6V5OVEqrMWy64vQAMWSiC+jlhFy"
+            "vTFw7h6hOQAcZXIQ/kdfqz6JvpjnzPjmDHVj3HGCKaw5afZJpUSDjiZjih+L+KBwJSiA02EBrvlCY/2lXKSo9xj5nU6bnso+rKt8Rwsqo"
+            "qaNAR0x76pNcODGg3oxQQa+/kjxW0Wk/014sWhvkPC0vAUqYoTJCs="
+        ),
+        (
+            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
+            """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2024-03-15" ParticipantName="F100" """
+            """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
+            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1"><OfferStack """
+            """StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100"/></OfferData></MarketSubmit>"""
+            """</MarketData>"""
+        ).encode("UTF-8"),
+        (
+            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
+            """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
+            """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" """
+            """XmlTimeStamp="2024-03-15T11:43:37" /><Messages><Warning Code="Warning1" /><Warning Code="Warning2" />"""
+            """<Information Code="Info1" /><Information Code="Info2" /></Messages><MarketSubmit Date="2024-03-15" """
+            """ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1" Validation="PASSED" """
+            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
+            """Code="Info1" /><Information Code="Info2" /></Messages><OfferData ResourceName="FAKE_RESO" """
+            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1" DrPatternNumber="1" """
+            """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" """
+            """ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2024-03-15T11:44:15" Validation="PASSED" """
+            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
+            """Code="Info1" /><Information Code="Info2" /></Messages><OfferStack StackNumber="1" """
+            """MinimumQuantityInKw="100" OfferUnitPrice="100" OfferId="FAKE_ID"><Messages><Warning Code="Warning1" />"""
+            """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages>"""
+            """</OfferStack></OfferData></MarketSubmit></MarketData>"""
+        ).encode("UTF-8"),
+        warnings=True,
+    )
+
+    # Now, attempt to put an offer with the valid client type; this should succeed
+    offers = client.put_offers([request], MarketType.DAY_AHEAD, 1, Date(2024, 3, 15))
+
+    # Finally, verify the offer
+    assert len(offers) == 1
+    verify_offer_data(
+        offers,
+        [offer_stack_verifier(1, 100, 100, id="FAKE_ID")],
+        "FAKE_RESO",
+        DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),
+        DateTime(2024, 3, 15, 21, tzinfo=Timezone("UTC")),
+        Direction.SELL,
+        pattern=1,
+        bsp_participant="F100",
+        company_short_name="偽会社",
+        operator="FAKE",
+        area=AreaCode.CHUBU,
+        resource_short_name="偽電力",
+        system_code="FSYS0",
+        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("UTC")),
+    )
+
+
 @responses.activate
 def test_query_offers_works(mock_certificate):
     """Test that the query_offers method works as expected."""

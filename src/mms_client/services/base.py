@@ -10,6 +10,8 @@ from typing import Optional
 from typing import Protocol
 from typing import Tuple
 from typing import Type
+from typing import Union
+from typing import get_args
 
 from mms_client.security.crypto import Certificate
 from mms_client.security.crypto import CryptoWrapper
@@ -119,7 +121,7 @@ class ClientProto(Protocol):
     def request_many(
         self,
         envelope: E,
-        data: P,
+        data: Union[P, List[P]],
         config: EndpointConfiguration,
     ) -> Tuple[MultiResponse[E, P], Dict[str, bytes]]:
         """Submit a request to the MMS server and return the multi-response.
@@ -361,7 +363,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
     def request_many(
         self,
         envelope: E,
-        payload: P,
+        payload: Union[P, List[P]],
         config: EndpointConfiguration[E, P],
     ) -> Tuple[MultiResponse[E, P], Dict[str, bytes]]:
         """Submit a request to the MMS server and return the multi-response.
@@ -374,10 +376,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Returns:    The multi-response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
+        data_type = get_args(type(payload))[0] if isinstance(payload, list) else type(payload)
         self._logger.debug(
             (
                 f"{config.name}: Starting multi-request. Envelope: {type(envelope).__name__}, "
-                f"Data: {type(payload).__name__}"
+                f"Data: {data_type.__name__}"
             ),
         )
         request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, payload))
@@ -391,7 +394,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
-        data_type = config.response_data_type or type(payload)
+        data_type = config.response_data_type or data_type
         data: MultiResponse[E, P] = config.service.serializer.deserialize_multi(resp.payload, envelope_type, data_type)
         self._verify_multi_response(data, config)
 
