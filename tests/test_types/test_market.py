@@ -12,7 +12,7 @@ from tests.testutils import verify_market_submit
 
 
 def test_market_query_defaults():
-    """Test that the MarketQuery class initializes and converts to a dictionary as we expect."""
+    """Test that the MarketQuery class initializes and converts to XML as we expect."""
     # First, create a new market query request
     request = MarketQuery(
         date=Date(2019, 8, 30),
@@ -20,7 +20,7 @@ def test_market_query_defaults():
         user="FAKEUSER",
     )
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
@@ -29,7 +29,7 @@ def test_market_query_defaults():
 
 
 def test_market_query_full():
-    """Test that the MarketQuery class initializes and converts to a dictionary as we expect."""
+    """Test that the MarketQuery class initializes and converts to XML as we expect."""
     # First, create a new market query request
     request = MarketQuery(
         date=Date(2019, 8, 30),
@@ -39,7 +39,7 @@ def test_market_query_full():
         days=4,
     )
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
