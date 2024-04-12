@@ -27,11 +27,11 @@ def test_sign(mock_certificate):
 
     # Finally, verify that the signature is as we expect
     assert signature == (
-        b"Nn36Zbx4onfPggD2uvwNQiWzA93yoBsXtHvJLm7MeRCxfBDh1pFgEBZ0D5V5v6IefPCF4/cLJqh+wzli+JodMKHGseBwk3lREg6opO/8z6m3"
-        b"DXIHqqkJ5aUlpsq2/DzLllAC6tq0DZDAXSUlUv6MP/3Fv3wqIawxqUkoSj4mZw+Zaq3ay6zjQzY9r5XW/7xSpeiHgFwdGur5iccp7/M/w3mh"
-        b"dIT8hhRUsDGT5ctC8pBhCF5TIXEiQ0JZsAvkMLHj+/K1L4VQTc5R7AjOdoWqfHen+8UvRlrYj3zZ1DsONJVMqBkQw8RfMog9P2d0w6dRwYg1"
-        b"gtffcO/3wA9/hoZbeY2dRyr87NXOTRVw3BEdW1HZ9stVKBgnz05ZJlQnjOcQ/wvh03Iu8zwpZxKgUyD3ejxXtCSiuBEjpHCA0ZMGmWplRgTE"
-        b"hJgmTGoV4aXk8nddq14kKoEgi33d26pGrT9oCmNXrD3TBE4Em0bfQ0Lew8npBH6mdVC6dorq66maaKMOAkXdYCmCD8falSFrCT1NLjCKgVB0"
-        b"/c/IcXzTUuyD8f5ikk+7j4we0PreUTYJa79i9hICn5MJtZcbo9oFmxkOZwj1UBTO627Stz2U5wNJrrFUfqAW6hZKG++3c+VP6V5QirZsXWBj"
-        b"hAFK/MR1zYLzloffDa3eycTiVouBbhLgBv0="
+        b"Q3iv2Nq6BqpNexc1flEcXHualIctgpFNv97XAVq+pSAsO+i36drPeDvjcvcbDZkwZwJPKaXCQVUTai3q8ufjd9Dq6e+4ipL1zIoHPXI/Tc2j"
+        b"g8fCWFAiNHT66YG+sm7vZ4ZIp8iCu0sWpSLRogPpdh77xYMJ5/s3BWqhku1npKSwtLGArnaH+FryGJRrd/TM9OaZ9E3aI3dBRh+/jfhrwf/2"
+        b"2f0UKav0Xae+FIZMufopom73lBCCI93Ka37lQswwMKJxHaXtGe9qhEpAsD3xr5fiSov9CC7cuf6BtOyh8/IZqGdHShdeRa+hRbDyyM2lowRn"
+        b"+Lkjxd5BjbKpA2N3hTWl/Uu0jTNpNm0IG9cBVJ2EERf0N2XuOdXuFRNz+649cB889x8qiNvBhWq3f4FX5g6AERAScfDAK1zjzQK9vvCU4n3s"
+        b"GkW1L726f87sUWB8qRcqkf+T1oYYB97GymVbI9Z7E1TFNSp2uCatjUznDNzBB2cv9Ho82axH7VYUVRjnAViFSMc4GeozUw+E1jJm6iGGNuNS"
+        b"A4T8r1l/r3X1gjVKU9EGZtIaF1K6xaULVbStR0IHIioYMesqeN1o+WO4hw7oSgxQBhNjqdFONtm7AuDyGiHS5dq0mUKxYGvdPgGKnykjwF/V"
+        b"Jl95I7f9Mlq4kd+m2LdSPhoOzCN3e2SkNvQ="
     )

@@ -11,6 +11,9 @@ The underlying API sends and receives XML documents. Each of these request or re
 
 After the data has been converted and added to the outer request object, it is sent to the appropriate server endpoint via a Zeep client. The client certificate is also injected into the request using a PCKS12 adaptor.
 
+# Serialization
+This library relies on Pydantic 2 and the pydantic-xml library for serialization/deserialization. As such, any type in this library can be converted to not only XML, but to JSON as well. This is extremely useful if you're trying to build a pass-through API service or something similar.
+
 ## Client Types
 Clients cannot call any and all endpoints in this API, willy-nilly. Some endpoints are restricted to particular clients. At the moment, there are two clients: Balance Service Providers (BSPs) and Transmission Service Operators (TSOs). Most likely you're operating as a BSP, in which case you'll have access to all endpoints. However, it makes little sense for a TSO to be able to submit bids on their own power, so they are restricted to a read-only role in most cases.
 
@@ -163,6 +166,8 @@ This client is not complete. Currently, it supports the following endpoints:
 - MarketSubmit_OfferData
 - MarketQuery_OfferQuery
 - MarketCancel_OfferCancel
+- RegistrationSubmit_Resource
+- RegistrationQuery_Resource
 
 We can add support for additional endpoints as time goes on, and independent contribution is, of course, welcome. However, support for attachments is currently limited because none of the endpoints we support currently require them. We have implemented attachment support up to the client level, but we haven't developed an architecture for submitting them through an endpoint yet.
 

@@ -17,7 +17,7 @@ class RequestType(Enum):
 
     INFO = "mp.info"
     MARKET = "mp.market"
-    REGISTRATION = "mp.registration"
+    REGISTRATION = "mpr"
     REPORT = "mp.report"
     OMI = "mp.omi"
 

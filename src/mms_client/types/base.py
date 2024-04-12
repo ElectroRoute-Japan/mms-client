@@ -14,6 +14,8 @@ from pydantic_xml import BaseXmlModel
 from pydantic_xml import attr
 from pydantic_xml import element
 
+from mms_client.types.fields import transaction_id
+
 
 class ValidationStatus(Enum):
     """Represents the status of the validation check done on an element."""
@@ -67,7 +69,7 @@ class ProcessingStatistics(BaseXmlModel):
     time_ms: Optional[int] = attr(default=None, name="ProcessingTimeMs")
 
     # The transaction ID of the request
-    transaction_id: Optional[str] = attr(default=None, name="TransactionID", min_length=8, max_length=10)
+    transaction_id: Optional[str] = transaction_id("TransactionId", True)
 
     # When the request was received, in the format "DDD MMM DD HH:MM:SS TZ YYYY"
     timestamp: str = attr(default="", name="TimeStamp")
