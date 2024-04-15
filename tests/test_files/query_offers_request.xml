@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" xsi:noNamespaceSchemaLocation="mi-market.xsd">
+    <MarketQuery Date="2024-03-15" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1">
+        <OfferQuery MarketType="DAM" ResourceName="FAKE_RESO" Area="04"/>
+    </MarketQuery>
+</MarketData>

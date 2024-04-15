@@ -16,7 +16,10 @@ from pydantic_xml import wrapped
 
 from mms_client.types.base import Payload
 from mms_client.types.enums import AreaCode
+from mms_client.types.enums import BooleanFlag
+from mms_client.types.enums import CommandMonitorMethod
 from mms_client.types.enums import Frequency
+from mms_client.types.enums import ResourceType
 from mms_client.types.fields import ASCII_TEXT
 from mms_client.types.fields import JAPANESE_ASCII_TEXT
 from mms_client.types.fields import JAPANESE_TEXT
@@ -180,18 +183,6 @@ class ContractType(Enum):
     REMAINING_RESERVE_UTILIZATION = "6"
 
 
-class ResourceType(Enum):
-    """How the power generation unit produces electricity."""
-
-    THERMAL = "01"
-    HYDRO = "02"
-    PUMP = "03"
-    BATTERY = "04"
-    VPP_GEN = "05"
-    VPP_GEN_AND_DEM = "06"
-    VPP_DEM = "07"
-
-
 class RemainingReserveAvailability(Enum):
     """Describes the availability of remaining reserves for a power generation unit."""
 
@@ -199,14 +190,6 @@ class RemainingReserveAvailability(Enum):
     AVAILABLE_FOR_UP_ONLY = "1"
     AVAILABLE_FOR_DOWN_ONLY = "2"
     AVAILABLE_FOR_UP_AND_DOWN = "3"
-
-
-class CommandMonitorMethod(Enum):
-    """Describes how the power generation unit is monitored and commanded."""
-
-    DEDICATED_LINE = "1"
-    SIMPLE_COMMAND = "2"
-    OFFLINE = "3"
 
 
 class SignalType(Enum):
@@ -229,17 +212,6 @@ class ThermalType(Enum):
     GT = "1"
     GTCC = "2"
     OTHER = "9"
-
-
-class BooleanFlag(Enum):
-    """Describes a boolean flag.
-
-    This could literally be a Boolean value but it's coded in the reference as an enum and I don't want to create a
-    custom serializer for it.
-    """
-
-    YES = "1"
-    NO = "0"
 
 
 class OverrideOption(Enum):
@@ -761,7 +733,7 @@ class ResourceData(Payload, tag="Resource"):
     has_contract: Optional[BooleanFlag] = attr(default=None, name="ContractExistence")
 
     # The maximum bid price for POWER_SUPPLY_1 power, in JPY/kW/hr
-    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", True)]
+    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", 10000.00, True)]
 
     # Presence of voltage regulation function.
     voltage_adjustable: Optional[BooleanFlag] = attr(default=None, name="VoltageAdjustment")

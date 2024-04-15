@@ -1,19 +1,19 @@
 """Contains objects for MMS offers."""
 
 from decimal import Decimal
-from enum import Enum
 from typing import List
 from typing import Optional
 
-from pydantic_core import PydanticUndefined
 from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import attr
 from pydantic_xml import element
 
 from mms_client.types.base import Payload
 from mms_client.types.enums import AreaCode
+from mms_client.types.enums import Direction
 from mms_client.types.fields import company_short_name
 from mms_client.types.fields import dr_patter_number
+from mms_client.types.fields import offer_id
 from mms_client.types.fields import operator_code
 from mms_client.types.fields import participant
 from mms_client.types.fields import power_positive
@@ -22,34 +22,6 @@ from mms_client.types.fields import resource_name
 from mms_client.types.fields import resource_short_name
 from mms_client.types.fields import system_code
 from mms_client.types.market import MarketType
-
-
-def offer_id(alias: str, optional: bool = False):
-    """Create a field for an offer ID.
-
-    Arguments:
-    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
-                        to the JSON/XML key.
-    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
-                        required, with no default.
-
-    Returns:    A Pydantic Field object for the offer ID.
-    """
-    return attr(
-        default=None if optional else PydanticUndefined,
-        name=alias,
-        min_length=1,
-        max_length=30,
-        pattern=r"^[a-zA-Z0-9_-]*$",
-    )
-
-
-class Direction(Enum):
-    """Represents the reserve direction of the offer."""
-
-    SELL = "1"  # Increasing the reserves (sell)
-    # Note: Support for the BUY direction was removed from the MMS API
-    # BUY = "2"  # Decreasing the reserves (buy)
 
 
 class OfferStack(Payload):
@@ -94,7 +66,7 @@ class OfferStack(Payload):
     tertiary_2_qty_kw: Optional[int] = power_positive("Tertiary2OfferQuantityInKw", True)
 
     # The unit price of the power, in JPY/kW/segment
-    unit_price: Decimal = price("OfferUnitPrice")
+    unit_price: Decimal = price("OfferUnitPrice", 10000.00)
 
     # The ID of the offer to which this stack belongs
     id: Optional[str] = offer_id("OfferId", True)

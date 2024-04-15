@@ -1,7 +1,5 @@
 """Tests the functionality in the mms_client.types.offer module."""
 
-from typing import Optional
-
 from pendulum import DateTime
 
 from mms_client.types.enums import AreaCode
@@ -18,7 +16,7 @@ from tests.testutils import verify_offer_query
 
 
 def test_offer_submit_defaults():
-    """Test that the OfferData class initializes and converts to a dictionary as we expect."""
+    """Test that the OfferData class initializes and converts to XML as we expect."""
     # First, create a new offer data request
     request = OfferData(
         stack=[OfferStack(number=1, unit_price=100, minimum_quantity_kw=100)],
@@ -28,7 +26,7 @@ def test_offer_submit_defaults():
         direction=Direction.SELL,
     )
 
-    # Next, convert the request to a dictionary
+    # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters

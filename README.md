@@ -166,6 +166,7 @@ This client is not complete. Currently, it supports the following endpoints:
 - MarketSubmit_OfferData
 - MarketQuery_OfferQuery
 - MarketCancel_OfferCancel
+- MarketQuery_AwardResultsQuery
 - RegistrationSubmit_Resource
 - RegistrationQuery_Resource
 

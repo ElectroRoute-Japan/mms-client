@@ -33,9 +33,6 @@ class BaseMarketRequest(Envelope):
     # will be checked against the certificate used to make the request.
     user: str = attr(name="UserName", min_length=1, max_length=12, pattern=r"^[A-Z0-9]*$")
 
-    # The type of market for which the data is being submitted
-    market_type: Optional[MarketType] = attr(default=None, name="MarketType")
-
 
 class MarketQuery(BaseMarketRequest):
     """Represents the base fields for a market query."""
@@ -48,6 +45,9 @@ class MarketQuery(BaseMarketRequest):
 class MarketSubmit(BaseMarketRequest):
     """Represents the base fields for a market registration request."""
 
+    # The type of market for which the data is being submitted
+    market_type: Optional[MarketType] = attr(default=None, name="MarketType")
+
     # If the market type is specified as "DAM" (day-ahead market), the number of days should be specified as "1".
     # Otherwise, this field indicates the number of days ahead for which the data is being submitted.
     days: int = attr(default=1, name="NumOfDays", ge=1, le=31)
@@ -55,6 +55,9 @@ class MarketSubmit(BaseMarketRequest):
 
 class MarketCancel(BaseMarketRequest):
     """Represents the base fields for a market cancellation request."""
+
+    # The type of market for which the data is being submitted
+    market_type: MarketType = attr(name="MarketType")
 
     # If the market type is specified as "DAM" (day-ahead market), the number of days should be specified as "1".
     # Otherwise, this field indicates the number of days ahead for which the data is being cancelled.

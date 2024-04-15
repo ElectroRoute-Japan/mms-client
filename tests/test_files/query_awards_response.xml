@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">
+    <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
+    <Messages>
+        <Warning Code="Warning1" />
+        <Warning Code="Warning2" />
+        <Information Code="Info1" />
+        <Information Code="Info2" />
+    </Messages>
+    <MarketQuery Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1" Validation="PASSED" Success="true">
+        <Messages>
+            <Warning Code="Warning1" />
+            <Warning Code="Warning2" />
+            <Information Code="Info1" />
+            <Information Code="Info2" />
+        </Messages>
+        <AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00+09:00" EndTime="2024-04-12T18:00:00+09:00" AfterGC="1" Validation="PASSED" Success="true">
+            <Messages>
+                <Warning Code="Warning1" />
+                <Warning Code="Warning2" />
+                <Information Code="Info1" />
+                <Information Code="Info2" />
+            </Messages>
+            <AwardResultsQueryResponse>
+                <Messages>
+                    <Warning Code="Warning1" />
+                    <Warning Code="Warning2" />
+                    <Information Code="Info1" />
+                    <Information Code="Info2" />
+                </Messages>
+                <AwardResults StartTime="2024-04-12T15:00:00+09:00" EndTime="2024-04-12T18:00:00+09:00" Direction="1">
+                    <Messages>
+                        <Warning Code="Warning1" />
+                        <Warning Code="Warning2" />
+                        <Information Code="Info1" />
+                        <Information Code="Info2" />
+                    </Messages>
+                    <AwardResultsData
+                        ContractId="156098uqt3qawldefjT"
+                        JbmsId="4235230998"
+                        Area="03"
+                        LinkedArea="02"
+                        ResourceName="FAKE_RESO"
+                        ResourceShortName="偽電力"
+                        SystemCode="FSYS0"
+                        ResourceType="01"
+                        DrPatternNumber="2"
+                        DrPatternName="偽パターン"
+                        BspParticipantName="F100"
+                        CompanyShortName="偽会社"
+                        OperatorCode="FAKE"
+                        CommandOperationMethodPriSec1="3"
+                        CommandOperationMethodSec2Ter1Ter2="2"
+                        OfferPrice="42.15"
+                        ContractPrice="69.44"
+                        PerfEvalCoeff="35.79"
+                        CorrectedUnitPrice="199.99"
+                        SubRequirementType="PRI-SEC1-SEC2"
+                        PrimaryOfferQuantityInKw="5000"
+                        Secondary1OfferQuantityInKw="6000"
+                        Secondary2OfferQuantityInKw="7000"
+                        Tertiary1OfferQuantityInKw="8000"
+                        Tertiary2OfferQuantityInKw="9000"
+                        PrimaryAwardQuantityInKw="5000"
+                        Secondary1AwardQuantityInKw="5001"
+                        Secondary2AwardQuantityInKw="5002"
+                        Tertiary1AwardQuantityInKw="5003"
+                        Tertiary2AwardQuantityInKw="5004"
+                        PrimaryContractQuantityInKw="5000"
+                        Secondary1ContractQuantityInKw="4000"
+                        Secondary2ContractQuantityInKw="3000"
+                        Tertiary1ContractQuantityInKw="2000"
+                        Tertiary2ContractQuantityInKw="1000"
+                        PrimaryValidQuantityInKw="5010"
+                        Secondary1ValidQuantityInKw="5020"
+                        Secondary2ValidQuantityInKw="5030"
+                        Tertiary1ValidQuantityInKw="5040"
+                        CompoundValidQuantityInKw="9001"
+                        PrimaryInvalidQuantityInKw="4001"
+                        Secondary1InvalidQuantityInKw="4002"
+                        Secondary2InvalidQuantityInKw="4003"
+                        Tertiary1InvalidQuantityInKw="4004"
+                        BaselineLoadFileNameNeg="W9_3010_20240411_15_AS490_FAKE_NEG.xml"
+                        BaselineLoadFileNamePos="W9_3010_20240411_15_AS490_FAKE_POS.xml"
+                        SubmissionTime="2024-04-10T22:34:44+09:00"
+                        OfferAwardedLevel="2"
+                        OfferId="FAKE_ID"
+                        ContractSource="2"
+                        AfterGC="1">
+                        <Messages>
+                            <Warning Code="Warning1" />
+                            <Warning Code="Warning2" />
+                            <Information Code="Info1" />
+                            <Information Code="Info2" />
+                        </Messages>
+                    </AwardResultsData>
+                </AwardResults>
+            </AwardResultsQueryResponse>
+        </AwardResultsQuery>
+    </MarketQuery>
+</MarketData>
