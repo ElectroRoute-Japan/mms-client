@@ -150,7 +150,6 @@ If you're connecting as a market operator (MO), you can connect in admin mode:
 
 ```python
 client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, is_admin=True)
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, test=True)
 ```
 
 ## Log Settings
