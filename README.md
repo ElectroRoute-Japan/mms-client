@@ -142,13 +142,14 @@ There's a lot of code here but it's not terribly difficult to understand. All th
 If you want to test your MMS connection, you can try using the test server:
 
 ```python
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, is_admin=True)
+client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, test=True)
 ```
 
 ## Connecting as a Market Admin
 If you're connecting as a market operator (MO), you can connect in admin mode:
 
 ```python
+client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, is_admin=True)
 client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, test=True)
 ```
 
