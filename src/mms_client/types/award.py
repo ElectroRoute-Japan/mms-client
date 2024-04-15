@@ -5,8 +5,8 @@ from enum import Enum
 from typing import List
 from typing import Optional
 
-from pendulum import DateTime
 from pydantic_core import PydanticUndefined
+from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import attr
 from pydantic_xml import element
 from pydantic_xml import wrapped
@@ -81,7 +81,7 @@ class ContractSource(Enum):
     SWITCHING = "2"
 
 
-class AwardResultsQuery(Payload):
+class AwardQuery(Payload, tag="AwardResultsQuery"):
     """Query object for bid awards."""
 
     # The market for which results should be retrieved
@@ -110,14 +110,14 @@ class AwardResultsQuery(Payload):
     gate_closed: Optional[BooleanFlag] = attr(default=None, name="AfterGC")
 
 
-class AwardResult(Payload):
+class Award(Payload):
     """Represents the details of a bid award."""
 
     # Unique identifier assigned to the contract
     contract_id: str = contract_id("ContractId")
 
     # Unique identifier assigned to the contract by the JBMS
-    jbms_id: str = jbms_id("JbmsId")
+    jbms_id: int = jbms_id("JbmsId")
 
     # The area of the power generation unit generating the electricity
     area: AreaCode = attr(name="Area")
@@ -287,7 +287,7 @@ class AwardResult(Payload):
     gate_closed: BooleanFlag = attr(name="AfterGC")
 
 
-class AwardResults(Payload):
+class AwardResult(Payload, tag="AwardResults"):
     """Contains a number of bid rewards associated with a block of time and trade direction."""
 
     # The start date and time of the block associated with the awards
@@ -300,11 +300,11 @@ class AwardResults(Payload):
     direction: Direction = attr(name="Direction")
 
     # The bid awards associated with these parameters
-    data: List[AwardResult] = element(tag="AwardResultsData", min_length=1)
+    data: List[Award] = element(tag="AwardResultsData", min_length=1)
 
 
-class AwardResultsResponse(AwardResultsQuery, tag="AwardResultsQuery"):
+class AwardResponse(AwardQuery, tag="AwardResultsQuery"):
     """Contains the results of a bid award query."""
 
     # The bid awards associated with the query
-    results: Optional[List[AwardResults]] = wrapped(default=None, path="AwardResultsQueryResponse")
+    results: Optional[List[AwardResult]] = wrapped(default=None, path="AwardResultsQueryResponse")

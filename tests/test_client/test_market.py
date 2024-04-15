@@ -1,6 +1,7 @@
 """Tests the functionality in the mms_client.services.market module."""
 
 from datetime import date as Date
+from decimal import Decimal
 
 import pytest
 import responses
@@ -8,7 +9,15 @@ from pendulum import DateTime
 from pendulum import Timezone
 
 from mms_client.client import MmsClient
+from mms_client.types.award import AwardQuery
+from mms_client.types.award import ContractSource
+from mms_client.types.award import SubRequirement
 from mms_client.types.enums import AreaCode
+from mms_client.types.enums import BooleanFlag
+from mms_client.types.enums import CommandMonitorMethod
+from mms_client.types.enums import ContractResult
+from mms_client.types.enums import Direction
+from mms_client.types.enums import ResourceType
 from mms_client.types.market import MarketType
 from mms_client.types.offer import Direction
 from mms_client.types.offer import OfferCancel
@@ -18,8 +27,13 @@ from mms_client.types.offer import OfferStack
 from mms_client.types.transport import RequestType
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.web import ClientType
+from tests.testutils import award_result_verifier
+from tests.testutils import award_verifier
 from tests.testutils import offer_stack_verifier
+from tests.testutils import read_file
+from tests.testutils import read_request_file
 from tests.testutils import register_mms_request
+from tests.testutils import verify_award_response
 from tests.testutils import verify_offer_cancel
 from tests.testutils import verify_offer_data
 
@@ -73,32 +87,8 @@ def test_put_offer_works(mock_certificate):
             "thBeOefq16bmqQnTw6ETKxVRkbAkB3OqPpkw/zJXEoeVJK4abyuCNPHz8bzaZR8VloqLlFnYkSUUvWK0iqrg8ZzUtiuKMUS9t8cvRiOTn"
             "JiabuhKc863mxe2L+Baft7QCY4dHWjldY3uVwCrEXfWOCVyGQIpbQ="
         ),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
-            """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2024-03-15" ParticipantName="F100" """
-            """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1"><OfferStack """
-            """StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100"/></OfferData></MarketSubmit>"""
-            """</MarketData>"""
-        ).encode("UTF-8"),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-            """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-            """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" """
-            """XmlTimeStamp="2024-03-15T11:43:37" /><Messages><Warning Code="Warning1" /><Warning Code="Warning2" />"""
-            """<Information Code="Info1" /><Information Code="Info2" /></Messages><MarketSubmit Date="2024-03-15" """
-            """ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferData ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1" DrPatternNumber="1" """
-            """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" """
-            """ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2024-03-15T11:44:15" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferStack StackNumber="1" """
-            """MinimumQuantityInKw="100" OfferUnitPrice="100" OfferId="FAKE_ID"><Messages><Warning Code="Warning1" />"""
-            """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages>"""
-            """</OfferStack></OfferData></MarketSubmit></MarketData>"""
-        ).encode("UTF-8"),
+        read_request_file("put_offer_request.xml"),
+        read_file("put_offer_response.xml"),
         warnings=True,
     )
 
@@ -173,32 +163,8 @@ def test_put_offers_works(mock_certificate):
             "thBeOefq16bmqQnTw6ETKxVRkbAkB3OqPpkw/zJXEoeVJK4abyuCNPHz8bzaZR8VloqLlFnYkSUUvWK0iqrg8ZzUtiuKMUS9t8cvRiOTn"
             "JiabuhKc863mxe2L+Baft7QCY4dHWjldY3uVwCrEXfWOCVyGQIpbQ="
         ),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
-            """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2024-03-15" ParticipantName="F100" """
-            """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1"><OfferStack """
-            """StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100"/></OfferData></MarketSubmit>"""
-            """</MarketData>"""
-        ).encode("UTF-8"),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-            """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-            """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" """
-            """XmlTimeStamp="2024-03-15T11:43:37" /><Messages><Warning Code="Warning1" /><Warning Code="Warning2" />"""
-            """<Information Code="Info1" /><Information Code="Info2" /></Messages><MarketSubmit Date="2024-03-15" """
-            """ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferData ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1" DrPatternNumber="1" """
-            """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" """
-            """ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2024-03-15T11:44:15" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferStack StackNumber="1" """
-            """MinimumQuantityInKw="100" OfferUnitPrice="100" OfferId="FAKE_ID"><Messages><Warning Code="Warning1" />"""
-            """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages>"""
-            """</OfferStack></OfferData></MarketSubmit></MarketData>"""
-        ).encode("UTF-8"),
+        read_request_file("put_offer_request.xml"),
+        read_file("put_offer_response.xml"),
         warnings=True,
     )
 
@@ -238,43 +204,15 @@ def test_query_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "HXD+EdcN+NJi6vlVZ3OirpncAxvwoy3YxMABLPpEKnHGv2+NB51TBujizFeKoxROy6nQEKtuGQYRKiPSnpuSJKF2PhaVBAteEz5w/C1We"
-            "HriBDOTnl6j0zBJbi896T7gLTwp3Zj94GTwhVh1Hnc0ZIGb+W0cpcZo6XDu4844zBtnRbjkE5UDbOp1Sm0mDVZ0BiwAC7DR+NFkpUrMNQ"
-            "qHor9HHMiXIT1blLP0TkioIo2l//1pEqd8NibHvjAYM5dZuDmz6ucxQivMrNgInlgXivINCzj3zkbfy66PqLUX1WJmEIlejOskC7qxuP6"
-            "JSywtV4kWUBqKBXHSHjB0Ie6JS3hoqVFOvC9lZhDiU3Geb054wZqk50+CldWeGzIsub5a9vgZZK/+6MbNVh8N5k2vZSyXS3GWhxHW/WCK"
-            "NkT6UZ4PHsaGI6eSyj2jqpGKJlZ8N9h/DDm9saBBLnqcdWQOubGDvrhloph/WIkqcYJJx6uzCOsIeZDI/Q0dSIMjtF4wpo3D6nD1rGvr+"
-            "E/Sxw7AyD2vAK6K999N3b4U/sdnfJncFldeOXJMRTxDeSRBHnSmkrQteKIJ91K53nQuhC3XaAGYaKgbSMeLV/WzWO85DoUSvWJrljhMWi"
-            "Uxn0ZMj46wrnJqU9KxZpNzvqHyrIoCnry+xJMSTJn2HtiqxywieOQ="
+            "JfhNprmqF5WZn1vss/JlcPzq2YGOK2gN2AYdesom7WC6d5Ou3aDhM5pTdU2lu2ts2c5OEW0p8izVNMNsizxCeSb3pPvsLccWdprtZ5Gi163E9+S6VU16Y/i3whybqZr8/clSrcr40S1i1kYyH2IJSXvoTNWQxNQu/7Q4/gyYVL2Tz2nbI6yrxpQ3b1E4wCJJWRW+pg9p29UeLHg2REdtILlMPyBRquk8VXZ4H4SvzT5DGhyrWYiahoMz7kQQLbCURTKqBT/iTS4ZgyodN4bMGkkx/JPe4ExL6FcJJ0nT2iQnkI7XpZFyUwQfExF2Jz+J4xbJpRb0zRdgvDUvhgDgCqeSd3zgslwBT8ALoPz/0X89xzL1YErTfREGtFlJSL4FMQOioz7XZPDTKirxJ8M3KbxWQeNMJSqqyXE9ZhXvOK84Xk03zDnCPSKkvS1YI9UUxzkAK0F4zzJePdnA3QjMHg6rZVV2SC2KqKIIFQmiM0uqe61FUZmjnT7CuA2DVKZ8FMja5jZ71K/4+PUX+DLxyrEXDRAnKg7EfmJDSpFjL6mnEIVaIr8hJmyHzMivsfxjtaj5ymIPnR8DYfZOApvlIjm8ysRixlin/8CYzRZJWWcr/uY860Y9Mb9B7Kw+vTtIWBciABHOMvvj46ky4g2NzM4s2lGMy0j0pDxwyp+x7J0="
         ),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
-            """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketQuery Date="2024-03-15" ParticipantName="F100" """
-            """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferQuery MarketType="DAM" """
-            """ResourceName="FAKE_RESO" Area="04"/></MarketQuery></MarketData>"""
-        ).encode("UTF-8"),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-            """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-            """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" """
-            """XmlTimeStamp="2024-03-15T11:43:37" /><Messages><Warning Code="Warning1" /><Warning Code="Warning2" />"""
-            """<Information Code="Info1" /><Information Code="Info2" /></Messages><MarketSubmit Date="2024-03-15" """
-            """ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferData ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1" DrPatternNumber="1" """
-            """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" """
-            """ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2024-03-15T11:44:15" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferStack StackNumber="1" """
-            """MinimumQuantityInKw="100" OfferUnitPrice="100" OfferId="FAKE_ID"><Messages><Warning Code="Warning1" />"""
-            """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages>"""
-            """</OfferStack></OfferData></MarketSubmit></MarketData>"""
-        ).encode("UTF-8"),
+        read_request_file("query_offers_request.xml"),
+        read_file("put_offer_response.xml"),
         warnings=True,
     )
 
     # Now, attempt to query offers with the valid client type; this should succeed
-    offers = client.query_offers(request, MarketType.DAY_AHEAD, 1, Date(2024, 3, 15))
+    offers = client.query_offers(request, 1, Date(2024, 3, 15))
 
     # Finally, verify the offer
     assert len(offers) == 1
@@ -345,25 +283,8 @@ def test_cancel_offer_works(mock_certificate):
             "KOP1hGW9wI5QtWZeyHTJbcbXBbeuRXAIHPKYqEMADFWzKZyJeEspKGUTyCegRudLRwQgzDvq9XzRUsW4uH84CuUaPgsUK29Bjy8H7lYL/"
             "aAlcB/daZWmWd/5noHKMfokRgYQir1zHEgjBlrev9c4fk0ckRaNEw="
         ),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
-            """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketCancel Date="2024-03-15" ParticipantName="F100" """
-            """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferCancel ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" MarketType="DAM"/></MarketCancel>"""
-            """</MarketData>"""
-        ).encode("UTF-8"),
-        (
-            """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-            """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-            """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" """
-            """XmlTimeStamp="2024-03-15T11:43:37" /><Messages><Warning Code="Warning1" /><Warning Code="Warning2" />"""
-            """<Information Code="Info1" /><Information Code="Info2" /></Messages><MarketCancel Date="2024-03-15" """
-            """ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1" Validation="PASSED" """
-            """Success="true"><Messages><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-            """Code="Info1" /><Information Code="Info2" /></Messages><OfferCancel ResourceName="FAKE_RESO" """
-            """StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" MarketType="DAM"/></MarketCancel>"""
-            """</MarketData>"""
-        ).encode("UTF-8"),
+        read_request_file("delete_offer_request.xml"),
+        read_file("delete_offer_response.xml"),
         warnings=True,
     )
 
@@ -377,4 +298,110 @@ def test_cancel_offer_works(mock_certificate):
         DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),
         DateTime(2024, 3, 15, 21, tzinfo=Timezone("UTC")),
         MarketType.DAY_AHEAD,
+    )
+
+
+@responses.activate
+def test_query_awards_works(mock_certificate):
+    """Test that the query_awards method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test award query
+    request = AwardQuery(
+        market_type=MarketType.DAY_AHEAD,
+        area=AreaCode.TOKYO,
+        linked_area=AreaCode.TOHOKU,
+        resource="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
+        end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
+        gate_closed=BooleanFlag.YES,
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.INFO,
+        (
+            "y/RTqaOCdC6ATv9L9Q2bVtZ9ovWERVbxMqn2gIwv90rvYpJ7ofgwjeEZ2MB9Yzvca+wixbUH1Um6rUhQ7IRVxnuSpHnLtyz+gMQC6E9KO1vsD7ILp6CoYVfTbzK5TkHCuLvlWbEHRe17/w8PgWr/bexkJ1+qguyNcF62/zfeSfzv7/ZbQXAuykcB0QyZ6Ha8aoO8GJKqV6UFHeH/0QFC1dWMkM+iv+LmK4+GsbjErL36bpNN1ePQ6I3a2F710l0TNZnwJ0FM/lwkdYyVzlD1G96rBe7GvROwdDOc/2InuWf+QEag8Hebnq+/s5VnKmD8u5W5UHL74B580wqLFtOmqf6vYYdvQq4MquBwVXEtrwqtUo4HSofAXJowDyKiIIx4UFZwcWYGDv//oYxGIWWMNc54p3lmmuqmnMsrpQqTIqvQJA+i2V4Sc8FyHlRO1ShEelC3nWuQceEmXyxnVii/256XlCLKQanG2w28jAqyU6rzoRoU1ZAihBKew3jx6lGHD4R6+JMoNiSEYeQKMgNkQ/YPrDnmSO8Txa/gklUqDnTySZWK9rcGZXo/sX2BA8SJQOng9roR+fsQXOldRuo5V+yTpF8mu6eVXcCBcelYixGsuvrkodJgdXZyuwHZ90bOMZlFTjSUqn0qJKMEwKJO/PdqkrUPVOXXLIGTkcFenfU="
+        ),
+        read_request_file("query_awards_request.xml"),
+        read_file("query_awards_response.xml"),
+        warnings=True,
+    )
+
+    # Now, attempt to query awards with the valid client type; this should succeed
+    awards = client.query_awards(request, 1, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    verify_award_response(
+        awards,
+        market_type=MarketType.DAY_AHEAD,
+        start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
+        end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
+        area=AreaCode.TOKYO,
+        linked_area=AreaCode.TOHOKU,
+        resource="FAKE_RESO",
+        gate_closed=BooleanFlag.YES,
+        result_verifiers=[
+            award_result_verifier(
+                start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
+                end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
+                direction=Direction.SELL,
+                award_verifiers=[
+                    award_verifier(
+                        contract_id="156098uqt3qawldefjT",
+                        jbms_id=4235230998,
+                        area=AreaCode.TOKYO,
+                        resource="FAKE_RESO",
+                        resource_name="偽電力",
+                        system_code="FSYS0",
+                        resource_type=ResourceType.THERMAL,
+                        bsp_participant="F100",
+                        company_name="偽会社",
+                        operator="FAKE",
+                        offer_price=Decimal("42.15"),
+                        contract_price=Decimal("69.44"),
+                        eval_coeff=Decimal("35.79"),
+                        corrected_price=Decimal("199.99"),
+                        result=ContractResult.PARTIAL,
+                        source=ContractSource.SWITCHING,
+                        gate_closed=BooleanFlag.YES,
+                        linked_area=AreaCode.TOHOKU,
+                        pattern_number=2,
+                        pattern_name="偽パターン",
+                        primary_secondary_1_control_method=CommandMonitorMethod.OFFLINE,
+                        secondary_2_tertiary_control_method=CommandMonitorMethod.SIMPLE_COMMAND,
+                        sub_requirement=SubRequirement.PRIAMRY_SECONDARY,
+                        primary_offer_qty=5000,
+                        secondary_1_offer_qty=6000,
+                        secondary_2_offer_qty=7000,
+                        tertiary_1_offer_qty=8000,
+                        tertiary_2_offer_qty=9000,
+                        primary_award_qty=5000,
+                        secondary_1_award_qty=5001,
+                        secondary_2_award_qty=5002,
+                        tertiary_1_award_qty=5003,
+                        tertiary_2_award_qty=5004,
+                        primary_contract_qty=5000,
+                        secondary_1_contract_qty=4000,
+                        secondary_2_contract_qty=3000,
+                        tertiary_1_contract_qty=2000,
+                        tertiary_2_contract_qty=1000,
+                        primary_valid_qty=5010,
+                        secondary_1_valid_qty=5020,
+                        secondary_2_valid_qty=5030,
+                        tertiary_1_valid_qty=5040,
+                        compound_valid_qty=9001,
+                        primary_invalid_qty=4001,
+                        secondary_1_invalid_qty=4002,
+                        secondary_2_invalid_qty=4003,
+                        tertiary_1_invalid_qty=4004,
+                        negative_baseload_file="W9_3010_20240411_15_AS490_FAKE_NEG.xml",
+                        positive_baseload_file="W9_3010_20240411_15_AS490_FAKE_POS.xml",
+                        submission_time=DateTime(2024, 4, 10, 22, 34, 44, tzinfo=Timezone("Asia/Tokyo")),
+                        offer_id="FAKE_ID",
+                    )
+                ],
+            ),
+        ],
     )

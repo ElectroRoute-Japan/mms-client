@@ -8,6 +8,8 @@ from mms_client.services.base import ClientProto
 from mms_client.services.base import ServiceConfiguration
 from mms_client.services.base import mms_endpoint
 from mms_client.services.base import mms_multi_endpoint
+from mms_client.types.award import AwardQuery
+from mms_client.types.award import AwardResponse
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
@@ -45,7 +47,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
 
         Returns:    The offer that has been registered with the MMS server.
         """
-        # Note: the return type does not match the method definition but the decorator will return the correct type
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketSubmit(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
@@ -71,7 +73,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
 
         Returns:    A list of offers that have been registered with the MMS server.
         """
-        # Note: the return type does not match the method definition but the decorator will return the correct type
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketSubmit(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
@@ -83,28 +85,24 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     @mms_multi_endpoint(
         "MarketQuery_OfferQuery", config, RequestType.INFO, resp_envelope_type=MarketSubmit, resp_data_type=OfferData
     )
-    def query_offers(
-        self: ClientProto, request: OfferQuery, market_type: MarketType, days: int, date: Optional[Date] = None
-    ) -> List[OfferData]:
+    def query_offers(self: ClientProto, request: OfferQuery, days: int, date: Optional[Date] = None) -> List[OfferData]:
         """Query the MMS server for offers.
 
         This endpoint is accessible to all client types.
 
         Arguments:
         request (OfferQuery):       The query to submit to the MMS server.
-        market_type (MarketType):   The type of market for which the offer was submitted.
         days (int):                 The number of days ahead for which the data is being queried.
         date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                     current date.
 
         Returns:    A list of offers that match the query.
         """
-        # Note: the return type does not match the method definition but the decorator will return the correct type
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketQuery(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
-            market_type=market_type,
             days=days,
         )
 
@@ -123,11 +121,38 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                     current date.
         """
-        # Note: the return type does not match the method definition but the decorator will return the correct type
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketCancel(  # type: ignore[return-value]
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
             market_type=market_type,
+            days=days,
+        )
+
+    @mms_endpoint("MarketQuery_AwardResultsQuery", config, RequestType.INFO, resp_data_type=AwardResponse)
+    def query_awards(self: ClientProto, request: AwardQuery, days: int, date: Optional[Date] = None) -> AwardResponse:
+        """Query the MMS server for award results.
+
+        This endpoint is accessible to all client types.
+
+        If no values are specified for Area, Associated Area, Power Generation Unit Code, or GC Registration Flag,
+        the results for all areas will be retrieved. If one or more of these criteria are specified, the results will
+        be filtered according to the specified criteria. If no value is specified for the retrieval period, the default
+        value for this field is 1.
+
+        Arguments:
+        request (AwardQuery):       The query to submit to the MMS server.
+        days (int):                 The number of days ahead for which the data is being queried.
+        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                    current date.
+
+        Returns:    The award results that match the query.
+        """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        return MarketQuery(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
             days=days,
         )

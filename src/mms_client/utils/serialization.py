@@ -16,6 +16,7 @@ from lxml.etree import XMLSchema
 from lxml.etree import _Element as Element
 from lxml.etree import parse
 from pydantic_xml import element
+from pydantic_xml.typedefs import EntityLocation
 
 from mms_client.types.base import E
 from mms_client.types.base import Messages
@@ -69,12 +70,12 @@ class Serializer:
         )
 
         # Next, inject the payload and data into the payload class
-        # Note: this returns a type that inherits from PayloadBase and the arguments provided to the initializer
+        # NOTE: this returns a type that inherits from PayloadBase and the arguments provided to the initializer
         # here are correct, but mypy thinks they are incorrect because it doesn't understand the the inherited type
         payload = payload_cls(request_envelope, request_data, self._xsd.value)  # type: ignore[call-arg, misc]
 
         # Finally, convert the payload to XML and return it
-        # Note: we provided the encoding here so this will return bytes, not a string
+        # NOTE: we provided the encoding here so this will return bytes, not a string
         return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)  # type: ignore[return-value]
 
     def serialize_multi(self, request_envelope: E, request_data: List[P], request_type: Type[P]) -> bytes:
@@ -93,12 +94,12 @@ class Serializer:
         )
 
         # Next, inject the payload and data into the payload class
-        # Note: this returns a type that inherits from PayloadBase and the arguments provided to the initializer
+        # NOTE: this returns a type that inherits from PayloadBase and the arguments provided to the initializer
         # here are correct, but mypy thinks they are incorrect because it doesn't understand the the inherited type
         payload = payload_cls(request_envelope, request_data, self._xsd.value)  # type: ignore[call-arg, misc]
 
         # Finally, convert the payload to XML and return it
-        # Note: we provided the encoding here so this will return bytes, not a string
+        # NOTE: we provided the encoding here so this will return bytes, not a string
         return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)  # type: ignore[return-value]
 
     def deserialize(self, data: bytes, envelope_type: Type[E], data_type: Type[P]) -> Response[E, P]:
@@ -190,7 +191,7 @@ class Serializer:
 
         # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
         # from within the envelope
-        # Note: apparently, mypy doesn't know about setter-getter properties either...
+        # NOTE: apparently, mypy doesn't know about setter-getter properties either...
         self._verify_tree_data_tag(env_node, data_type)
         resp.payload = [
             self._from_tree_data(item, data_type) for item in env_node.findall(get_tag(data_type))  # type: ignore[misc]
@@ -271,7 +272,13 @@ class Serializer:
         )
 
     def _from_tree_messages(
-        self, raw: Element, envelope_type: Type[E], current_type: Type[P], root: str, multi: bool
+        self,
+        raw: Element,
+        envelope_type: Type[E],
+        current_type: Type[P],
+        root: str,
+        multi: bool,
+        wrapped: bool = False,
     ) -> Dict[str, Messages]:
         """Attempt to extract the messages from within the payload.
 
@@ -287,6 +294,7 @@ class Serializer:
         multi (bool):                   Whether we're processing a list of nodes or a single node. If called with the
                                         payload root, this value will determine whether we're processing a multi-
                                         response or a single response.
+        wrapped (bool):                 Whether or not this type is referenced from a wrapped field.
         """
         # First, find the Messages node in the raw data
         message_node = raw.find("Messages")
@@ -309,40 +317,41 @@ class Serializer:
                     current_type,
                     f"{root}.{envelope_type.__name__}",
                     multi,
+                    False,
                 )
             )
-        elif root.endswith(envelope_type.__name__):
+        elif root.endswith(envelope_type.__name__) or wrapped:
             messages.update(
-                self._from_tree_messages_inner(raw, envelope_type, current_type, root, current_type.__name__, multi)
+                self._from_tree_messages_inner(
+                    raw, envelope_type, current_type, root, get_tag(current_type), multi, False
+                )
             )
         else:
             # Iterate over each field on the current type...
             for field in current_type.model_fields.values():
 
-                # First, get the arguments and origin of the field's annotation
-                args = get_args(field.annotation)
-                origin = get_origin(field.annotation)
-                has_args = len(args) > 0
+                # First, get the arguments and origin of the field's annotation. Occaisionally, we'll have an optional
+                # list. In this case, we'll have to do get_args twice to traverse the type tree.
+                arg, multi = _get_field_typing(field.annotation)  # type: ignore[arg-type]
 
                 # Next, check if the annotation is a subclass of Payload or else if it's a collection of Payload. If
                 # neither of these is the case, we can skip this field.
-                # Note: all our fields are annotated so there's no need to check if they're not
-                if not (
-                    (has_args and issubclass(args[0], Payload))
-                    or (not has_args and issubclass(field.annotation, Payload))  # type: ignore[arg-type]
-                ):
+                # NOTE: All our fields are annotated so there's no need to check if they're not
+                if not issubclass(arg, Payload):
                     continue
 
                 # Finally, call this method recursively for the field and update the messages with the results
-                # Note: All our fields are annotated as XmlEntityInfo, so they have the "path" attribute
+                # NOTE: All our fields are annotated as XmlEntityInfo, so they have the "path" and "location" attributes
+                print(field)
                 messages.update(
                     self._from_tree_messages_inner(
                         raw,
                         envelope_type,
-                        args[0],
+                        arg,
                         root,
                         field.path,  # type: ignore[attr-defined]
-                        origin is list,
+                        multi,
+                        field.location == EntityLocation.WRAPPED,  # type: ignore[attr-defined]
                     )
                 )
 
@@ -350,7 +359,14 @@ class Serializer:
         return messages
 
     def _from_tree_messages_inner(
-        self, raw: Element, envelope_type: Type[E], current_type: Type[P], root: str, tag: str, multi: bool
+        self,
+        raw: Element,
+        envelope_type: Type[E],
+        current_type: Type[P],
+        root: str,
+        tag: str,
+        multi: bool,
+        wrapped: bool,
     ) -> Dict[str, Messages]:
         """Attempt to extract the messages from within the payload at the current level.
 
@@ -362,6 +378,7 @@ class Serializer:
         tag (str):                      The tag of the current node being processed.
         multi (bool):                   If True, the payload will be a multi-response; otherwise, it will be a single
                                         response.
+        wrapped (bool):                 Whether or not this field is a wrapped field.
 
         Returns:    A dictionary mapping messages to where they were found in the response.
         """
@@ -379,12 +396,20 @@ class Serializer:
             # Otherwise, we'll call this method recursively for each node and update the messages with the results.
             messages = {}
             for i, node in enumerate(nodes):
-                messages.update(self._from_tree_messages(node, envelope_type, current_type, f"{path_base}[{i}]", True))
+                messages.update(
+                    self._from_tree_messages(
+                        node, envelope_type, current_type, path_base if wrapped else f"{path_base}[{i}]", True, wrapped
+                    )
+                )
             return messages
 
         # If we reached this point then we are processing a single item so find the associated
         child = raw.find(tag)
-        return {} if child is None else self._from_tree_messages(child, envelope_type, current_type, path_base, False)
+        return (
+            {}
+            if child is None
+            else self._from_tree_messages(child, envelope_type, current_type, path_base, False, wrapped)
+        )
 
     def _from_xml(self, data: bytes) -> Element:
         """Parse the XML file, returning the resulting XML tree.
@@ -545,6 +570,45 @@ def _find_or_fail(node: Element, tag: str) -> Element:
     if found is None:
         raise ValueError(f"Expected tag '{tag}' not found in node")  # pragma: no cover
     return found
+
+
+def _get_field_typing(typ: Type) -> Tuple[Type, bool]:
+    """Retrieve the field's actual type and whether or not the field is a collection.
+
+    This method is designed to find the inner type of fields in the following cases:
+    1. Fundamental types and classes (e.g. int, str, Award, Offer, etc.)
+    2. Nullable fundamental types and classes
+    3. Collections of fundamental types and classes
+    4. Nullable collections of fundamental types and classes
+
+    Arguments:
+    typ (Type): The type of the field to retrieve the inner type for.
+
+    Returns:
+    Type:   The inner type of the field.
+    bool:   Whether or not the field is a collection.
+    """
+    # First, check for the case where we have a fundamental type. If we do then we can return the type and False.
+    init = get_args(typ)
+    if len(init) == 0:
+        return typ, False
+
+    # Next, iterate over the type hierarchy and repeat the operation until we find the leaf type.
+    args = [get_args(typ)]
+    while len(args[-1]) > 1:
+        temp = get_args(args[-1][0])
+        if len(temp) == 0:
+            break
+        args.append(temp)
+
+    # Now, find the origin type of the field. This will be the lowest type in the hierarchy that isn't a multi-type.
+    # If there aren't any of these, then we'll just use the original type.
+    origin_type = next(
+        filter(lambda x: x is not None, map(lambda arg: arg[0] if len(arg) > 1 else None, reversed(args))), typ
+    )
+
+    # Finally, return the inner type and whether or not the origin type is a list
+    return args[-1][0] if len(args) > 0 else typ, get_origin(origin_type) is list  # typing: ignore[return-value]
 
 
 def get_tag(data_type: Type[P]) -> str:

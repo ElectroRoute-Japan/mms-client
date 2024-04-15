@@ -733,7 +733,7 @@ class ResourceData(Payload, tag="Resource"):
     has_contract: Optional[BooleanFlag] = attr(default=None, name="ContractExistence")
 
     # The maximum bid price for POWER_SUPPLY_1 power, in JPY/kW/hr
-    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", True)]
+    declared_maximum_unit_price_kWh: Annotated[Decimal, price("DeclaredMaximumUnitPrice", 10000.00, True)]
 
     # Presence of voltage regulation function.
     voltage_adjustable: Optional[BooleanFlag] = attr(default=None, name="VoltageAdjustment")
