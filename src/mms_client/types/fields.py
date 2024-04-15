@@ -69,6 +69,26 @@ def transaction_id(alias: str, optional: bool = False):
     )
 
 
+def offer_id(alias: str, optional: bool = False):
+    """Create a field for an offer ID.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the offer ID.
+    """
+    return attr(
+        default=None if optional else PydanticUndefined,
+        name=alias,
+        min_length=1,
+        max_length=30,
+        pattern=r"^[a-zA-Z0-9_-]*$",
+    )
+
+
 def capacity(alias: str, minimum: int, optional: bool = False):
     """Create a field for a capacity value.
 
@@ -98,18 +118,19 @@ def power_positive(alias: str, optional: bool = False):
     return attr(default=None if optional else PydanticUndefined, name=alias, gt=0, le=10000000)
 
 
-def price(alias: str, optional: bool = False):
+def price(alias: str, limit: float, optional: bool = False):
     """Create a field for a price value.
 
     Arguments:
     alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
                         to the JSON/XML key.
+    limit (int):        The maximum value for the price field.
     optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
                         required, with no default.
 
     Returns:    A Pydantic Field object for the price value.
     """
-    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.00, lt=10000.00, decimal_places=2)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0.00, le=limit, decimal_places=2)
 
 
 def percentage(alias: str, optional: bool = False):
@@ -138,6 +159,22 @@ def dr_patter_number(alias: str, optional: bool = False):
     Returns:    A Pydantic Field object for the DR pattern number.
     """
     return attr(default=None if optional else PydanticUndefined, name=alias, ge=1, le=20)
+
+
+def dr_pattern_name(alias: str, optional: bool = False):
+    """Create a field for a DR pattern name.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the DR pattern name.
+    """
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, min_length=1, max_length=20, pattern=JAPANESE_TEXT
+    )
 
 
 def pattern_name(alias: str, optional: bool = False):
@@ -244,6 +281,40 @@ def resource_short_name(alias: str, optional: bool = False):
     return attr(
         default=None if optional else PydanticUndefined, name=alias, min_length=1, max_length=10, pattern=JAPANESE_TEXT
     )
+
+
+def contract_id(alias: str, optional: bool = False):
+    """Create a field for a contract ID.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the contract ID.
+    """
+    return attr(
+        default=None if optional else PydanticUndefined,
+        name=alias,
+        min_length=19,
+        max_length=19,
+        pattern=r"^[a-zA-Z0-9]**$",
+    )
+
+
+def jbms_id(alias: str, optional: bool = False):
+    """Create a field for a JBMS ID.
+
+    Arguments:
+    alias (str):        The name of the alias to assign to the Pydanitc field. This value will be used to map the field
+                        to the JSON/XML key.
+    optional (bool):    If True, the field will be optional with a default of None. If False, the field will be
+                        required, with no default.
+
+    Returns:    A Pydantic Field object for the JBMS ID.
+    """
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=1, lt=1000000000000000000)
 
 
 def system_code(alias: str, optional: bool = False):

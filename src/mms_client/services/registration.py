@@ -38,6 +38,7 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
 
         Returns:    The resource that has been registered with the MMS server.
         """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
         # For some reason, the registration DTOs require that the participant ID exist on the payload rather than on
         # the envelope so we need to set it before we return the envelope.
         request.participant = self.participant
@@ -65,6 +66,7 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
 
         Returns:    A list of resources that match the query.
         """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
         # For some reason, the registration DTOs require that the participant ID exist on the payload rather than on
         # the envelope so we need to set it before we return the envelope.
         request.participant = self.participant

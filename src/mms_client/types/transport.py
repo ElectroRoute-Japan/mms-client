@@ -25,7 +25,7 @@ class RequestType(Enum):
 class RequestDataType(Enum):
     """Represents the type of data to be sent to the MMS server.
 
-    Note that JSON is currently not supported and has been left in for future use.
+    NOTE: JSON is currently not supported and has been left in for future use.
     """
 
     JSON = "JSON"
@@ -35,7 +35,7 @@ class RequestDataType(Enum):
 class ResponseDataType(Enum):
     """Represents the type of data to be received from the MMS server.
 
-    Note that JSON is currently not supported and has been left in for future use.
+    NOTE: JSON is currently not supported and has been left in for future use.
     """
 
     XML = "XML"

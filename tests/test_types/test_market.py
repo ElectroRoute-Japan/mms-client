@@ -35,7 +35,6 @@ def test_market_query_full():
         date=Date(2019, 8, 30),
         participant="F100",
         user="FAKEUSER",
-        market_type=MarketType.WEEK_AHEAD,
         days=4,
     )
 
@@ -43,10 +42,8 @@ def test_market_query_full():
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_market_query(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.WEEK_AHEAD, 4)
-    assert data == (
-        b"""<MarketQuery Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"/>"""
-    )
+    verify_market_query(request, Date(2019, 8, 30), "F100", "FAKEUSER", 4)
+    assert data == b"""<MarketQuery Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="4"/>"""
 
 
 def test_market_submit_defaults():
@@ -95,14 +92,18 @@ def test_market_cancel_defaults():
         date=Date(2019, 8, 30),
         participant="F100",
         user="FAKEUSER",
+        market_type=MarketType.DAY_AHEAD,
     )
 
     # Next, convert the request to a dictionary
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_market_cancel(request, Date(2019, 8, 30), "F100", "FAKEUSER")
-    assert data == b"""<MarketCancel Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1"/>"""
+    verify_market_cancel(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.DAY_AHEAD)
+    assert (
+        data
+        == b"""<MarketCancel Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"/>"""
+    )
 
 
 def test_market_cancel_full():

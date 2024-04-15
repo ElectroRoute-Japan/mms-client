@@ -16,9 +16,17 @@ from pendulum import DateTime
 from requests import PreparedRequest
 from responses.matchers import header_matcher
 
+from mms_client.types.award import Award
+from mms_client.types.award import AwardQuery
+from mms_client.types.award import AwardResponse
+from mms_client.types.award import AwardResult
+from mms_client.types.award import ContractResult
+from mms_client.types.award import ContractSource
 from mms_client.types.base import Message
 from mms_client.types.base import Messages
 from mms_client.types.enums import AreaCode
+from mms_client.types.enums import BooleanFlag
+from mms_client.types.enums import ResourceType
 from mms_client.types.market import BaseMarketRequest
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
@@ -153,11 +161,9 @@ def verify_messages(messages: Dict[str, Messages], verifiers: dict):
         verifier(messages[key])
 
 
-def verify_market_query(
-    req: MarketQuery, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
-):
+def verify_market_query(req: MarketQuery, date: Date, participant: str, user: str, days: int = 1):
     """Verify that the MarketQuery was created with the correct parameters."""
-    verify_base_market_request(req, date, participant, user, market_type)
+    verify_base_market_request(req, date, participant, user)
     assert req.days == days
 
 
@@ -165,26 +171,25 @@ def verify_market_submit(
     req: MarketSubmit, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
 ):
     """Verify that the MarketSubmit was created with the correct parameters."""
-    verify_base_market_request(req, date, participant, user, market_type)
+    verify_base_market_request(req, date, participant, user)
     assert req.days == days
+    assert req.market_type == market_type
 
 
 def verify_market_cancel(
-    req: MarketCancel, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None, days: int = 1
+    req: MarketCancel, date: Date, participant: str, user: str, market_type: MarketType, days: int = 1
 ):
     """Verify that the MarketCancel was created with the correct parameters."""
-    verify_base_market_request(req, date, participant, user, market_type)
+    verify_base_market_request(req, date, participant, user)
     assert req.days == days
+    assert req.market_type == market_type
 
 
-def verify_base_market_request(
-    req: BaseMarketRequest, date: Date, participant: str, user: str, market_type: Optional[MarketType] = None
-):
+def verify_base_market_request(req: BaseMarketRequest, date: Date, participant: str, user: str):
     """Verify that the BaseMarketRequest was created with the correct parameters."""
     assert req.date == date
     assert req.participant == participant
     assert req.user == user
-    assert req.market_type == market_type
 
 
 def verify_registration_query(
@@ -194,6 +199,94 @@ def verify_registration_query(
     assert req.action == action
     assert req.query_type == query_type
     assert req.date == date
+
+
+def verify_award_query(req: AwardQuery, market_type: MarketType, start: DateTime, end: DateTime, **kwargs):
+    """Verify that the given AwardQuery has the expected parameters."""
+    assert req.market_type == market_type
+    assert req.start == start
+    assert req.end == end
+    for field, info in req.model_fields.items():
+        if not (info.is_required() or field == "results"):
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def verify_award_response(
+    resp: AwardResponse,
+    market_type: MarketType,
+    start: DateTime,
+    end: DateTime,
+    result_verifiers: list = None,
+    **kwargs,
+):
+    """Verify that the given AwardResponse has the expected parameters."""
+    verify_award_query(resp, market_type, start, end, **kwargs)
+    verify_list(resp.results, result_verifiers)
+
+
+def award_result_verifier(start: DateTime, end: DateTime, direction: Direction, award_verifiers: list):
+    """Return a function that verifies the award results response has the expected parameters."""
+
+    def inner(resp: AwardResult):
+        assert resp.start == start
+        assert resp.end == end
+        assert resp.direction == direction
+        verify_list(resp.data, award_verifiers)
+
+    return inner
+
+
+def award_verifier(
+    contract_id: str,
+    jbms_id: str,
+    area: AreaCode,
+    resource: str,
+    resource_name: str,
+    system_code: str,
+    resource_type: ResourceType,
+    bsp_participant: str,
+    company_name: str,
+    operator: str,
+    offer_price: Decimal,
+    contract_price: Decimal,
+    eval_coeff: Decimal,
+    corrected_price: Decimal,
+    result: ContractResult,
+    source: ContractSource,
+    gate_closed: BooleanFlag,
+    **kwargs,
+):
+    """Return a function that verifies the award result has the expected parameters."""
+
+    def inner(resp: Award):
+        resp.contract_id == contract_id
+        resp.jbms_id == jbms_id
+        resp.area == area
+        resp.resource == resource
+        resp.resource_short_name == resource_name
+        resp.system_code == system_code
+        resp.resource_type == resource_type
+        resp.bsp_participant == bsp_participant
+        resp.company_short_name == company_name
+        resp.operator == operator
+        resp.offer_price == offer_price
+        resp.contract_price == contract_price
+        resp.performance_evaluation_coefficient == eval_coeff
+        resp.corrected_unit_price == corrected_price
+        resp.offer_award_level == result
+        resp.contract_source == source
+        resp.gate_closed == gate_closed
+        for field, info in resp.model_fields.items():
+            if not info.is_required():
+                if field in kwargs:
+                    assert getattr(resp, field) == kwargs[field]
+                else:
+                    assert getattr(resp, field) is None
+
+    return inner
 
 
 def verify_offer_data(
