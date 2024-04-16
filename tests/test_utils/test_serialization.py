@@ -23,31 +23,11 @@ from mms_client.utils.serialization import Serializer
 from tests.testutils import code_verifier
 from tests.testutils import messages_verifier
 from tests.testutils import offer_stack_verifier
+from tests.testutils import read_file
+from tests.testutils import read_request_file
 from tests.testutils import verify_market_submit
 from tests.testutils import verify_messages
 from tests.testutils import verify_offer_data
-
-# Test base-64 encoded XML payload
-TEST_XML_ENCODED = (
-    """<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-    """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-    """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
-    """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" /><Warning """
-    """Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" />"""
-    """</Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" """
-    """NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" """
-    """/><Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" """
-    """/></Messages><OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-08-30T11:24:15" """
-    """Direction="1" DrPatternNumber="12" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" """
-    """Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2019-08-29T03:24:15" Validation="PASSED" """
-    """Success="true"><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" /><Warning Code="Warning1" />"""
-    """<Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" /></Messages><OfferStack """
-    """StackNumber="1" MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
-    """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """
-    """OfferUnitPrice="100" OfferId="FAKE_ID"><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
-    """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information Code="Info2" />"""
-    """</Messages></OfferStack></OfferData></MarketSubmit></MarketData>"""
-).encode("UTF-8")
 
 
 def test_serialize_data():
@@ -94,17 +74,7 @@ def test_serialize_data():
     data = serializer.serialize(request, offer)
 
     # Finally, verify that the request was serialized as we expect
-    assert data == (
-        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
-        """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2019-08-29" ParticipantName="F100" """
-        """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
-        """StartTime="2019-08-30T03:24:15" EndTime="2019-08-30T11:24:15" Direction="1" DrPatternNumber="12" """
-        """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" ResourceShortName="偽電力" """
-        """SystemCode="FSYS0" SubmissionTime="2019-08-29T03:24:15"><OfferStack StackNumber="1" """
-        """MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
-        """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """
-        """OfferUnitPrice="100" OfferId="FAKE_ID"/></OfferData></MarketSubmit></MarketData>"""
-    ).encode("UTF-8")
+    assert data == read_request_file("serialization_2.xml")
 
 
 def test_serialize_multi_data():
@@ -151,17 +121,7 @@ def test_serialize_multi_data():
     data = serializer.serialize_multi(request, [offer], OfferData)
 
     # Finally, verify that the request was serialized as we expect
-    assert data == (
-        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema" """
-        """xsi:noNamespaceSchemaLocation="mi-market.xsd"><MarketSubmit Date="2019-08-29" ParticipantName="F100" """
-        """UserName="FAKEUSER" MarketType="DAM" NumOfDays="1"><OfferData ResourceName="FAKE_RESO" """
-        """StartTime="2019-08-30T03:24:15" EndTime="2019-08-30T11:24:15" Direction="1" DrPatternNumber="12" """
-        """BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" ResourceShortName="偽電力" """
-        """SystemCode="FSYS0" SubmissionTime="2019-08-29T03:24:15"><OfferStack StackNumber="1" """
-        """MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" """
-        """Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" """
-        """OfferUnitPrice="100" OfferId="FAKE_ID"/></OfferData></MarketSubmit></MarketData>"""
-    ).encode("UTF-8")
+    assert data == read_request_file("serialization_2.xml")
 
 
 def test_deserialize_payload_key_invalid():
@@ -171,7 +131,7 @@ def test_deserialize_payload_key_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(TEST_XML_ENCODED, MarketSubmit, OfferData)
+        _ = serialzier.deserialize(read_request_file("serialization_1.xml", False), MarketSubmit, OfferData)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected payload key 'ReportData' not found in response"
@@ -184,7 +144,7 @@ def test_deserialize_envelope_type_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(TEST_XML_ENCODED, MarketQuery, OfferData)
+        _ = serialzier.deserialize(read_file("serialization_1.xml"), MarketQuery, OfferData)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected envelope type 'MarketQuery' not found in response"
@@ -197,7 +157,7 @@ def test_deserialize_data_type_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(TEST_XML_ENCODED, MarketSubmit, OfferCancel)
+        _ = serialzier.deserialize(read_request_file("serialization_1.xml"), MarketSubmit, OfferCancel)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected data type 'OfferCancel' not found in response"
@@ -209,7 +169,7 @@ def test_deserialize_works():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize(TEST_XML_ENCODED, MarketSubmit, OfferData)
+    resp = serialzier.deserialize(read_file("serialization_1.xml"), MarketSubmit, OfferData)
 
     # Finally, verify that the response is as we expect
     verify_offer_data(
@@ -264,17 +224,7 @@ def test_deserialize_no_data_works():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Create our test XML payload
-    encoded_data = (
-        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-        """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-        """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
-        """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
-        """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information """
-        """Code="Info2" /></Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" """
-        """MarketType="DAM" NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" />"""
-        """<Error Code="ErrorCode2" /><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-        """Code="Info1" /><Information Code="Info2" /></Messages></MarketSubmit></MarketData>"""
-    ).encode("UTF-8")
+    encoded_data = read_file("serialization_3.xml")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
     resp = serialzier.deserialize(encoded_data, MarketSubmit, OfferData)
@@ -307,7 +257,7 @@ def test_deserialize_multi_payload_key_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize_multi(TEST_XML_ENCODED, MarketSubmit, OfferData)
+        _ = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketSubmit, OfferData)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected payload key 'ReportData' not found in response"
@@ -320,7 +270,7 @@ def test_deserialize_multi_envelope_type_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize_multi(TEST_XML_ENCODED, MarketQuery, OfferData)
+        _ = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketQuery, OfferData)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected envelope type 'MarketQuery' not found in response"
@@ -333,7 +283,7 @@ def test_deserialize_multi_data_type_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize_multi(TEST_XML_ENCODED, MarketSubmit, OfferCancel)
+        _ = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketSubmit, OfferCancel)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected data type 'OfferCancel' not found in response"
@@ -345,7 +295,7 @@ def test_deserialize_multi_works():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize_multi(TEST_XML_ENCODED, MarketSubmit, OfferData)
+    resp = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketSubmit, OfferData)
 
     # Finally, verify that the response is as we expect
     assert len(resp.data) == 1
@@ -401,17 +351,7 @@ def test_deserialize_multi_no_data_works():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Create our test XML payload
-    encoded_data = (
-        """<?xml version='1.0' encoding='utf-8'?>\n<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">"""
-        """<ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" """
-        """ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" """
-        """XmlTimeStamp="2024-03-12T11:43:37" /><Messages><Error Code="ErrorCode1" /><Error Code="ErrorCode2" />"""
-        """<Warning Code="Warning1" /><Warning Code="Warning2" /><Information Code="Info1" /><Information """
-        """Code="Info2" /></Messages><MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" """
-        """MarketType="DAM" NumOfDays="1" Validation="PASSED" Success="true"><Messages><Error Code="ErrorCode1" />"""
-        """<Error Code="ErrorCode2" /><Warning Code="Warning1" /><Warning Code="Warning2" /><Information """
-        """Code="Info1" /><Information Code="Info2" /></Messages></MarketSubmit></MarketData>"""
-    ).encode("UTF-8")
+    encoded_data = read_file("serialization_3.xml")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
     resp = serialzier.deserialize_multi(encoded_data, MarketSubmit, OfferData)
