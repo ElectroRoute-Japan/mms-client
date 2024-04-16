@@ -19,7 +19,10 @@ def test_response_base_validate_defaults_works():
     """Test that the ResponseBase class can be converted from an XML payload as expected."""
 
     # First, create our test XML payload
-    raw = b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema"><ProcessingStatistics TimeStamp=""/></BaseResponse>"""
+    raw = (
+        b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ProcessingStatistics TimeStamp=""/>"""
+        b"""</BaseResponse>"""
+    )
 
     # Next, attempt to validate it against our ResponseBase model
     data = BaseResponse[Envelope].from_xml(raw)
@@ -32,7 +35,12 @@ def test_response_base_validate_full_works():
     """Test that the ResponseBase class can be converted from an XML payload as expected."""
 
     # First, create our test XML payload
-    raw = b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema"><ProcessingStatistics Received="1" Valid="2" Invalid="3" Successful="4" Unsuccessful="5" ProcessingTimeMs="6" TransactionId="derpderp" TimeStamp="Mon Aug 30 03:25:41 JST 2019" XmlTimeStamp="2019-08-30T03:25:41Z"/></BaseResponse>"""
+    raw = (
+        b"""<BaseResponse xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><ProcessingStatistics """
+        b"""Received="1" Valid="2" Invalid="3" Successful="4" Unsuccessful="5" ProcessingTimeMs="6" """
+        b"""TransactionId="derpderp" TimeStamp="Mon Aug 30 03:25:41 JST 2019" XmlTimeStamp="2019-08-30T03:25:41Z"/>"""
+        b"""</BaseResponse>"""
+    )
 
     # Next, attempt to validate it against our ResponseBase model
     data = BaseResponse[Envelope].from_xml(raw)

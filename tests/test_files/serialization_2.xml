@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="mi-market.xsd">
+    <MarketSubmit Date="2019-08-29" ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1">
+        <OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-08-30T11:24:15" Direction="1" DrPatternNumber="12" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2019-08-29T03:24:15">
+            <OfferStack StackNumber="1" MinimumQuantityInKw="100" PrimaryOfferQuantityInKw="150" Secondary1OfferQuantityInKw="200" Secondary2OfferQuantityInKw="250" Tertiary1OfferQuantityInKw="300" Tertiary2OfferQuantityInKw="350" OfferUnitPrice="100" OfferId="FAKE_ID"/>
+        </OfferData>
+    </MarketSubmit>
+</MarketData>

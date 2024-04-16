@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema">
+<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
     <Messages>
         <Warning Code="Warning1" />

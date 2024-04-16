@@ -79,13 +79,13 @@ def test_put_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "uU52ZMls11Bw0mVTVVXgBoqfbLqtL4af3SZq0kbEIMLrVUYDuRtmgQ2hasCCg3wz2STJy64lfU4uw3j9ZYR+oLcE1WY9URhr5+udDEB4B"
-            "n9lo+jWju+GH5+wV8SOEWYs325ymPheDqOhuVcUt5oVKAwd88RKxtnjzlV5boc+O1OEcaOlJt1M8qmpub8y2LAk1HKwb5Wo83UP0CMe+C"
-            "QRKQ2fXBhsBiVDa0nHToRq5QpIWv6pnC9brGBO2R0KoZh0j6J6t6s6QqfCjUPShZbsiGDB9ju377l87YnwgkiFKRMzGlxzFo0Ayr6WHc0"
-            "bN9/qZuqVkhLoKTs+0oK0kouJkiqsrfbdrqEN//zHpjCmD7IxmM1R8LXXSeljZXMntaABG7hPPUik7MkSN41V3pn6OkI1n7UdA+ZWmqjk"
-            "/At+C2v4XtfPKaXtT7mMgu7UdNB4n64nJg1eR0BOw7clpkmWwaZzgTS5QXoW05gjnnkqKoorx0pGPcWUw8QC3jJWnnJ4H54iB5+MBlnJC"
-            "thBeOefq16bmqQnTw6ETKxVRkbAkB3OqPpkw/zJXEoeVJK4abyuCNPHz8bzaZR8VloqLlFnYkSUUvWK0iqrg8ZzUtiuKMUS9t8cvRiOTn"
-            "JiabuhKc863mxe2L+Baft7QCY4dHWjldY3uVwCrEXfWOCVyGQIpbQ="
+            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
+            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
+            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
+            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
+            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
+            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
+            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
         ),
         read_request_file("put_offer_request.xml"),
         read_file("put_offer_response.xml"),
@@ -155,13 +155,13 @@ def test_put_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "uU52ZMls11Bw0mVTVVXgBoqfbLqtL4af3SZq0kbEIMLrVUYDuRtmgQ2hasCCg3wz2STJy64lfU4uw3j9ZYR+oLcE1WY9URhr5+udDEB4B"
-            "n9lo+jWju+GH5+wV8SOEWYs325ymPheDqOhuVcUt5oVKAwd88RKxtnjzlV5boc+O1OEcaOlJt1M8qmpub8y2LAk1HKwb5Wo83UP0CMe+C"
-            "QRKQ2fXBhsBiVDa0nHToRq5QpIWv6pnC9brGBO2R0KoZh0j6J6t6s6QqfCjUPShZbsiGDB9ju377l87YnwgkiFKRMzGlxzFo0Ayr6WHc0"
-            "bN9/qZuqVkhLoKTs+0oK0kouJkiqsrfbdrqEN//zHpjCmD7IxmM1R8LXXSeljZXMntaABG7hPPUik7MkSN41V3pn6OkI1n7UdA+ZWmqjk"
-            "/At+C2v4XtfPKaXtT7mMgu7UdNB4n64nJg1eR0BOw7clpkmWwaZzgTS5QXoW05gjnnkqKoorx0pGPcWUw8QC3jJWnnJ4H54iB5+MBlnJC"
-            "thBeOefq16bmqQnTw6ETKxVRkbAkB3OqPpkw/zJXEoeVJK4abyuCNPHz8bzaZR8VloqLlFnYkSUUvWK0iqrg8ZzUtiuKMUS9t8cvRiOTn"
-            "JiabuhKc863mxe2L+Baft7QCY4dHWjldY3uVwCrEXfWOCVyGQIpbQ="
+            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
+            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
+            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
+            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
+            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
+            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
+            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
         ),
         read_request_file("put_offer_request.xml"),
         read_file("put_offer_response.xml"),
@@ -204,7 +204,13 @@ def test_query_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "JfhNprmqF5WZn1vss/JlcPzq2YGOK2gN2AYdesom7WC6d5Ou3aDhM5pTdU2lu2ts2c5OEW0p8izVNMNsizxCeSb3pPvsLccWdprtZ5Gi163E9+S6VU16Y/i3whybqZr8/clSrcr40S1i1kYyH2IJSXvoTNWQxNQu/7Q4/gyYVL2Tz2nbI6yrxpQ3b1E4wCJJWRW+pg9p29UeLHg2REdtILlMPyBRquk8VXZ4H4SvzT5DGhyrWYiahoMz7kQQLbCURTKqBT/iTS4ZgyodN4bMGkkx/JPe4ExL6FcJJ0nT2iQnkI7XpZFyUwQfExF2Jz+J4xbJpRb0zRdgvDUvhgDgCqeSd3zgslwBT8ALoPz/0X89xzL1YErTfREGtFlJSL4FMQOioz7XZPDTKirxJ8M3KbxWQeNMJSqqyXE9ZhXvOK84Xk03zDnCPSKkvS1YI9UUxzkAK0F4zzJePdnA3QjMHg6rZVV2SC2KqKIIFQmiM0uqe61FUZmjnT7CuA2DVKZ8FMja5jZ71K/4+PUX+DLxyrEXDRAnKg7EfmJDSpFjL6mnEIVaIr8hJmyHzMivsfxjtaj5ymIPnR8DYfZOApvlIjm8ysRixlin/8CYzRZJWWcr/uY860Y9Mb9B7Kw+vTtIWBciABHOMvvj46ky4g2NzM4s2lGMy0j0pDxwyp+x7J0="
+            "MbWcUSlJ6fJq8SDusw3kLBMPrTxO2ip2rrUbtIhv7XiCjzav6JGCtdqOtli0Y9JufEqYs1jhA0vPWCDand8jACzK8/fVMNlVard1roUtm"
+            "TujJ0Nlf2mtAVmCkAAxA43cCXIwqd67aH/GxSGGfP4lwES2CU5MsbSKDi3x1Yrko7NVgC3z26LZlyeUbFOG7A8KcZQyxNQKY3sQ3/PW8o"
+            "QHuZEvz9jDS09pGZRpuWifqPs1sPMzdruVIkhJCUbtEpmVaTZgUjQbmLaKMLK8dHLGvfJh335mlEWOqkOlcdvk4tDOAO3Krzdhk5VI46U"
+            "VXMIF2hWPWx1IgMkPXRb4J7SqRa0t2PbDBhIc5DLzv3ecWQC6A0Jn0t4059b17bHa77bB2/RDPCJfsjwyg/xa+4Ftf1R5QQQukQzR8bQs"
+            "DIhPX33F7dFcW8mMt0MItFn76AsDWgsGIMpFO+wjdXx1ISHsI4lttJqx58DwXdbx/N8qtBgSrZAUzxEOhqzqOJRMHhFQWZIMHMTXm4v98"
+            "cWKmeeO+1mup8+H0j4Mlv25+BYA9S8WE8iD/8JTizKiplPZr7eTPcazfWR4oXY1lxAHZqaCNZlz6yHR/qZ/nu8qwPhsaa7ZMCGd89ZnIT"
+            "lkMz/xgMQNv8FjikpqDN9S5vWu9UfAJNug1xjAOo5gjb3a1oMEtiE="
         ),
         read_request_file("query_offers_request.xml"),
         read_file("put_offer_response.xml"),
@@ -275,13 +281,13 @@ def test_cancel_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "tYViRBY8lgXK7ud/sYswT6UtC4QTFLYxToRgbhxqLL6uQYa2cD7pKJfgfj4iSFrf/jLfNvR+6f+FqXvalRcijdYEH29hdKJQ1lsZ5rLic"
-            "iRiw6cq7a40hTVOG8NqTlhgak6i3A0Xa3wgPF8UTAjo4a5Orx70zZitkUITVrKY70Z2u+drMQM/BAs3R8/7kRKNPwzLpi9BNcrAMWqt0w"
-            "23S5UoiC6EgXFCkt2VabGLUsmoXNabgR41e4n7A5a8C79ydmz3JVy6NHm34lOQWp9y8/QSNfA3I4lWWoLOLpNJXso4fD2CEHGPG2nonf5"
-            "AjdC53EflgK/fwKQHZQo7GfhFIh1blSPnEY4Oiz9UJhpTvYHgwITM354X3VEousJ5is0EtD9hG3+8rM3LAQirCOyuJXEUfF5z30LXFwlQ"
-            "dx5rFfYho3Z1fjhrbNLjg8cPnFwvfUa4+xueAxomN4O//E1VIceUW6ns9CGzR7VvqYaEGmX6gEcixXQ/lQ5kaeJtNhBHpFMDBbWZGiCON"
-            "KOP1hGW9wI5QtWZeyHTJbcbXBbeuRXAIHPKYqEMADFWzKZyJeEspKGUTyCegRudLRwQgzDvq9XzRUsW4uH84CuUaPgsUK29Bjy8H7lYL/"
-            "aAlcB/daZWmWd/5noHKMfokRgYQir1zHEgjBlrev9c4fk0ckRaNEw="
+            "mPUqEy9Ee8UiJmviQW0EelZEkccyE7NiNxb1f73Ifsi+e4430y2XJT9vmMBt7gW+zBoCGVDvhf0qm/DTFbaWgsOWk7ZD0vFhNrJvEaGpy"
+            "SasFJe5aSngJ6dfAaCTajpMdmAcxUHh/t6dC4cla6DrCmrX0UfsPMqXzq56fn/Gz9rawfkHNfZHzaxo0lW/g+UQHVXPohIvs2qyg/wBGl"
+            "QcQ3qrVZEcuO2d0LCVhk5ouxmKUkThMXLH3mKFG16RRuhHFWqqSdrGY3sR5LwFiCCzplrloksIqqFLz2JnM4pohUeHwdYKFcRC2LzK/Cv"
+            "T6g4fMgwBrtI0liW10lDQzeBGmFKJKv21ya1l8t/opG0PKEUunajx3IfyvQcvTpUDAbaCKTaI/DzyHvyCgFpsO64tYxBOXXA3FzvDKGhx"
+            "eYBzySxYz9xYELzZTjzCo3jmP+h9sTWkgHva3fxgdVXgGJ9RT3F4euqrxdXL6aQX07GtyQmp8h5J3TFe44gILYS5iDDI64L63gt1FmKPq"
+            "waaqA1mGVOivW3vkZO9IVCMoL4PzfcN54td6R/2hESZK/f1csVzxk9F4gWaupemym3YaeSQGoIZRVcjbmWXidTRsMc+ZWsxI7oP6sl3m9"
+            "rU17ZiGkJLcUpjBs3NV6nOU3LAgIjqvBW/10KEjikQU3idWXT4Rps="
         ),
         read_request_file("delete_offer_request.xml"),
         read_file("delete_offer_response.xml"),
@@ -322,7 +328,13 @@ def test_query_awards_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "y/RTqaOCdC6ATv9L9Q2bVtZ9ovWERVbxMqn2gIwv90rvYpJ7ofgwjeEZ2MB9Yzvca+wixbUH1Um6rUhQ7IRVxnuSpHnLtyz+gMQC6E9KO1vsD7ILp6CoYVfTbzK5TkHCuLvlWbEHRe17/w8PgWr/bexkJ1+qguyNcF62/zfeSfzv7/ZbQXAuykcB0QyZ6Ha8aoO8GJKqV6UFHeH/0QFC1dWMkM+iv+LmK4+GsbjErL36bpNN1ePQ6I3a2F710l0TNZnwJ0FM/lwkdYyVzlD1G96rBe7GvROwdDOc/2InuWf+QEag8Hebnq+/s5VnKmD8u5W5UHL74B580wqLFtOmqf6vYYdvQq4MquBwVXEtrwqtUo4HSofAXJowDyKiIIx4UFZwcWYGDv//oYxGIWWMNc54p3lmmuqmnMsrpQqTIqvQJA+i2V4Sc8FyHlRO1ShEelC3nWuQceEmXyxnVii/256XlCLKQanG2w28jAqyU6rzoRoU1ZAihBKew3jx6lGHD4R6+JMoNiSEYeQKMgNkQ/YPrDnmSO8Txa/gklUqDnTySZWK9rcGZXo/sX2BA8SJQOng9roR+fsQXOldRuo5V+yTpF8mu6eVXcCBcelYixGsuvrkodJgdXZyuwHZ90bOMZlFTjSUqn0qJKMEwKJO/PdqkrUPVOXXLIGTkcFenfU="
+            "0/vQHWWqpCEZl/OttLYjq18Y59aRDJ7kodDIYn1uxHoUGXAv0OwbI3rJblCYFbf8D9rDkatEXxhG5IUrgXqeA/Cx6NoL/zFI8JBcR/iFF"
+            "gp9wGEUMxvDZjEs+ue8wGuw/TMwECOGLNi5VRRwyUo0NXGZSWH0Nt+XdLVs/I73EzMu6/uHYELBFlGJFhNWGENRQ+eWFXMcFsabTAdcxy"
+            "KrywH3vS3fWznbNfIMX6rGLjNKJsHjTR2uUCxbNIZ3tFgCtT0d4lNSjcb1blhv6rZGFV2srvs/O790d7+VIH6oWH3MEz1MfXRiw6j/okQ"
+            "ZeneGJN5Bw4Nu3QOJlGjrbE+1tUH6AM1r29CvbKzZ2TiQTrE6GU9wlks/pgIW1sRui5GiQA5EW6Uv8m6TXBOF2tNw++VJVrDorORZkpc4"
+            "ObbZO2E75IsMv1k27FDiYMTBuqRITx2zVid1MIUc0A1BUaXv4CV9XnJdf+MZG9+mxcmGCJeNX9emQIg3EY/M4n8T5L8WVkPl2taHxq13c"
+            "h0AYv8xci+n45yFs2KeTtWA/VkjVfDSUbzJ94C/tvx/8jY/OJuSG12703UXbdTlXQdtmObJDgBGgtxs9co3or9/YTjZMGEePxep9k3ETQ"
+            "rRHHOEteceDK/7Y099zrriix102+aMz1H+zZIOfvi/jcufrRMh270="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),
