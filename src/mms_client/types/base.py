@@ -115,7 +115,7 @@ class SchemaType(Enum):
     OMI = "omi.xsd"
 
 
-class PayloadBase(BaseXmlModel, nsmap={"xsi": "http://www.w3.org/2001/XMLSchema"}):
+class PayloadBase(BaseXmlModel, nsmap={"xsi": "http://www.w3.org/2001/XMLSchema-instance"}):
     """Represents the base fields for an MMS request payload."""
 
     # The XML schema to use for validation

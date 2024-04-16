@@ -14,21 +14,7 @@
             <Information Code="Info1" />
             <Information Code="Info2" />
         </Messages>
-        <OfferData
-            ResourceName="FAKE_RESO"
-            StartTime="2024-03-15T12:00:00"
-            EndTime="2024-03-15T21:00:00"
-            Direction="1"
-            DrPatternNumber="1"
-            BspParticipantName="F100"
-            CompanyShortName="偽会社"
-            OperatorCode="FAKE"
-            Area="04"
-            ResourceShortName="偽電力"
-            SystemCode="FSYS0"
-            SubmissionTime="2024-03-15T11:44:15"
-            Validation="PASSED"
-            Success="true">
+        <OfferData ResourceName="FAKE_RESO" StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1" DrPatternNumber="1" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2024-03-15T11:44:15" Validation="PASSED" Success="true">
             <Messages>
                 <Warning Code="Warning1" />
                 <Warning Code="Warning2" />
