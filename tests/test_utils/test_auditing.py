@@ -43,7 +43,7 @@ def test_auditer_works(mock_certificate: Certificate):
 
     # Next, create our Zeep client
     auditor = TestAuditPlugin()
-    z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter(), logger=getLogger(), auditer=auditor)
+    z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter(), logger=getLogger(), plugins=[auditor])
 
     # Now, attempt to submit a request and retrieve the response
     resp = z.submit(
