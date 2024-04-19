@@ -1,7 +1,7 @@
 [![Unit Tests Status](https://github.com/ElectroRoute-Japan/mms-client/actions/workflows/check.yml/badge.svg)](https://github.com/ElectroRoute-Japan/mms-client/actions)
 
 # Overview
-This repository contains a Python client that is capable of communication with the Market Management System (MMS), which handles requests related to Flex or Virtual Power Plant (VPP) trading. The underlying library is relies on SOAP communication, which is a pain to work with at the best of times. This particular SOAP API adds its own special layer of obnoxiousness, however. As such, it was deemed useful to have a client which would obfuscate most, if not all of this away from the user.
+This repository contains a Python client that is capable of communication with the Market Management System (MMS), which handles requests related to Flex or Virtual Power Plant (VPP) trading. The underlying library relies on SOAP communication, which is a pain to work with at the best of times. This particular SOAP API adds its own special layer of obnoxiousness, however. As such, it was deemed useful to have a client which would obfuscate most, if not all of this away from the user.
 
 # Communication
 The underlying API sends and receives XML documents. Each of these request or responses, which we will hereafter refer to as *outer* requests and responses, contains metadata about the request/response as well as three fields which are extremely important to successful communication with the API:
@@ -15,7 +15,9 @@ After the data has been converted and added to the outer request object, it is s
 This library relies on Pydantic 2 and the pydantic-xml library for serialization/deserialization. As such, any type in this library can be converted to not only XML, but to JSON as well. This is extremely useful if you're trying to build a pass-through API service or something similar.
 
 ## Client Types
-Clients cannot call any and all endpoints in this API, willy-nilly. Some endpoints are restricted to particular clients. At the moment, there are two clients: Balance Service Providers (BSPs) and Transmission Service Operators (TSOs). Most likely you're operating as a BSP, in which case you'll have access to all endpoints. However, it makes little sense for a TSO to be able to submit bids on their own power, so they are restricted to a read-only role in most cases.
+Clients cannot call any and all endpoints in this API, willy-nilly. Some endpoints are restricted to particular clients. At the moment, there are three clients: Balance Service Providers (BSPs), Market Operators (MOs), and Transmission Service Operators (TSOs). Most likely you're operating as a BSP or MO, in which case you'll have access to most or all endpoints. However, it makes little sense for a TSO to be able to submit bids on their own power, so they are restricted to a read-only role in most cases.
+
+Note that MOs and BSPs access the MMS service using the same endpoints, but have distinct permissions. As such, both client types are supported explicitly here.
 
 Should you request an endpoint which you are not authorized for, you will receive an `mms_client.utils.errors.AudienceError`.
 

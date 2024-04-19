@@ -11,7 +11,8 @@ from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
-from mms_client.utils.web import URLS
+from mms_client.utils.web import BSP_MO_URLS
+from mms_client.utils.web import TSO_URLS
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
 from mms_client.utils.web import ZWrapper
@@ -20,27 +21,37 @@ from tests.testutils import verify_mms_response
 
 
 @pytest.mark.parametrize(
-    "client, interface, error, test, expected",
+    "interface, error, test, expected",
     [
-        (ClientType.BSP, Interface.MI, False, False, "https://www2.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.BSP, Interface.MI, True, False, "https://www3.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.BSP, Interface.MI, False, True, "https://www4.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.BSP, Interface.OMI, False, False, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.BSP, Interface.OMI, True, False, "https://www6.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.BSP, Interface.OMI, False, True, "https://www7.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.TSO, Interface.MI, False, False, "https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.TSO, Interface.MI, True, False, "https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.TSO, Interface.MI, False, True, "https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.TSO, Interface.OMI, False, False, "https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.TSO, Interface.OMI, True, False, "https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.TSO, Interface.OMI, False, True, "https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.MI, False, False, "https://www2.tdgc.jp/axis2/services/MiWebService"),
+        (Interface.MI, True, False, "https://www3.tdgc.jp/axis2/services/MiWebService"),
+        (Interface.MI, False, True, "https://www4.tdgc.jp/axis2/services/MiWebService"),
+        (Interface.OMI, False, False, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, True, False, "https://www6.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, False, True, "https://www7.tdgc.jp/axis2/services/OmiWebService"),
     ],
 )
-def test_service_endpoint_select_works(
-    client: ClientType, interface: Interface, error: bool, test: bool, expected: str
-):
+def test_bsp_mo_service_endpoint_select_works(interface: Interface, error: bool, test: bool, expected: str):
     """Test that the select method of the ServiceEndpoint class works as expected."""
-    endpoint = URLS[client][interface]
+    endpoint = BSP_MO_URLS[interface]
+    endpoint.select(error=error, test=test)
+    assert endpoint.selected == expected
+
+
+@pytest.mark.parametrize(
+    "interface, error, test, expected",
+    [
+        (Interface.MI, False, False, "https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
+        (Interface.MI, True, False, "https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
+        (Interface.MI, False, True, "https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService"),
+        (Interface.OMI, False, False, "https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, True, False, "https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, False, True, "https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService"),
+    ],
+)
+def test_tso_service_endpoint_select_works(interface: Interface, error: bool, test: bool, expected: str):
+    """Test that the select method of the ServiceEndpoint class works as expected."""
+    endpoint = TSO_URLS[interface]
     endpoint.select(error=error, test=test)
     assert endpoint.selected == expected
 
@@ -49,7 +60,7 @@ def test_zwrapper_client_invalid(mocker):
     """Test that the ZWrapper constructor raises an error when the given client is invalid."""
     with pytest.raises(ValueError) as exc_info:
         _ = ZWrapper("invalid", Interface.OMI, mocker.MagicMock(), getLogger())
-    assert str(exc_info.value) == "Invalid client, 'invalid'. Only 'bsp' and 'tso' are supported."
+    assert str(exc_info.value) == "Invalid client, 'invalid'. Only 'bsp', 'mo', and 'tso' are supported."
 
 
 def test_zwrapper_interface_invalid(mocker):
@@ -60,16 +71,20 @@ def test_zwrapper_interface_invalid(mocker):
 
 
 @pytest.mark.parametrize(
-    "interface, addr",
+    "client_type, interface, addr",
     [
-        (Interface.MI, "https://www2.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.OMI, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
+        (ClientType.BSP, Interface.MI, "https://www2.tdgc.jp/axis2/services/MiWebService"),
+        (ClientType.BSP, Interface.OMI, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
+        (ClientType.MO, Interface.MI, "https://www2.tdgc.jp/axis2/services/MiWebService"),
+        (ClientType.MO, Interface.OMI, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
+        (ClientType.TSO, Interface.MI, "https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
+        (ClientType.TSO, Interface.OMI, "https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
     ],
 )
-def test_zwrapper_client_interface_valid(mocker, interface: Interface, addr: str):
+def test_zwrapper_client_interface_valid(mocker, client_type: ClientType, interface: Interface, addr: str):
     """Test that the ZWrapper constructor does not raise an error when the given client and interface are valid."""
     mock_cert = mocker.MagicMock()
-    zmi = ZWrapper(ClientType.BSP, interface, mock_cert, getLogger())
+    zmi = ZWrapper(client_type, interface, mock_cert, getLogger())
     assert zmi._service._binding_options["address"] == addr
 
 
@@ -83,7 +98,7 @@ def test_zwrapper_client_interface_valid(mocker, interface: Interface, addr: str
 def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
     """Test that the ZWrapper constructor instantiates the correct client."""
     z = ZWrapper(ClientType.BSP, Interface.MI, mocker.MagicMock(), getLogger(), test=test)
-    assert z._endpoint == URLS[ClientType.BSP][Interface.MI]
+    assert z._endpoint == BSP_MO_URLS[Interface.MI]
     assert z._endpoint.selected == expected
 
 
