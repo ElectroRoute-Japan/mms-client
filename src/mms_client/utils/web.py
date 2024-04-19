@@ -3,6 +3,7 @@
 from enum import Enum
 from logging import Logger
 from pathlib import Path
+from typing import List
 from typing import Optional
 
 from backoff import expo
@@ -10,6 +11,7 @@ from backoff import on_exception
 from requests import Session
 from requests_pkcs12 import Pkcs12Adapter
 from zeep import Client
+from zeep import Plugin
 from zeep import Transport
 from zeep.cache import SqliteCache
 from zeep.exceptions import TransportError
@@ -17,7 +19,6 @@ from zeep.xsd.valueobjects import CompoundValue
 
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
-from mms_client.utils.auditing import AuditPlugin
 
 
 class ClientType(Enum):
@@ -134,7 +135,7 @@ class ZWrapper:
         interface: Interface,
         adapter: Pkcs12Adapter,
         logger: Logger,
-        auditer: Optional[AuditPlugin] = None,
+        plugins: Optional[List[Plugin]] = None,
         cache: bool = True,
         test: bool = False,
     ):
@@ -150,8 +151,8 @@ class ZWrapper:
         adapter (Pkcs12Adapter):    The PKCS12 adapter containing the certificate and private key to use for
                                     authenticating with the MMS server.
         logger (Logger):            The logger to use for instrumentation.
-        auditer (AuditPlugin):      The audit plugin to use for auditing MMS requests and responses. This is useful for
-                                    logging the XML messages sent to and received from the MMS server.
+        plugins (List[Plugin]):     A list of Zeep plugins to use with the client. This is useful for adding additional
+                                    functionality to the client, such as auditing or logging.
         cache (bool):               If True, use a cache for the Zeep client. This is useful for avoiding repeated
                                     lookups of the WSDL file, which should result in lower latency.
         test (bool):                If True, use the test service endpoint. This is useful for testing the client.
@@ -189,7 +190,7 @@ class ZWrapper:
         self._client = Client(
             wsdl=str(location.resolve()),
             transport=Transport(cache=SqliteCache() if cache else None, session=sess),
-            plugins=[auditer] if auditer else [],
+            plugins=plugins,
         )
         self._create_service()
 

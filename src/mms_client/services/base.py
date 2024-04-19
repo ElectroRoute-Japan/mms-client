@@ -27,13 +27,13 @@ from mms_client.types.transport import MmsResponse
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
-from mms_client.utils.auditing import AuditPlugin
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.errors import MMSClientError
 from mms_client.utils.errors import MMSValidationError
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
+from mms_client.utils.web import Plugin
 from mms_client.utils.web import ZWrapper
 
 # Set the default logger for the MMS client
@@ -254,7 +254,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         client_type: ClientType,
         cert: Certificate,
         logger: Optional[Logger] = None,
-        auditer: Optional[AuditPlugin] = None,
+        plugins: Optional[List[Plugin]] = None,
         is_admin: bool = False,
         test: bool = False,
     ):
@@ -267,7 +267,8 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         cert (Certificate):         The certificate to use for signing requests.
         logger (Logger):            The logger to use for instrumentation. If this is not provided, then the default
                                     logger will be used.
-        auditer (AuditPlugin):      A plugin to use for auditing requests and responses.
+        plugins (List[Plugin]):     A list of plugins to add to the Zeep client. This can be useful for auditing or
+                                    other purposes.
         is_admin (bool):            Whether the user is an admin (i.e. is a market operator).
         test (bool):                Whether to use the test server.
         """
@@ -284,7 +285,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # Now, set our logger to either the provided logger or the default logger
         self._logger = logger or default_logger
-        self._auditor = auditer
+        self._plugins = plugins or []
 
         # Finally, create a list of wrappers for the different interfaces
         self._wrappers: Dict[Interface, ZWrapper] = {}
@@ -606,7 +607,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
                 service.interface,
                 self._cert.to_adapter(),
                 self._logger,
-                self._auditor,
+                self._plugins,
                 True,
                 self._test,
             )

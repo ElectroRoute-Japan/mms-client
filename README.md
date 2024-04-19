@@ -177,8 +177,10 @@ class TestAuditPlugin(AuditPlugin):
     def audit_response(self, mms_response: bytes) -> None:
         self.response = mms_response
 
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, auditer=TestAuditPlugin())
+client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, plugins=[TestAuditPlugin()])
 ```
+
+This same input allows for the user to create their own plugins and add them to the Zeep client, allowing for a certain amount of extensibility.
 
 # Completeness
 This client is not complete. Currently, it supports the following endpoints:
