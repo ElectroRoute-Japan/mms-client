@@ -6,6 +6,7 @@ import pytest
 import responses
 from zeep.exceptions import TransportError
 
+from mms_client.security.certs import Certificate
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
@@ -87,7 +88,7 @@ def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
 
 
 @responses.activate
-def test_zwrapper_submit_server_error(mock_certificate):
+def test_zwrapper_submit_server_error(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class handles server errors as expected."""
     # First, register our test responses with the responses library
     register_mms_request(RequestType.INFO, "test", b"derp", b"", 500)
@@ -114,7 +115,7 @@ def test_zwrapper_submit_server_error(mock_certificate):
 
 
 @responses.activate
-def test_zwrapper_unrecoverable_error(mock_certificate):
+def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
     """Test that, in the event of a 4xx error, the ZWrapper class raises an exception."""
     # First, register our test responses with the responses library
     register_mms_request(RequestType.INFO, "test", b"derp", b"", 400)
@@ -140,7 +141,7 @@ def test_zwrapper_unrecoverable_error(mock_certificate):
 
 
 @responses.activate
-def test_zwrapper_submit_works(mock_certificate):
+def test_zwrapper_submit_works(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class works as expected."""
     # First, register our test response with the responses library
     register_mms_request(RequestType.INFO, "test", b"derp", b"derp")

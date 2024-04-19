@@ -27,6 +27,7 @@ from mms_client.types.transport import MmsResponse
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
+from mms_client.utils.auditing import AuditPlugin
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.errors import MMSClientError
 from mms_client.utils.errors import MMSValidationError
@@ -253,6 +254,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         client_type: ClientType,
         cert: Certificate,
         logger: Optional[Logger] = None,
+        auditer: Optional[AuditPlugin] = None,
         is_admin: bool = False,
         test: bool = False,
     ):
@@ -265,6 +267,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         cert (Certificate):         The certificate to use for signing requests.
         logger (Logger):            The logger to use for instrumentation. If this is not provided, then the default
                                     logger will be used.
+        auditer (AuditPlugin):      A plugin to use for auditing requests and responses.
         is_admin (bool):            Whether the user is an admin (i.e. is a market operator).
         test (bool):                Whether to use the test server.
         """
@@ -281,6 +284,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # Now, set our logger to either the provided logger or the default logger
         self._logger = logger or default_logger
+        self._auditor = auditer
 
         # Finally, create a list of wrappers for the different interfaces
         self._wrappers: Dict[Interface, ZWrapper] = {}
@@ -598,6 +602,12 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         if service.interface not in self._wrappers:
             self._logger.debug(f"Creating wrapper for {service.interface.name} interface.")
             self._wrappers[service.interface] = ZWrapper(
-                self._client_type, service.interface, self._cert.to_adapter(), self._logger, True, self._test
+                self._client_type,
+                service.interface,
+                self._cert.to_adapter(),
+                self._logger,
+                self._auditor,
+                True,
+                self._test,
             )
         return self._wrappers[service.interface]
