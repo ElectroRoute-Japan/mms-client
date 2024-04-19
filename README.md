@@ -176,6 +176,8 @@ class TestAuditPlugin(AuditPlugin):
 
     def audit_response(self, mms_response: bytes) -> None:
         self.response = mms_response
+
+client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, auditer=TestAuditPlugin())
 ```
 
 # Completeness
