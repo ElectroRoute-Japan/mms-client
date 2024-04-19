@@ -322,7 +322,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             f"{config.name}: Verifying audience. Allowed clients: "
             f"{config.allowed_clients if config.allowed_clients else 'Any'}."
         )
-        if config.allowed_clients and self._client_type not in config.allowed_clients:
+        if config.allowed_clients and (self._client_type not in config.allowed_clients):
             raise AudienceError(config.name, config.allowed_clients, self._client_type)
 
     def request_one(
