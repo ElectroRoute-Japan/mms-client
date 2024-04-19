@@ -1,6 +1,6 @@
 """Contains the HTTP/web layer for communicating with the MMS server."""
 
-from enum import Enum
+from enum import StrEnum
 from logging import Logger
 from pathlib import Path
 from typing import List
@@ -21,17 +21,19 @@ from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
 
 
-class ClientType(Enum):
+class ClientType(StrEnum):
     """Identifies the type of client to use.
 
-    The client can be either "bsp" (Balancing Service Provider) or "tso" (Transmission System Operator).
+    The client can be either "bsp" (Balancing Service Provider), "mo" (Market Operator), or "tso" (Transmission System
+    Operator).
     """
 
     BSP = "bsp"
+    MO = "mo"
     TSO = "tso"
 
 
-class Interface(Enum):
+class Interface(StrEnum):
     """Identifies the type of interface to use.
 
     The interface can be either "omi" (Other Market Initiator) or "mi" (Market Initiator).
@@ -76,32 +78,30 @@ class ServiceEndpoint:
             self._selected = self.main
 
 
-# Defines the service endpoints for the BSP and TSO clients for the OMI and MI web services, respectively.
-URLS = {
-    ClientType.BSP: {
-        Interface.OMI: ServiceEndpoint(
-            main="https://www5.tdgc.jp/axis2/services/OmiWebService",
-            backup="https://www6.tdgc.jp/axis2/services/OmiWebService",
-            test="https://www7.tdgc.jp/axis2/services/OmiWebService",
-        ),
-        Interface.MI: ServiceEndpoint(
-            main="https://www2.tdgc.jp/axis2/services/MiWebService",
-            backup="https://www3.tdgc.jp/axis2/services/MiWebService",
-            test="https://www4.tdgc.jp/axis2/services/MiWebService",
-        ),
-    },
-    ClientType.TSO: {
-        Interface.OMI: ServiceEndpoint(
-            main="https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
-            backup="https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
-            test="https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService",
-        ),
-        Interface.MI: ServiceEndpoint(
-            main="https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService",
-            backup="https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService",
-            test="https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService",
-        ),
-    },
+# Defines the service endpoints for the BSP, MO and TSO clients for the OMI and MI web services, respectively.
+BSP_MO_URLS = {
+    Interface.OMI: ServiceEndpoint(
+        main="https://www5.tdgc.jp/axis2/services/OmiWebService",
+        backup="https://www6.tdgc.jp/axis2/services/OmiWebService",
+        test="https://www7.tdgc.jp/axis2/services/OmiWebService",
+    ),
+    Interface.MI: ServiceEndpoint(
+        main="https://www2.tdgc.jp/axis2/services/MiWebService",
+        backup="https://www3.tdgc.jp/axis2/services/MiWebService",
+        test="https://www4.tdgc.jp/axis2/services/MiWebService",
+    ),
+}
+TSO_URLS = {
+    Interface.OMI: ServiceEndpoint(
+        main="https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
+        backup="https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
+        test="https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService",
+    ),
+    Interface.MI: ServiceEndpoint(
+        main="https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService",
+        backup="https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService",
+        test="https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService",
+    ),
 }
 
 
@@ -158,8 +158,12 @@ class ZWrapper:
         test (bool):                If True, use the test service endpoint. This is useful for testing the client.
         """
         # First, we'll check that the client is valid. If it's not, we'll raise a ValueError.
-        if client not in URLS:
-            raise ValueError(f"Invalid client, '{client}'. Only 'bsp' and 'tso' are supported.")
+        if client in [ClientType.BSP, ClientType.MO]:
+            urls = BSP_MO_URLS
+        elif client == ClientType.TSO:
+            urls = TSO_URLS
+        else:
+            raise ValueError(f"Invalid client, '{client}'. Only 'bsp', 'mo', and 'tso' are supported.")
 
         # We need to determine the service port and location of the WSDL file based on the given interface. If the
         # interface is neither "omi" nor "mi", we raise a ValueError.
@@ -172,7 +176,7 @@ class ZWrapper:
             raise ValueError(f"Invalid interface, '{self._interface}'. Only 'mi' and 'omi' are supported.")
 
         # Next, we need to select the correct service endpoint based on the given client and interface.
-        self._endpoint = URLS[client][self._interface]
+        self._endpoint = urls[self._interface]
         self._endpoint.select(test=test)
 
         # Now, we need to create a new session and mount the PKCS12 adapter to it. This is necessary for

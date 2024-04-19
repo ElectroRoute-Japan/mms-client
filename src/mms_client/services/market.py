@@ -30,7 +30,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     # The configuration for the market service
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData"))
 
-    @mms_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, ClientType.BSP)
+    @mms_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, [ClientType.BSP])
     def put_offer(
         self: ClientProto, request: OfferData, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> OfferData:
@@ -56,7 +56,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_multi_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, ClientType.BSP)
+    @mms_multi_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, [ClientType.BSP])
     def put_offers(
         self: ClientProto, requests: List[OfferData], market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> List[OfferData]:
@@ -106,7 +106,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_endpoint("MarketCancel_OfferCancel", config, RequestType.INFO, ClientType.BSP)
+    @mms_endpoint("MarketCancel_OfferCancel", config, RequestType.INFO, [ClientType.BSP])
     def cancel_offer(
         self: ClientProto, request: OfferCancel, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> OfferCancel:

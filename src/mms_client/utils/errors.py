@@ -14,7 +14,7 @@ from mms_client.utils.web import ClientType
 class AudienceError(ValueError):
     """Error raised when an invalid audience is provided."""
 
-    def __init__(self, method: str, allowed: ClientType, audience: ClientType):
+    def __init__(self, method: str, allowed: List[ClientType], audience: ClientType):
         """Initialize the error.
 
         Arguments:
@@ -22,8 +22,13 @@ class AudienceError(ValueError):
         allowed (str):  The allowed audience.
         audience (str): The invalid audience.
         """
+        inner = (
+            f"'{allowed[0].name}' is"
+            if len(allowed) == 1
+            else f"""{" or ".join([f"'{a.name}'" for a in allowed])} are"""
+        )
         self.method = method
-        self.message = f"{method}: Invalid client type, '{audience.name}' provided. Only '{allowed.name}' is supported."
+        self.message = f"{method}: Invalid client type, '{audience.name}' provided. Only {inner} supported."
         self.allowed = allowed
         self.audience = audience
         super().__init__(self.message)

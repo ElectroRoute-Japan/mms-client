@@ -59,7 +59,7 @@ class EndpointConfiguration(Generic[E, P]):
     name: str
 
     # The allowed client types for the endpoint
-    allowed_client: Optional[ClientType]
+    allowed_clients: Optional[List[ClientType]]
 
     # The service for the endpoint
     service: ServiceConfiguration
@@ -139,7 +139,7 @@ def mms_endpoint(
     name: str,
     service: ServiceConfiguration,
     request_type: RequestType,
-    allowed_client: Optional[ClientType] = None,
+    allowed_clients: Optional[List[ClientType]] = None,
     resp_envelope_type: Optional[Type[E]] = None,
     resp_data_type: Optional[Type[P]] = None,
 ):
@@ -150,18 +150,18 @@ def mms_endpoint(
     Decorated functions will only be responsible for creating the payload envelope to submit to the MMS server.
 
     Arguments:
-    name (str):                     The name of the endpoint.
-    service (ServiceConfiguration): The configuration for the service.
-    request_type (RequestType):     The type of request to submit to the MMS server.
-    allowed_client (ClientType):    The type of client that is allowed to access the endpoint. If this is not provided,
-                                    then any client type is allowed.
-    resp_envelope_type (Type[E]):   The type of payload to expect in the response. If this is not provided, then the
-                                    the response envelope will be assumed to have the same type as the request envelope.
-    resp_data_type (Type[P]):       The type of data to expect in the response. If this is not provided, then the
-                                    response data will be assumed to have the same type as the request data.
+    name (str):                         The name of the endpoint.
+    service (ServiceConfiguration):     The configuration for the service.
+    request_type (RequestType):         The type of request to submit to the MMS server.
+    allowed_clients (List[ClientType]): The types of clients that are allowed to access the endpoint. If this is not
+                                        provided, then any client will be allowed.
+    resp_envelope_type (Type[E]):       The type of payload to expect in the response. If this is not provided, then the
+                                        response envelope will be assumed to have the same type as the request envelope.
+    resp_data_type (Type[P]):           The type of data to expect in the response. If this is not provided, then the
+                                        response data will be assumed to have the same type as the request data.
     """
     # First, create the endpoint configuration from the given parameters
-    config = EndpointConfiguration(name, allowed_client, service, request_type, resp_envelope_type, resp_data_type)
+    config = EndpointConfiguration(name, allowed_clients, service, request_type, resp_envelope_type, resp_data_type)
 
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
@@ -189,7 +189,7 @@ def mms_multi_endpoint(
     name: str,
     service: ServiceConfiguration,
     request_type: RequestType,
-    allowed_client: Optional[ClientType] = None,
+    allowed_clients: Optional[List[ClientType]] = None,
     resp_envelope_type: Optional[Type[E]] = None,
     resp_data_type: Optional[Type[P]] = None,
 ):
@@ -201,21 +201,22 @@ def mms_multi_endpoint(
     the MMS server.
 
     Arguments:
-    name (str):                     The name of the endpoint.
-    service (ServiceConfiguration): The configuration for the service.
-    request_type (RequestType):     The type of request to submit to the MMS server.
-    allowed_client (ClientType):    The type of client that is allowed to access the endpoint. If this is not provided,
-                                    then any client type is allowed.
-    resp_envelope_type (Type[E]):   The type of payload to expect in the response. If this is not provided, then the
-                                    the response envelope will be assumed to have the same type as the request envelope.
-    resp_data_type (Type[P]):       The type of data to expect in the response. If this is not provided, then the
-                                    response data will be assumed to have the same type as the request data. Note, that
-                                    this is not intended to account for the expected sequence type of the response data.
-                                    That is already handled in the wrapped function, so this should only be set if the
-                                    inner data type being returned differs from what was sent.
+    name (str):                         The name of the endpoint.
+    service (ServiceConfiguration):     The configuration for the service.
+    request_type (RequestType):         The type of request to submit to the MMS server.
+    allowed_clients (List[ClientType]): The types of clients that are allowed to access the endpoint. If this is not
+                                        provided, then any client will be allowed.
+    resp_envelope_type (Type[E]):       The type of payload to expect in the response. If this is not provided, then
+                                        the response envelope will be assumed to have the same type as the request
+                                        envelope.
+    resp_data_type (Type[P]):           The type of data to expect in the response. If this is not provided, then the
+                                        response data will be assumed to have the same type as the request data. Note,
+                                        that this is not intended to account for the expected sequence type of the
+                                        response data. That is already handled in the wrapped function, so this should
+                                        only be set if the inner data type being returned differs from what was sent.
     """
     # First, create the endpoint configuration from the given parameters
-    config = EndpointConfiguration(name, allowed_client, service, request_type, resp_envelope_type, resp_data_type)
+    config = EndpointConfiguration(name, allowed_clients, service, request_type, resp_envelope_type, resp_data_type)
 
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
@@ -318,11 +319,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         ValueError: If the client type is not allowed.
         """
         self._logger.debug(
-            f"{config.name}: Verifying audience. Allowed client: "
-            f"{config.allowed_client.name if config.allowed_client else 'Any'}."
+            f"{config.name}: Verifying audience. Allowed clients: "
+            f"{config.allowed_clients if config.allowed_clients else 'Any'}."
         )
-        if config.allowed_client and self._client_type != config.allowed_client:
-            raise AudienceError(config.name, config.allowed_client, self._client_type)
+        if config.allowed_clients and (self._client_type not in config.allowed_clients):
+            raise AudienceError(config.name, config.allowed_clients, self._client_type)
 
     def request_one(
         self,

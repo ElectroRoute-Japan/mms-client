@@ -27,7 +27,7 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
     # The configuration for the registration service
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.REGISTRATION, "RegistrationData"))
 
-    @mms_endpoint("RegistrationSubmit_Resource", config, RequestType.REGISTRATION, ClientType.BSP)
+    @mms_endpoint("RegistrationSubmit_Resource", config, RequestType.REGISTRATION, [ClientType.BSP])
     def put_resource(self: ClientProto, request: ResourceData) -> ResourceData:
         """Submit a new resource to the MMS server.
 
@@ -50,6 +50,7 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
         "RegistrationQuery_Resource",
         config,
         RequestType.REGISTRATION,
+        allowed_clients=[ClientType.BSP, ClientType.TSO],
         resp_envelope_type=RegistrationSubmit,
         resp_data_type=ResourceData,
     )

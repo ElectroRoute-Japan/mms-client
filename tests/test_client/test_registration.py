@@ -381,6 +381,29 @@ def test_put_resource_works(mock_certificate):
     )
 
 
+def test_query_resources_invalid_client(mock_certificate):
+    """Test that the query_resources method raises an exception when called by a non-BSP client."""
+    # First, create our MMS client
+    client = MmsClient("F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
+
+    # Next, create our test resource query
+    query = ResourceQuery(
+        participant="F100",
+        name="FAKE_RESO",
+        status=Status.APPROVED,
+    )
+
+    # Now, try to query resources; this should raise an exception
+    with pytest.raises(ValueError) as ex_info:
+        _ = client.query_resources(query, QueryAction.NORMAL, Date(2024, 4, 11))
+
+    # Finvally, verify the details of the raised exception
+    assert (
+        str(ex_info.value)
+        == "RegistrationQuery_Resource: Invalid client type, 'MO' provided. Only 'BSP' or 'TSO' are supported."
+    )
+
+
 @responses.activate
 def test_query_resources_works(mock_certificate):
     """Test that the query_resources method works as expected."""
