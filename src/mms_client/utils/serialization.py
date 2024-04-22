@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 from io import BytesIO
+from logging import getLogger
 from pathlib import Path
 from typing import Dict
 from typing import List
@@ -31,6 +32,9 @@ from mms_client.types.base import SchemaType
 
 # Directory containing all our XML schemas
 XSD_DIR = Path(__file__).parent.parent / "schemas" / "xsd"
+
+# Set the default logger for the MMS client
+logger = getLogger(__name__)
 
 
 class Serializer:

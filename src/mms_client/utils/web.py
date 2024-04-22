@@ -1,7 +1,7 @@
 """Contains the HTTP/web layer for communicating with the MMS server."""
 
 from enum import StrEnum
-from logging import Logger
+from logging import getLogger
 from pathlib import Path
 from typing import List
 from typing import Optional
@@ -19,6 +19,9 @@ from zeep.xsd.valueobjects import CompoundValue
 
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
+
+# Set the default logger for the MMS client
+logger = getLogger(__name__)
 
 
 class ClientType(StrEnum):
@@ -134,7 +137,6 @@ class ZWrapper:
         client: ClientType,
         interface: Interface,
         adapter: Pkcs12Adapter,
-        logger: Logger,
         plugins: Optional[List[Plugin]] = None,
         cache: bool = True,
         test: bool = False,
@@ -150,7 +152,6 @@ class ZWrapper:
                                     as the service and port to use.
         adapter (Pkcs12Adapter):    The PKCS12 adapter containing the certificate and private key to use for
                                     authenticating with the MMS server.
-        logger (Logger):            The logger to use for instrumentation.
         plugins (List[Plugin]):     A list of Zeep plugins to use with the client. This is useful for adding additional
                                     functionality to the client, such as auditing or logging.
         cache (bool):               If True, use a cache for the Zeep client. This is useful for avoiding repeated
@@ -190,7 +191,6 @@ class ZWrapper:
 
         # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings and then,
         # from that client, we create the SOAP service with the given service binding and selected endpoint.
-        self._logger = logger
         self._client = Client(
             wsdl=str(location.resolve()),
             transport=Transport(cache=SqliteCache() if cache else None, session=sess),
@@ -198,11 +198,11 @@ class ZWrapper:
         )
         self._create_service()
 
-    @on_exception(expo, TransportError, max_tries=3, giveup=fatal_code)  # type: ignore[arg-type]
+    @on_exception(expo, TransportError, max_tries=3, giveup=fatal_code, logger=logger)  # type: ignore[arg-type]
     def submit(self, req: MmsRequest) -> MmsResponse:
         """Submit the given request to the MMS server and return the response."""
         try:
-            self._logger.debug(f"Submitting MMS request request to {self._interface.name} service")
+            logger.debug(f"Submitting MMS request request to {self._interface.name} service")
 
             # Submit the request to the MMS server and retrieve the response
             resp: CompoundValue = self._service["submitAttachment"](**req.to_arguments())
@@ -212,12 +212,12 @@ class ZWrapper:
         except TransportError as e:
             # If we got a server fault error, then we'll switch to the backup endpoint. In any case, we'll raise the
             # exception so that our back-off can handle it or pass the exception up the stack.
-            self._logger.error(
+            logger.error(
                 f"MMS request to {self._interface.name} service failed with status code: {e.status_code}",
                 exc_info=e,
             )
             if e.status_code >= 500:
-                self._logger.warning(f"MMS server error, switching to backup endpoint: {self._endpoint.backup}")
+                logger.warning(f"MMS server error, switching to backup endpoint: {self._endpoint.backup}")
                 self._endpoint.select(error=True)
                 self._create_service()
             raise
@@ -227,5 +227,5 @@ class ZWrapper:
 
         This is useful for switching between the main and backup endpoints in case of an error.
         """
-        self._logger.debug(f"Creating new {self._interface.name} service with endpoint: {self._endpoint.selected}")
+        logger.debug(f"Creating new {self._interface.name} service with endpoint: {self._endpoint.selected}")
         self._service = self._client.create_service(SERVICE_BINDINGS[self._interface], self._endpoint.selected)

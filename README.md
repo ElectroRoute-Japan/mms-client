@@ -154,15 +154,6 @@ If you're connecting as a market operator (MO), you can connect in admin mode:
 client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, is_admin=True)
 ```
 
-## Log Settings
-The client also supports injection of a custom logger. The default logger is named "MMS Client".
-
-```python
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, logger=my_logger)
-```
-
-The client currently logs a number of informational, debug and error messages. You can freely change the logging level yourself.
-
 ## Auditing XML Requests & Responses
 A common requirement for this sort of library is recording or saving the raw XML requests and responses for audit/logging purposes. This library supports this workflow through the `mms_client.utils.auditing.AuditPlugin` object. This object intercepts the XML request at the Zeep client level right before it is sent to the MMS and, similarly, intercepts the XML response immediately after it is received from the MMS. Before passing these objects on, without modifying them, it records the XML data as a byte string and passes it to two methods: `audit_request` and `audit_response`. These can be overridden by any object that inherits from this class, allowing the user to direct this data to whatever store they prefer to use for auditing or logging.
 

@@ -1,7 +1,6 @@
 """Contains the client layer for communicating with the MMS server."""
 
 from dataclasses import dataclass
-from logging import Logger
 from logging import getLogger
 from typing import Dict
 from typing import Generic
@@ -37,7 +36,7 @@ from mms_client.utils.web import Plugin
 from mms_client.utils.web import ZWrapper
 
 # Set the default logger for the MMS client
-default_logger = getLogger("MMS Client")
+logger = getLogger(__name__)
 
 
 @dataclass
@@ -84,10 +83,6 @@ class ClientProto(Protocol):
     @property
     def user(self) -> str:
         """Return the user name of the person making the request."""
-
-    @property
-    def logger(self) -> Logger:
-        """Return the logger for the client."""
 
     def verify_audience(self, config: EndpointConfiguration) -> None:
         """Verify that the client type is allowed.
@@ -166,6 +161,7 @@ def mms_endpoint(
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
         def wrapper(self: ClientProto, *args, **kwargs) -> Optional[P]:
+            logger.info(f"{config.name}: Called with args: {args[1:]}...")
 
             # First, verify that the client type is allowed
             self.verify_audience(config)
@@ -177,6 +173,7 @@ def mms_endpoint(
             resp, _ = self.request_one(envelope, args[0], config)
 
             # Finally, extract the data from the response and return it
+            logger.info(f"{config.name}: Returning {type(resp.data).__name__} data.")
             return resp.data
 
         return wrapper
@@ -221,7 +218,7 @@ def mms_multi_endpoint(
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
         def wrapper(self: ClientProto, *args, **kwargs) -> List[P]:
-            self.logger.info(f"{config.name}: Called with args: {args[1:]}...")
+            logger.info(f"{config.name}: Called with args: {args[1:]}...")
 
             # First, verify that the client type is allowed
             self.verify_audience(config)
@@ -233,7 +230,7 @@ def mms_multi_endpoint(
             resp, _ = self.request_many(envelope, args[0], config)
 
             # Finally, extract the data from the response and return it
-            self.logger.info(f"{config.name}: Returning {len(resp.data)} item(s).")
+            logger.info(f"{config.name}: Returning {len(resp.data)} item(s).")
             return resp.data
 
         return wrapper
@@ -254,7 +251,6 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         user: str,
         client_type: ClientType,
         cert: Certificate,
-        logger: Optional[Logger] = None,
         plugins: Optional[List[Plugin]] = None,
         is_admin: bool = False,
         test: bool = False,
@@ -266,8 +262,6 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         user (str):                 The user name of the person making the request.
         client_type (ClientType):   The type of client to use for making requests to the MMS server.
         cert (Certificate):         The certificate to use for signing requests.
-        logger (Logger):            The logger to use for instrumentation. If this is not provided, then the default
-                                    logger will be used.
         plugins (List[Plugin]):     A list of plugins to add to the Zeep client. This can be useful for auditing or
                                     other purposes.
         is_admin (bool):            Whether the user is an admin (i.e. is a market operator).
@@ -284,8 +278,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         self._cert = cert
         self._signer = CryptoWrapper(cert)
 
-        # Now, set our logger to either the provided logger or the default logger
-        self._logger = logger or default_logger
+        # Now, set the plugins we'll inject into the Zeep client
         self._plugins = plugins or []
 
         # Finally, create a list of wrappers for the different interfaces
@@ -301,11 +294,6 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         """Return the user name of the person making the request."""
         return self._user
 
-    @property
-    def logger(self) -> Logger:
-        """Return the logger for the client."""
-        return self._logger
-
     def verify_audience(self, config: EndpointConfiguration) -> None:
         """Verify that the client type is allowed.
 
@@ -318,7 +306,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Raises:
         ValueError: If the client type is not allowed.
         """
-        self._logger.debug(
+        logger.debug(
             f"{config.name}: Verifying audience. Allowed clients: "
             f"{config.allowed_clients if config.allowed_clients else 'Any'}."
         )
@@ -341,7 +329,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Returns:    The response from the MMS server.
         """
         # First, create the MMS request from the payload and data.
-        self._logger.debug(
+        logger.debug(
             f"{config.name}: Starting request. Envelope: {type(envelope).__name__}, Data: {type(payload).__name__}",
         )
         request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, payload))
@@ -360,7 +348,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         self._verify_response(data, config)
 
         # Return the response data and any attachments
-        self._logger.debug(
+        logger.debug(
             f"{config.name}: Returning response. Envelope: {envelope_type.__name__}, Data: {data_type.__name__}",
         )
         return data, attachments
@@ -383,7 +371,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         # First, create the MMS request from the payload and data.
         is_list = isinstance(payload, list)
         data_type = type(payload[0]) if is_list else type(payload)  # type: ignore[index]
-        self._logger.debug(
+        logger.debug(
             (
                 f"{config.name}: Starting multi-request. Envelope: {type(envelope).__name__}, "
                 f"Data: {data_type.__name__}"
@@ -414,7 +402,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         self._verify_multi_response(data, config)
 
         # Return the response data and any attachments
-        self._logger.debug(
+        logger.debug(
             f"{config.name}: Returning multi-response. Envelope: {envelope_type.__name__}, Data: {data_type.__name__}",
         )
         return data, attachments
@@ -447,7 +435,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         )
 
         # Embed the data and the attachments in the MMS request and return it
-        self._logger.debug(
+        logger.debug(
             f"Creating MMS request of type {req_type.name} to send {len(data)} bytes of data and "
             f"{len(attachment_data)} attachments."
         )
@@ -481,9 +469,9 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # Check the response status flags and log any warnings or errors
         if resp.warnings:
-            self._logger.warning(f"{config.name}: MMS response contained warnings.")
+            logger.warning(f"{config.name}: MMS response contained warnings.")
         if not resp.success:
-            self._logger.error(f"{config.name}: MMS response was unsuccessful.")
+            logger.error(f"{config.name}: MMS response was unsuccessful.")
 
     def _verify_response(self, resp: Response[E, P], config: EndpointConfiguration) -> None:
         """Verify that the given response is valid.
@@ -544,7 +532,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Returns:    True to indicate that the response is valid, False otherwise.
         """
         # Log the request's processing statistics
-        self._logger.info(
+        logger.info(
             f"{config.name} ({resp.statistics.timestamp_xml}): Recieved {resp.statistics.received}, "
             f"Valid: {resp.statistics.valid}, Invalid: {resp.statistics.invalid}, "
             f"Successful: {resp.statistics.successful}, Unsuccessful: {resp.statistics.unsuccessful} "
@@ -566,11 +554,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         """
         for path, messages in resp.messages.items():
             for info in messages.information:
-                self._logger.info(f"{config.name} - {path}: {info.code}")
+                logger.info(f"{config.name} - {path}: {info.code}")
             for warning in messages.warnings:
-                self._logger.warning(f"{config.name} - {path}: {warning.code}")
+                logger.warning(f"{config.name} - {path}: {warning.code}")
             for error in messages.errors:
-                self._logger.error(f"{config.name} - {path}: {error.code}")
+                logger.error(f"{config.name} - {path}: {error.code}")
 
     def _verify_response_common(
         self, config: EndpointConfiguration, payload_type: type, resp: ResponseCommon, index: Optional[int] = None
@@ -587,7 +575,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Returns:    True to indicate that the response is valid, False otherwise.
         """
         # Log the status of the response validation
-        self._logger.info(
+        logger.info(
             f"{config.name}: {payload_type.__name__}{f'[{index}]' if index is not None else ''} was valid? "
             f"{resp.success} ({resp.validation.value})",
         )
@@ -602,12 +590,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         service (ServiceConfiguration):  The service for which to get the wrapper.
         """
         if service.interface not in self._wrappers:
-            self._logger.debug(f"Creating wrapper for {service.interface.name} interface.")
+            logger.debug(f"Creating wrapper for {service.interface.name} interface.")
             self._wrappers[service.interface] = ZWrapper(
                 self._client_type,
                 service.interface,
                 self._cert.to_adapter(),
-                self._logger,
                 self._plugins,
                 True,
                 self._test,

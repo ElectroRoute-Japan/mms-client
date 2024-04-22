@@ -1,6 +1,7 @@
 """Contains the client layer for making registration requests to the MMS server."""
 
 from datetime import date as Date
+from logging import getLogger
 from typing import List
 from typing import Optional
 
@@ -19,6 +20,9 @@ from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
+
+# Set the default logger for the MMS client
+logger = getLogger(__name__)
 
 
 class RegistrationClientMixin:  # pylint: disable=unused-argument
