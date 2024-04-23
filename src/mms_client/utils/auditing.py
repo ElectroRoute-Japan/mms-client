@@ -2,10 +2,14 @@
 
 from abc import ABC
 from abc import abstractmethod
+from logging import getLogger
 
 from lxml.etree import _Element as Element
 from lxml.etree import tostring
 from zeep import Plugin
+
+# Set the default logger for the MMS client
+logger = getLogger(__name__)
 
 
 class AuditPlugin(ABC, Plugin):

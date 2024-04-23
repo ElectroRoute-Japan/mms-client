@@ -1,8 +1,6 @@
 """Tests the functionality in the mms_client.utils.serialization module."""
 
-from base64 import b64encode
 from datetime import date as Date
-from typing import Dict
 
 import pytest
 from pendulum import DateTime

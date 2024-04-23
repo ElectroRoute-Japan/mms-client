@@ -1,5 +1,6 @@
 """Contains error classes for the MMS client."""
 
+from logging import getLogger
 from typing import Dict
 from typing import List
 from typing import Optional
@@ -9,6 +10,9 @@ from mms_client.types.base import E
 from mms_client.types.base import Messages
 from mms_client.types.base import P
 from mms_client.utils.web import ClientType
+
+# Set the default logger for the MMS client
+logger = getLogger(__name__)
 
 
 class AudienceError(ValueError):
