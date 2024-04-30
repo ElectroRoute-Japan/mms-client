@@ -200,7 +200,13 @@ class ZWrapper:
 
     @on_exception(expo, TransportError, max_tries=3, giveup=fatal_code, logger=logger)  # type: ignore[arg-type]
     def submit(self, req: MmsRequest) -> MmsResponse:
-        """Submit the given request to the MMS server and return the response."""
+        """Submit the given request to the MMS server and return the response.
+
+        Arguments:
+        req (MmsRequest):   The MMS request to submit.
+
+        Returns:    The MMS response.
+        """
         try:
             logger.debug(f"Submitting MMS request request to {self._interface.name} service")
 

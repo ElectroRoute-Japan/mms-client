@@ -23,16 +23,19 @@ class FakeAuditPlugin(AuditPlugin):
 
     def __init__(self):
         """Initialize the TestAuditPlugin class."""
+        self.name = None
         self.request = None
         self.response = None
 
-    def audit_request(self, mms_request: bytes) -> None:
+    def audit_request(self, name: str, mms_request: bytes) -> None:
         """Audit an MMS request."""
         self.request = mms_request
+        self.name = name
 
-    def audit_response(self, mms_response: bytes) -> None:
+    def audit_response(self, name: str, mms_response: bytes) -> None:
         """Audit an MMS response."""
         self.response = mms_response
+        self.name = name
 
 
 @responses.activate
@@ -75,3 +78,4 @@ def test_auditer_works(mock_certificate: Certificate):
         f"""</responseCompressed><responseDataType>XML</responseDataType><responseData>{data}</responseData>"""
         """</ns0:ResponseAttInfo></soap-env:Body></soap-env:Envelope>"""
     ).encode("UTF-8")
+    assert auditor.name == "submitAttachment"
