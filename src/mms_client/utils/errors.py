@@ -38,6 +38,21 @@ class AudienceError(ValueError):
         super().__init__(self.message)
 
 
+class MMSServerError(RuntimeError):
+    """Error raised when the MMS server returns an error."""
+
+    def __init__(self, method: str, message: str):
+        """Initialize the error.
+
+        Arguments:
+        method (str):   The method that caused the error.
+        message (str):  The error message.
+        """
+        super().__init__(f"{method}: {message}")
+        self.message = message
+        self.method = method
+
+
 class MMSClientError(RuntimeError):
     """Base class for MMS client errors."""
 

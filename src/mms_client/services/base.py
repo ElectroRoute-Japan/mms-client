@@ -28,6 +28,7 @@ from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.errors import MMSClientError
+from mms_client.utils.errors import MMSServerError
 from mms_client.utils.errors import MMSValidationError
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
@@ -459,7 +460,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         MMSClientError: If the response is not valid.
         """
         # Verify that the response is in the correct format. If it's not, raise an error.
-        if resp.data_type != ResponseDataType.XML:
+        # NOTE: We're disabling the no-else-raise rule here because both comparisons are on the same enum so if one is
+        # removed then the other will raise an error. This is a false positive.
+        if resp.data_type == ResponseDataType.TXT:  # pylint: disable=no-else-raise
+            raise MMSServerError(config.name, resp.payload.decode("UTF-8"))
+        elif resp.data_type != ResponseDataType.XML:
             raise MMSClientError(
                 config.name,
                 f"Invalid MMS response data type: {resp.data_type.name}. Only XML is supported.",
