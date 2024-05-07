@@ -17,6 +17,7 @@ from mms_client.types.offer import OfferStack
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
 from mms_client.utils.errors import MMSClientError
+from mms_client.utils.errors import MMSServerError
 from mms_client.utils.errors import MMSValidationError
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
@@ -89,6 +90,59 @@ def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, c
     assert exc_info.value.method == "Test"
     assert exc_info.value.message == message
     assert f"Test: {message}" in str(exc_info.value)
+
+
+@responses.activate
+def test_txt_received(mock_certificate):
+    """Test that an exception is raised if a TXT response is received."""
+    # First, create our base client and endpoint configuration
+    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    config = EndpointConfiguration(
+        "Test",
+        ClientType.BSP,
+        ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
+        RequestType.INFO,
+        None,
+        None,
+    )
+
+    # Next, register our test response with the responses library
+    register_mms_request(
+        RequestType.INFO,
+        (
+            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
+            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
+            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
+            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
+            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
+            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
+            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+        ),
+        read_request_file("base_request.xml"),
+        b"Some error message",
+        data_type=ResponseDataType.TXT,
+    )
+
+    # Now, create our request envelope and payload
+    envelope = MarketSubmit(
+        date=Date(2024, 3, 15), participant="F100", user="FAKEUSER", market_type=MarketType.DAY_AHEAD, days=1
+    )
+    payload = OfferData(
+        stack=[OfferStack(number=1, unit_price=100, minimum_quantity_kw=100)],
+        resource="FAKE_RESO",
+        start=DateTime(2024, 3, 15, 12),
+        end=DateTime(2024, 3, 15, 21),
+        direction=Direction.SELL,
+    )
+
+    # Finally, attempt to submit the request; this should fail
+    with pytest.raises(MMSServerError) as exc_info:
+        _ = client.request_one(envelope, payload, config)
+
+    # Verify the details of the raised exception
+    assert exc_info.value.method == "Test"
+    assert exc_info.value.message == "Some error message"
+    assert f"Test: Some error message" in str(exc_info.value)
 
 
 @responses.activate
