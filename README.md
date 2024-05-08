@@ -177,6 +177,7 @@ This same input allows for the user to create their own plugins and add them to 
 
 # Completeness
 This client is not complete. Currently, it supports the following endpoints:
+- MarketQuery_ReserveRequirementQuery
 - MarketSubmit_OfferData
 - MarketQuery_OfferQuery
 - MarketCancel_OfferCancel
