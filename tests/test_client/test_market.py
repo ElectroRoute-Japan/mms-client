@@ -24,6 +24,9 @@ from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
+from mms_client.types.reserve import Requirement
+from mms_client.types.reserve import ReserveRequirement
+from mms_client.types.reserve import ReserveRequirementQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.web import ClientType
@@ -33,9 +36,58 @@ from tests.testutils import offer_stack_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
 from tests.testutils import register_mms_request
+from tests.testutils import requirement_verifier
 from tests.testutils import verify_award_response
 from tests.testutils import verify_offer_cancel
 from tests.testutils import verify_offer_data
+from tests.testutils import verify_reserve_requirement
+
+
+@responses.activate
+def test_query_reserve_requirements_works(mock_certificate):
+    """Test that the query_reserve_requirements method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test reserve requirement query
+    request = ReserveRequirementQuery(
+        market_type=MarketType.DAY_AHEAD,
+        area=AreaCode.TOKYO,
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.INFO,
+        (
+            "OryynJOg2KX3A5mM7U+K6c9TpkrIdwE93Dm2+d2+9lyOeFs2+RSXnVHnXyLWPsONoFkkWkWo/zxkKESZR5eEXQmd1IcOmyIyUw5Fwc+gQJi7fvlNy2OFN3RBnxtDzEyO0frYVSrazNCeMrsXpOBT9UyLoDSwscoLtQ0T2u5j9wH4iRCRR3GQr/uuEybGHabtoKsJd6siIgTP8XvSsTK2+kfT3CspJ6QX0evZSKnK8bUJRubHTQICcT1hza6+82TiojsI/1X5nMEgVQNPFUiG5WZQZ2ueb0bJ2Xy6Bkrk7OS2xz8bHfG2q8NF0vesyDcHWKJ949UkJYuGqBqvP9T7tB35AkRHkZl7sxcKSDTu2rm/rZsKdyPeIqZhevoUkRYLAiV8qds17BJDQNMefT9qPQ1EkrnR8QpdR2Q90uMN/sqsSyaPWyL34scQJF8wPjCQXL4Zty+2fzaF7Tig11gWaZAsd3g56ljdaaz6oXEjw7LD2dytwaX0YrQF42EloNA0WTPPnw8sXG97+GBVTPxOHZLIX1p8SB3kDFDsDm6WBN/TZEDoaR/lYNktpLdqkEmp0XRD3YpE+YtQDNikmcVEhoW5fKBJEOto6GC6geP7ZTT8Nye2wYYqLJAOUUoemRBxSZeaLDBuqp5t2SP3ZNHZyOhyXbwR14Uf6+anDK2EfvY="
+        ),
+        read_request_file("query_reserve_requirements_request.xml"),
+        read_file("query_reserve_requirements_response.xml"),
+        warnings=True,
+    )
+
+    # Now, attempt to query reserve requirements with the valid client type; this should succeed
+    resp = client.query_reserve_requirements(request, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    verify_reserve_requirement(
+        resp,
+        AreaCode.TOKYO,
+        [
+            requirement_verifier(
+                DateTime(2024, 4, 12, 15, tzinfo=Timezone("UTC")),
+                DateTime(2024, 4, 12, 18, tzinfo=Timezone("UTC")),
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
+            )
+        ],
+    )
 
 
 def test_put_offer_invalid_client(mock_certificate):

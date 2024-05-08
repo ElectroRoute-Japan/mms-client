@@ -18,6 +18,8 @@ from mms_client.types.market import MarketType
 from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
+from mms_client.types.reserve import ReserveRequirement
+from mms_client.types.reserve import ReserveRequirementQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
@@ -33,6 +35,35 @@ class MarketClientMixin:  # pylint: disable=unused-argument
 
     # The configuration for the market service
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData"))
+
+    @mms_endpoint(
+        "MarketQuery_ReserveRequirementQuery",
+        config,
+        RequestType.INFO,
+        resp_envelope_type=MarketSubmit,
+        resp_data_type=ReserveRequirement,
+    )
+    def query_reserve_requirements(
+        self: ClientProto, request: ReserveRequirementQuery, date: Optional[Date] = None
+    ) -> List[ReserveRequirement]:
+        """Query the MMS server for reserve requirements.
+
+        This endpoint is accessible to all client types.
+
+        Arguments:
+        request (ReserveRequirementQuery):  The query to submit to the MMS server.
+        date (Date):                        The date of the transaction in the format "YYYY-MM-DD". This value defaults
+                                            to the current date.
+
+        Returns:    A list of reserve requirements that match the query.
+        """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        return MarketQuery(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
+            days=1,
+        )
 
     @mms_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, [ClientType.BSP])
     def put_offer(
@@ -124,6 +155,8 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         days (int):                 The number of days ahead for which the data is being cancelled.
         date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                     current date.
+
+        Returns:    Data identifying the offer that was cancelled.
         """
         # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketCancel(  # type: ignore[return-value]

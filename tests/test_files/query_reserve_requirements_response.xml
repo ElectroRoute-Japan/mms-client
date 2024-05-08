@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
+    <Messages>
+        <Warning Code="Warning1" />
+        <Warning Code="Warning2" />
+        <Information Code="Info1" />
+        <Information Code="Info2" />
+    </Messages>
+    <MarketSubmit Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1" Validation="PASSED" Success="true">
+        <Messages>
+            <Warning Code="Warning1" />
+            <Warning Code="Warning2" />
+            <Information Code="Info1" />
+            <Information Code="Info2" />
+        </Messages>
+        <ReserveRequirement Area="03">
+            <Requirement
+             StartTime="2024-04-12T15:00:00"
+             EndTime="2024-04-12T18:00:00"
+             Direction="1"
+             PrimaryReserveQuantityInKw="100"
+             Secondary1ReserveQuantityInKw="200"
+             Secondary2ReserveQuantityInKw="300"
+             Tertiary1ReserveQuantityInKw="400"
+             Tertiary2ReserveQuantityInKw="500"
+             CompoundPriSec1ReserveQuantityInKw="600"
+             CompoundPriSec2ReserveQuantityInKw="700"
+             CompoundPriTer1ReserveQuantityInKw="800"/>
+        </ReserveRequirement>
+    </MarketSubmit>
+</MarketData>
