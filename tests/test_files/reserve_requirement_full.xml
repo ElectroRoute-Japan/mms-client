@@ -1,0 +1,14 @@
+<ReserveRequirement Area="03">
+    <Requirement
+     StartTime="2024-04-12T15:00:00"
+     EndTime="2024-04-12T18:00:00"
+     Direction="1"
+     PrimaryReserveQuantityInKw="100"
+     Secondary1ReserveQuantityInKw="200"
+     Secondary2ReserveQuantityInKw="300"
+     Tertiary1ReserveQuantityInKw="400"
+     Tertiary2ReserveQuantityInKw="500"
+     CompoundPriSec1ReserveQuantityInKw="600"
+     CompoundPriSec2ReserveQuantityInKw="700"
+     CompoundPriTer1ReserveQuantityInKw="800"/>
+</ReserveRequirement>

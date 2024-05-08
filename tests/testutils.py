@@ -40,6 +40,9 @@ from mms_client.types.offer import OfferStack
 from mms_client.types.registration import QueryAction
 from mms_client.types.registration import QueryType
 from mms_client.types.registration import RegistrationQuery
+from mms_client.types.reserve import Requirement
+from mms_client.types.reserve import ReserveRequirement
+from mms_client.types.reserve import ReserveRequirementQuery
 from mms_client.types.resource import AfcMinimumOutput
 from mms_client.types.resource import OutputBand
 from mms_client.types.resource import ResourceData
@@ -376,6 +379,50 @@ def verify_offer_cancel(req: OfferCancel, resource: str, start: DateTime, end: D
     assert req.start == start
     assert req.end == end
     assert req.market_type == market_type
+
+
+def verify_reserve_requirement_query(
+    req: ReserveRequirementQuery, market_type: MarketType, area: Optional[AreaCode] = None
+):
+    """Verify that the ReserveRequirementQuery was created with the correct parameters."""
+    assert req.area == area
+    assert req.market_type == market_type
+
+
+def verify_reserve_requirement(req: ReserveRequirement, area: AreaCode, requirement_verifiers: list):
+    """Verify that the ReserveRequirement was created with the correct parameters."""
+    assert req.area == area
+    verify_list(req.requirements, requirement_verifiers)
+
+
+def requirement_verifier(
+    start: DateTime,
+    end: DateTime,
+    primary: Optional[int] = None,
+    secondary_1: Optional[int] = None,
+    secondary_2: Optional[int] = None,
+    tertiary_1: Optional[int] = None,
+    tertiary_2: Optional[int] = None,
+    primary_secondary_1: Optional[int] = None,
+    primary_secondary_2: Optional[int] = None,
+    primary_tertiary_1: Optional[int] = None,
+):
+    """Verify that the given Requirement has the expected parameters."""
+
+    def inner(req: Requirement):
+        assert req.start == start
+        assert req.end == end
+        assert req.direction == Direction.SELL
+        assert req.primary_qty_kw == primary
+        assert req.secondary_1_qty_kw == secondary_1
+        assert req.secondary_2_qty_kw == secondary_2
+        assert req.tertiary_1_qty_kw == tertiary_1
+        assert req.tertiary_2_qty_kw == tertiary_2
+        assert req.primary_secondary_1_qty_kw == primary_secondary_1
+        assert req.primary_secondary_2_qty_kw == primary_secondary_2
+        assert req.primary_tertiary_1_qty_kw == primary_tertiary_1
+
+    return inner
 
 
 def verify_resource_data(
