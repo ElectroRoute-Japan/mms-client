@@ -1,6 +1,7 @@
 """Contains functionality associated with certificates."""
 
 from pathlib import Path
+from ssl import PROTOCOL_TLSv1_2
 from typing import Union
 
 from cryptography.hazmat.primitives.asymmetric.rsa import RSAPrivateKey
@@ -43,7 +44,7 @@ class Certificate:
         if isinstance(private_key, RSAPrivateKey):
             self._private = private_key
         else:
-            raise ValueError(f"Private key of type ({type(self._private).__name__}) was not expected.")
+            raise TypeError(f"Private key of type ({type(private_key).__name__}) was not expected.")
 
     @property
     def certificate(self) -> bytes:
@@ -69,8 +70,8 @@ class Certificate:
 
         Returns: The private key in PEM format.
         """
-        return self._private.private_bytes(Certificate.encoding, PrivateFormat.TraditionalOpenSSL, NoEncryption())
+        return self._private.private_bytes(Certificate.encoding, PrivateFormat.PKCS8, NoEncryption())
 
     def to_adapter(self) -> Pkcs12Adapter:
         """Convert the certificate to a Pkcs12Adapter."""
-        return Pkcs12Adapter(pkcs12_data=self._cert, pkcs12_password=self._passphrase)
+        return Pkcs12Adapter(pkcs12_data=self._cert, pkcs12_password=self._passphrase, ssl_protocol=PROTOCOL_TLSv1_2)

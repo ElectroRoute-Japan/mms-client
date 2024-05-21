@@ -42,7 +42,7 @@ class FakeAuditPlugin(AuditPlugin):
 def test_auditer_works(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class handles server errors as expected."""
     # First, register our test responses with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"derp")
+    register_mms_request(RequestType.INFO, "test", "derp", b"derp")
 
     # Next, create our Zeep client
     auditor = FakeAuditPlugin()
@@ -54,7 +54,7 @@ def test_auditer_works(mock_certificate: Certificate):
             requestType=RequestType.INFO,
             requestDataType=RequestDataType.XML,
             requestSignature="test",
-            requestData=b"derp",
+            requestData="derp",
             sendRequestDataOnSuccess=False,
         )
     )
@@ -68,7 +68,7 @@ def test_auditer_works(mock_certificate: Certificate):
         """<requestType>mp.info</requestType><adminRole>false</adminRole><requestDataCompressed>false"""
         """</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
         """</sendRequestDataOnSuccess><sendResponseDataCompressed>false</sendResponseDataCompressed>"""
-        f"""<requestSignature>test</requestSignature><requestData>{data}</requestData></ns0:RequestAttInfo>"""
+        f"""<requestSignature>test</requestSignature><requestData>derp</requestData></ns0:RequestAttInfo>"""
         """</soap-env:Body></soap-env:Envelope>"""
     ).encode("UTF-8")
     assert auditor.response == (

@@ -1,5 +1,6 @@
 """Contains the client layer for communicating with the MMS server."""
 
+from base64 import b64decode
 from dataclasses import dataclass
 from logging import getLogger
 from typing import Dict
@@ -329,18 +330,23 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         Returns:    The response from the MMS server.
         """
+        # Create a new ZWrapper for the given service
+        wrapper = self._get_wrapper(config.service)
+
         # First, create the MMS request from the payload and data.
         logger.debug(
             f"{config.name}: Starting request. Envelope: {type(envelope).__name__}, Data: {type(payload).__name__}",
         )
-        request = self._to_mms_request(config.request_type, config.service.serializer.serialize(envelope, payload))
+        request = self._to_mms_request(
+            wrapper, config.request_type, config.service.serializer.serialize(envelope, payload)
+        )
 
         # Next, submit the request to the MMS server and get and verify the response.
-        resp = self._get_wrapper(config.service).submit(request)
+        resp = wrapper.submit(request)
         self._verify_mms_response(resp, config)
 
         # Now, extract the attachments from the response
-        attachments = {a.name: a.data for a in resp.attachments}
+        attachments = {a.name: b64decode(a.data) for a in resp.attachments}
 
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
@@ -369,6 +375,9 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         Returns:    The multi-response from the MMS server.
         """
+        # Create a new ZWrapper for the given service
+        wrapper = self._get_wrapper(config.service)
+
         # First, create the MMS request from the payload and data.
         is_list = isinstance(payload, list)
         data_type = type(payload[0]) if is_list else type(payload)  # type: ignore[index]
@@ -383,14 +392,14 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             if is_list
             else config.service.serializer.serialize(envelope, payload)  # type: ignore[type-var]
         )
-        request = self._to_mms_request(config.request_type, serialized)
+        request = self._to_mms_request(wrapper, config.request_type, serialized)
 
         # Next, submit the request to the MMS server and get and verify the response.
-        resp = self._get_wrapper(config.service).submit(request)
+        resp = wrapper.submit(request)
         self._verify_mms_response(resp, config)
 
         # Now, extract the attachments from the response
-        attachments = {a.name: a.data for a in resp.attachments}
+        attachments = {a.name: b64decode(a.data) for a in resp.attachments}
 
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
@@ -410,6 +419,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
     def _to_mms_request(
         self,
+        client: ZWrapper,
         req_type: RequestType,
         data: bytes,
         return_req: bool = False,
@@ -418,6 +428,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         """Convert the given data to an MMS request.
 
         Arguments:
+        client (ZWrapper):              The Zeep client to use for submitting the request.
         req_type (RequestType):         The type of request to submit to the MMS server.
         data (bytes):                   The data to submit to the MMS server.
         return_req (bool):              Whether to return the request data in the response. This is False by default.
@@ -425,15 +436,13 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         Arguments:    The MMS request to submit to the MMS server.
         """
-        # Convert the attachments to the correct the MMS format
+        # First, convert the attachments to the correct the MMS format
         attachment_data = (
-            [
-                Attachment(signature=self._signer.sign(data), name=name, binaryData=data)
-                for name, data in attachments.items()
-            ]
-            if attachments
-            else []
+            [self._to_mms_attachment(client, name, data) for name, data in attachments.items()] if attachments else []
         )
+
+        # Next, convert the payload to a base-64 string
+        tag, signature = self._register_and_sign(client, "payload", data)
 
         # Embed the data and the attachments in the MMS request and return it
         logger.debug(
@@ -445,10 +454,35 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             adminRole=self._is_admin,
             requestDataType=RequestDataType.XML,
             sendRequestDataOnSuccess=return_req,
-            requestSignature=self._signer.sign(data),
-            requestData=data,
+            requestSignature=signature,
+            requestData=tag,
             attachmentData=attachment_data,
         )
+
+    def _to_mms_attachment(self, client: ZWrapper, name: str, data: bytes) -> Attachment:  # pragma: no cover
+        """Convert the given data to an MMS attachment.
+
+        Arguments:
+        client (ZWrapper):  The Zeep client to use for submitting the request.
+        name (str):         The name of the attachment.
+        data (bytes):       The data to be attached.
+
+        Returns:    The MMS attachment.
+        """
+        # Convert the data to a base-64 string
+        tag, signature = self._register_and_sign(client, name, data)
+
+        # Create the MMS attachment and return it
+        return Attachment(signature=signature, name=name, binaryData=tag)
+
+    def _register_and_sign(self, client: ZWrapper, name: str, data: bytes) -> Tuple[str, str]:
+        tag = client.register_attachment(name, data)
+
+        # Next, sign the data
+        signature = self._signer.sign(data)
+
+        # Finally, convert the encoded data to a string and return it and the signature
+        return tag, signature.decode("UTF-8")
 
     def _verify_mms_response(self, resp: MmsResponse, config: EndpointConfiguration) -> None:
         """Verify that the given MMS response is valid.

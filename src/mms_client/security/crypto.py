@@ -5,7 +5,7 @@ from base64 import b64encode
 
 from Cryptodome.Hash import SHA256
 from Cryptodome.PublicKey import RSA
-from Cryptodome.Signature import PKCS1_v1_5
+from Cryptodome.Signature import pkcs1_15
 
 from mms_client.security.certs import Certificate
 
@@ -24,8 +24,8 @@ class CryptoWrapper:
         public_key = RSA.import_key(cert.public_key())
 
         # Create a new signer from the private key and a new verifier from the public key
-        self._signer = PKCS1_v1_5.new(private_key)
-        self._verifier = PKCS1_v1_5.new(public_key)
+        self._signer = pkcs1_15.new(private_key)
+        self._verifier = pkcs1_15.new(public_key)
 
     def verify(self, content: bytes, signature: bytes) -> bool:
         """Verify a signature against the given content using the certificate.
@@ -39,8 +39,13 @@ class CryptoWrapper:
         # Hash the content using SHA256
         hashed = SHA256.new(content)
 
-        # Verify the signature using the public key
-        return self._verifier.verify(hashed, b64decode(signature))
+        # Verify the signature using the public key. This will raise a ValueError if the signature is invalid.
+        # We catch this exception and return False to indicate that the signature is invalid.
+        try:
+            self._verifier.verify(hashed, b64decode(signature))
+            return True
+        except ValueError:
+            return False
 
     def sign(self, data: bytes) -> bytes:
         """Create a signature from the given data using the certificate.

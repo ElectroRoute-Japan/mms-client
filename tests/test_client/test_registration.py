@@ -231,17 +231,13 @@ def test_put_resource_works(mock_certificate):
     register_mms_request(
         RequestType.REGISTRATION,
         (
-            "TetvKa7anxSKoN5A9H6XeYUoPY70IQOm8sWrBP+CjdegdWic77JcrVWwedpTk4UZPQIkRJ89ymMcCgI0zWBKTCHVc0jZFciqBursutyDB"
-            "M90tKqHvCuK9N5oinkH/hx28Htqw5RuZ/pynmAhumDKQ3Fsa6QoCbRoE8fSqHLkQtmj4m5cX1y8xRlVewRYpl0I7m2QoWYHCG8RrDqwbu"
-            "YCpTv+UDuzNG6OPOURuf8PRzObDDg/EGDHsmbGzoMjzA6TgKoZdwUxDQbVCXvOpIYmvLzuQpZjZUMo1m/xMSnEO/1Pl/1pupWDlrybMfa"
-            "Nfj8gowDZo1Bbs9VB+vjHB1D94Tl/wCiHcE9SFsUuDe4RKOcahr1w5k8VXyrY55aGnPgwMsVUxbpoVlVdAlzkey6TZSN5+ign9g76rLM9"
-            "cRpzcZFVP/cBSLxwkTjgvz0aOKv84oN3W2daaZjMZ/4PicUI7dw+3wzHUywtQ+79/G/BkRxIsTt3pfu4fxeelPp2GijrOYa5g86bYQ6s2"
-            "6eljcBGXuOZtcmnePs3RGM59g5SeWqVB2hFTbfEs0RRoUKvKf7k3yt5eurNpiDu12NqAsi+n2cxDeFoH5mesfxHo+Q+ekcr9tDCqHN2/5"
-            "LHSiyG6vSESowYa53SlTTqli+0dE0iziWM0IFLsg01WZWUiwLwc2I="
+            "id0MOFNI1jdOVarYdFWGCWMbVCZfSh/WTqxyO4kuZnWAs2xSMgnP0stWU79q0fdU1oWqCFZalp/GpqYQhYwVBkgVDns/yAqX55lnjiuLqE90vNYeKw9J/+mXpA/+oibaJluwMRq78hVS9BkpKDmcXhD02yagS7GnU8knegykO0fpUyNMh/HsDQiqgoE3rrdDSQxdOfAfiwXOfEoNo7i4BP9XmYK4JOb1QenZBJcZy84yZukuw3quC1NguKtCFEHRAlLFPbVzD1N36Bo+5SYnysHBevOLDwP1Bdv+nVDUAGGTdDXcjo0ZiqYrCjMK7GtVnDEtgLolCviPcRQx8jfi1/6ngJVOO+DJaT+raNsby3T7IxRJl+IFfxpzg6SrNxNPCCS/aUxYHv+Iba/b4tAyJuwZx9i8FAZJclZhceVMdZq4GG2aju25TlJI2JxVGOusKl17SWUp+616Zd5nsvPrvCmumQWpvjxSUHG932/h8fqX2cM2E8d4jirmDu00tHXDOtfpC479W99+LzE5HPLe6iDBWFT1dpGYNV3oCek4T1vsLGZGGcjLnNKcLvpEVvprpoYMku2LMTu+Yy2ba8FppUPoBF1DGJr4Webec/yUdGjO9JeM5e7SGNPxLtw7hMrh4Vau+vSBHNOtQ3vZ2CRvoAlAK+HdXzQooe9/FJOQHIE="
         ),
         read_request_file("put_resource_request.xml"),
         read_file("put_resource_response.xml"),
         warnings=True,
+        multipart=True,
+        encoded=True,
     )
 
     # Now, attempt to put a resource with the valid client type; this should succeed
@@ -421,17 +417,12 @@ def test_query_resources_works(mock_certificate):
     register_mms_request(
         RequestType.REGISTRATION,
         (
-            "Z1tgb4DuRI69mE5kZJU1AeptOZCH3MYbbZh8rfH72QCeqjAsIYM/9P3LfAAtMRgtKgqAJA6yHwiW4ldCqaiTTA+FLmDp4bznIhoUNQid1"
-            "4jJGi7FgHoQSpBOF0YiBlbI34Hmb7mYuJoPHWnzpGOoBKkm3rEYLcXJchxDmEghJK5rxqSbIidmz860kb3JqKa+C56pCB9qfQdiXxXvTW"
-            "wapq2/ZvEdMVthADt6srUb4L77HR75uI7VyZTD5U6lrSJmUzevYeelPWClIXzBT3Kalra/TNvQfjtXkQ6a3Y8jvtz6a7XGDdSjOcgFBtp"
-            "rQ/qz/YumDWoM+q7eg3MQ4zHlBESMtklN5Vf9ZgexEBnaSrNV2Vrey8m/9lkKzhz/10THVhRf0CABZMYUABh5fLukk0UPTN2oMRqwoWm2"
-            "mvOQAIhxdxtm7rWz5Qlea/pkJcdsIemil8fghATVwGg9Cm+je6ZdvLQJQRjAhyAhWYWlcHbIcY1M0JLvQa4D6zr5auQ87QHoG9dH1j5aw"
-            "jKEgL+xQ+ja/A3bScs/SuFumfJwk9EoPVi9fwloGGDIpdNhLSWcM055IyBDbWoLJElijS5pApD0lJ8nCcQBF9xyx6NxqKpyIZ0XN9cyN+"
-            "2f79jlvdif+B9wcSOvRBin6jpsK9J3Ca/DppWSWGUeIJpU85t1/XE="
+            "CdYPCLid6clLRClHQKnU06lscstA9XqyEIPc8qjYR2gi2O3GvcUuqWYQYBgaJ4kj9vrAIFgRUtk24cy0AeCX3cUp7lgpDI/2d5hSx4bx1n6m7ufUJvCeqe8+FC38gZSMGBqFiCNmP/OWU9M3Dfr66fqzmX52yCK/wDNVC6Y7XUfCWkImYMSniTy1OCi+vFZ5bnWIO9FDo33GHioZ+2vyCQ1P8pGy4YnxL8Iv9Iit4p+hctZsIJmb/IZEFZqEc3DmnWsxllSEVy/kPd/HYv60FxUPH3c5Zvcg2YHC7gsLNs4YC+8ZRKwEj4QTp4mkEkC45NvnYcjBxW9QkJ8UkPMY3QL0Sdrmmj12uq/dLRyObZvJwlC5MJkns+Jhm/uOAHd1/cVVoAoKIGCw8csYROy9/qb7ifI+Zkx64dSMFVXuuIOuP4O9yo6JwHBcB3XTLg/wFiTT6kp/YL6f18FBLxkY956El51fZTYKYAjiI4x2sANsy1Fd4GRiDNRRQnMMlQwI7evMJEeQEo+s0CLiD6kFdmgzBB9ZdkIIZ9iYipGs1MEoxNKhkLwtOEHVdmAi0Lb8nUvkUAXut97xLCwE03NRPoNkaMjzOMABLGRNPjAO0OMHEjIKP4UVS/AqoVGzT9c9Kakf8qoPuuOBLJ3+/vdkpENps0Aj1dVKuy9oTC5iIAY="
         ),
         read_request_file("query_resources_request.xml"),
         read_file("put_resource_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to put a resource with the valid client type; this should succeed

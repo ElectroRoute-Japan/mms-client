@@ -12,13 +12,13 @@ from requests import Session
 from requests_pkcs12 import Pkcs12Adapter
 from zeep import Client
 from zeep import Plugin
-from zeep import Transport
 from zeep.cache import SqliteCache
 from zeep.exceptions import TransportError
 from zeep.xsd.valueobjects import CompoundValue
 
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
+from mms_client.utils.multipart_transport import MultipartTransport
 
 # Set the default logger for the MMS client
 logger = getLogger(__name__)
@@ -191,12 +191,24 @@ class ZWrapper:
 
         # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings and then,
         # from that client, we create the SOAP service with the given service binding and selected endpoint.
+        self._transport = MultipartTransport(cache=SqliteCache() if cache else None, session=sess)
         self._client = Client(
             wsdl=str(location.resolve()),
-            transport=Transport(cache=SqliteCache() if cache else None, session=sess),
+            transport=self._transport,
             plugins=plugins,
         )
         self._create_service()
+
+    def register_attachment(self, name: str, attachment: bytes) -> str:
+        """Register a multipart attachment.
+
+        Arguments:
+        name (str):         The name of the attachment.
+        attachment (bytes): The data to be attached.
+
+        Returns:    The content ID of the attachment, which should be used in place of the attachment data.
+        """
+        return self._transport.register_attachment(name, attachment)
 
     @on_exception(expo, TransportError, max_tries=3, giveup=fatal_code, logger=logger)  # type: ignore[arg-type]
     def submit(self, req: MmsRequest) -> MmsResponse:

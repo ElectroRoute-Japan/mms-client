@@ -98,7 +98,7 @@ def test_reserve_requirement_full():
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    assert data == read_request_file("reserve_requirement_full.xml", False)
+    assert data == read_request_file("reserve_requirement_full.xml").encode("UTF-8")
     verify_reserve_requirement(
         request,
         AreaCode.TOKYO,

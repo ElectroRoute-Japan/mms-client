@@ -24,8 +24,6 @@ from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
-from mms_client.types.reserve import Requirement
-from mms_client.types.reserve import ReserveRequirement
 from mms_client.types.reserve import ReserveRequirementQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.errors import AudienceError
@@ -59,15 +57,16 @@ def test_query_reserve_requirements_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "OryynJOg2KX3A5mM7U+K6c9TpkrIdwE93Dm2+d2+9lyOeFs2+RSXnVHnXyLWPsONoFkkWkWo/zxkKESZR5eEXQmd1IcOmyIyUw5Fwc+gQJi7fvlNy2OFN3RBnxtDzEyO0frYVSrazNCeMrsXpOBT9UyLoDSwscoLtQ0T2u5j9wH4iRCRR3GQr/uuEybGHabtoKsJd6siIgTP8XvSsTK2+kfT3CspJ6QX0evZSKnK8bUJRubHTQICcT1hza6+82TiojsI/1X5nMEgVQNPFUiG5WZQZ2ueb0bJ2Xy6Bkrk7OS2xz8bHfG2q8NF0vesyDcHWKJ949UkJYuGqBqvP9T7tB35AkRHkZl7sxcKSDTu2rm/rZsKdyPeIqZhevoUkRYLAiV8qds17BJDQNMefT9qPQ1EkrnR8QpdR2Q90uMN/sqsSyaPWyL34scQJF8wPjCQXL4Zty+2fzaF7Tig11gWaZAsd3g56ljdaaz6oXEjw7LD2dytwaX0YrQF42EloNA0WTPPnw8sXG97+GBVTPxOHZLIX1p8SB3kDFDsDm6WBN/TZEDoaR/lYNktpLdqkEmp0XRD3YpE+YtQDNikmcVEhoW5fKBJEOto6GC6geP7ZTT8Nye2wYYqLJAOUUoemRBxSZeaLDBuqp5t2SP3ZNHZyOhyXbwR14Uf6+anDK2EfvY="
+            "j/QJWIqedO/PWDHdHSa9MHDyHvqx0UIkcFc1CAzWRku+8mXL0UFLtI01zP0xZsvD3SUjktFf5VauyM5u+Ypc9vAip9PF17Msv/0bREeTDbWEWGgcFic7Mue5783DaWFvcgwLopH2DkqGCNTEknrnF9y0YIj0FNezMbC7LCZ7CV4akjXzJtTAcV71OcsyyG1uFmgz3Z8oumxctkYYfuJJIQyyipkwo6FCHsKpNnFVEe6HDo2jGYcNmRLUxJ7iJmKvfb6mo0/zn7NywyHRJ5ci8UILvQaqJguvZfwEgwOfGuoO9zI9tgtThP8gmTFPKWkH0UtEo/cCkFTIfxftC8FkCPv3SfNB9wo/jQphgwlYIlVKM6on0XP0DfI5HVZFQXssgsX5UfYdurPJIvaTP86VpoWyV6FwCjtv6k5n07QkMpulyQDtBP5HhYcIBTKb8mcnCrZ584aO0AfGHutlfFwMN5RjyFzxwu4hwpdn+69nuPSo68gavWZjQ/b5nhb7piW8CrxwT0CAl+C6JsyU4lcFveLAyMjKMKfk8Ji+Vhr0c35GFf8MS5OhFTNLnvWIBIZfsqMyttEDscOMa4VfDx00bZRAQlOdn0rk0txCkoctWKIeA+xKiBXVfmshtPDFZbjnfm/TzeaHYROrK1IiJjqxvn54N4QdluHspXvdCDEeMLs="
         ),
         read_request_file("query_reserve_requirements_request.xml"),
         read_file("query_reserve_requirements_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to query reserve requirements with the valid client type; this should succeed
-    resp = client.query_reserve_requirements(request, Date(2024, 4, 12))
+    resp = client.query_reserve_requirements(request, 1, Date(2024, 4, 12))
 
     # Finally, verify the response
     verify_reserve_requirement(
@@ -131,17 +130,12 @@ def test_put_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
-            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
-            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
-            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
-            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
-            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
-            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9guOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlNJC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("put_offer_request.xml"),
         read_file("put_offer_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to put an offer with the valid client type; this should succeed
@@ -207,17 +201,12 @@ def test_put_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
-            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
-            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
-            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
-            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
-            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
-            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9guOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlNJC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("put_offer_request.xml"),
         read_file("put_offer_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to put an offer with the valid client type; this should succeed
@@ -256,17 +245,12 @@ def test_query_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "MbWcUSlJ6fJq8SDusw3kLBMPrTxO2ip2rrUbtIhv7XiCjzav6JGCtdqOtli0Y9JufEqYs1jhA0vPWCDand8jACzK8/fVMNlVard1roUtm"
-            "TujJ0Nlf2mtAVmCkAAxA43cCXIwqd67aH/GxSGGfP4lwES2CU5MsbSKDi3x1Yrko7NVgC3z26LZlyeUbFOG7A8KcZQyxNQKY3sQ3/PW8o"
-            "QHuZEvz9jDS09pGZRpuWifqPs1sPMzdruVIkhJCUbtEpmVaTZgUjQbmLaKMLK8dHLGvfJh335mlEWOqkOlcdvk4tDOAO3Krzdhk5VI46U"
-            "VXMIF2hWPWx1IgMkPXRb4J7SqRa0t2PbDBhIc5DLzv3ecWQC6A0Jn0t4059b17bHa77bB2/RDPCJfsjwyg/xa+4Ftf1R5QQQukQzR8bQs"
-            "DIhPX33F7dFcW8mMt0MItFn76AsDWgsGIMpFO+wjdXx1ISHsI4lttJqx58DwXdbx/N8qtBgSrZAUzxEOhqzqOJRMHhFQWZIMHMTXm4v98"
-            "cWKmeeO+1mup8+H0j4Mlv25+BYA9S8WE8iD/8JTizKiplPZr7eTPcazfWR4oXY1lxAHZqaCNZlz6yHR/qZ/nu8qwPhsaa7ZMCGd89ZnIT"
-            "lkMz/xgMQNv8FjikpqDN9S5vWu9UfAJNug1xjAOo5gjb3a1oMEtiE="
+            "eBki+iSH6OaDGQSRkB6unDPyDxqMnpmZravPSYLztpaYqc1L8Zxx4ZcPFVbM2BJZ3CbKCw4urcRDsCA+4p5Lnx0BwCtCWCknFfrPyJfkg/VHixX2GJygyCzfY39Ysm3Lor8a5m5VjVukhiYG8roTE55wqivEzYX6mBDxSWSKx697c0Kmfy6lsIZaALxdLWMEnZwSgf4i/nSWdqaqFc/6oAmpHYkdp2woeXs4UTgG0BxPsoaDwhHH1HTqSzJqFexgilmOLMKo/9wg/zyEOiwOdp+chaaI4DEYhi7q+d6coFQiN0+pWh4+KA6PeHkQsaAVTurw60MVtw3CQ4EL5Od3lDutndkdVdwsW8/fbY0xsH1/uusqoZjhZine4oRTdOudP2y8pPhE65N//XP9Tgti7DU8I7CaQ9418FgZ/9u9N7Ut3W/CgwWVTuiTG3JJN8UvrO3833ANl0QlhY78az9rEa58MfpZ0mmaxNIH8Y55XqX2BDytsN6YUNlZHYFw0fe2qt+jRursDlbcbAvNn+AGUTEwAdLxzUiHbuEvX/i4Rc7R9mGm3F0XFA6OXb8EOrXCyPuerfpqbVEAW7WRSsEOB4tzq53VnJPbdsNHPD/5z2JdOkHwB2ZtfnqvAZ8yXx0B5FFyS6oiTZbD/tjdU1bGLPgc782d9zqFr4B1Gn7UDro="
         ),
         read_request_file("query_offers_request.xml"),
         read_file("put_offer_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to query offers with the valid client type; this should succeed
@@ -333,17 +317,12 @@ def test_cancel_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "mPUqEy9Ee8UiJmviQW0EelZEkccyE7NiNxb1f73Ifsi+e4430y2XJT9vmMBt7gW+zBoCGVDvhf0qm/DTFbaWgsOWk7ZD0vFhNrJvEaGpy"
-            "SasFJe5aSngJ6dfAaCTajpMdmAcxUHh/t6dC4cla6DrCmrX0UfsPMqXzq56fn/Gz9rawfkHNfZHzaxo0lW/g+UQHVXPohIvs2qyg/wBGl"
-            "QcQ3qrVZEcuO2d0LCVhk5ouxmKUkThMXLH3mKFG16RRuhHFWqqSdrGY3sR5LwFiCCzplrloksIqqFLz2JnM4pohUeHwdYKFcRC2LzK/Cv"
-            "T6g4fMgwBrtI0liW10lDQzeBGmFKJKv21ya1l8t/opG0PKEUunajx3IfyvQcvTpUDAbaCKTaI/DzyHvyCgFpsO64tYxBOXXA3FzvDKGhx"
-            "eYBzySxYz9xYELzZTjzCo3jmP+h9sTWkgHva3fxgdVXgGJ9RT3F4euqrxdXL6aQX07GtyQmp8h5J3TFe44gILYS5iDDI64L63gt1FmKPq"
-            "waaqA1mGVOivW3vkZO9IVCMoL4PzfcN54td6R/2hESZK/f1csVzxk9F4gWaupemym3YaeSQGoIZRVcjbmWXidTRsMc+ZWsxI7oP6sl3m9"
-            "rU17ZiGkJLcUpjBs3NV6nOU3LAgIjqvBW/10KEjikQU3idWXT4Rps="
+            "y1QlSIDeZjY21o00JTxT1HDJYbrNZExq1ZeM/O5dx3hDW9LA3dL9fAKEy/Pfkj2MzmP+f2/hwp7lSBkHhvrD9j/3D0jeTkv4sRVe7WQO6WybDwcN7uMDta2KHUkxO+i85KIUuEX4zKMm8JDwMjyXsiKZQ7zercRpjmqm9oWnli8rQkfh1E0KPirayKErSccmZJWkrIiVkWpzsJGOl2+HSo8E5A6jhZz5D1rrRlru2q6QIM47SEWjTsJ720/CUBZUZsneTMz8r1wAqk9nTeO7cbAYXWt5EWbt85DXy9G5UbJnkdlUXUSMCIOuo3znfmZI4kxMXYWIBMnUDqlflgxt0wD60CaBjxGNhrfV2EmC8QQLjwldS69bIIqF0BD8jOQEkL7GSKrk8WUmqc1Re2crypSGpmjYuprMPsERJCw1LnO65dodkqIZpKrILS99U5Nqm4Jwn53u2hhZWKZtDc3xRxXSx0TasOlL/A+NElXYehra3p6miFTtcx1FSGMxB7AaWrAnHGLci46/klEiWzFeFbjbY7RvaAKM8CS4+3WUZQqpqpp6Md/IWqAXyPN/1QC9O/UqrDsYWIhssK+1Bvljt9e7jJoxiW5fUtMvstZ8D90S4EJLxB6EJb+KDHLyURXevuW+koCGvollsZI58iG9G2UGNu4bb8iQaBNo+x89iqk="
         ),
         read_request_file("delete_offer_request.xml"),
         read_file("delete_offer_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to cancel an offer with the valid client type; this should succeed
@@ -378,19 +357,14 @@ def test_query_awards_works(mock_certificate):
 
     # Register our test response with the responses library
     register_mms_request(
-        RequestType.INFO,
+        RequestType.MARKET,
         (
-            "0/vQHWWqpCEZl/OttLYjq18Y59aRDJ7kodDIYn1uxHoUGXAv0OwbI3rJblCYFbf8D9rDkatEXxhG5IUrgXqeA/Cx6NoL/zFI8JBcR/iFF"
-            "gp9wGEUMxvDZjEs+ue8wGuw/TMwECOGLNi5VRRwyUo0NXGZSWH0Nt+XdLVs/I73EzMu6/uHYELBFlGJFhNWGENRQ+eWFXMcFsabTAdcxy"
-            "KrywH3vS3fWznbNfIMX6rGLjNKJsHjTR2uUCxbNIZ3tFgCtT0d4lNSjcb1blhv6rZGFV2srvs/O790d7+VIH6oWH3MEz1MfXRiw6j/okQ"
-            "ZeneGJN5Bw4Nu3QOJlGjrbE+1tUH6AM1r29CvbKzZ2TiQTrE6GU9wlks/pgIW1sRui5GiQA5EW6Uv8m6TXBOF2tNw++VJVrDorORZkpc4"
-            "ObbZO2E75IsMv1k27FDiYMTBuqRITx2zVid1MIUc0A1BUaXv4CV9XnJdf+MZG9+mxcmGCJeNX9emQIg3EY/M4n8T5L8WVkPl2taHxq13c"
-            "h0AYv8xci+n45yFs2KeTtWA/VkjVfDSUbzJ94C/tvx/8jY/OJuSG12703UXbdTlXQdtmObJDgBGgtxs9co3or9/YTjZMGEePxep9k3ETQ"
-            "rRHHOEteceDK/7Y099zrriix102+aMz1H+zZIOfvi/jcufrRMh270="
+            "BiEsp0K4TkHJv0NbYf82KOyn8bhkEQxX3QlOq5lLYQxzPOdonKDuy/E8huI6PgzX+Md5MckH2WRf14+eKpvJLtc8o9bDbcF+YkSxWr147jj7x28ScDJT4dMdOgMNzvCY2N66a9JD2TSZYEfgmFEy+Aez9KIXMHyiBva+wrQ13WLLyXambGZ3oZsOYK6U5qhgO842HPQu+LlCfory7wiTIOklUop5BxVnT9SDlwRuXv3hUEO3TqnjT8d2nvtuBeAcKMyHD4F83VOF8t0PRZz6haacOOqOBf5nzij5oA5JUdQaCPN2KLx0i0hqbe5L7q8+15D267UY2L5Pd2pfgNoT/8KUE4Rhgdzdsp7m7uQTWpt2xxNjvx/cdV27zRtIk6g57udT034QTtGct8s0+cX+2wMolh7hegPIoh4doyUJFdSXdMtia3sRnD5HGREafaT3pFqH66NJp9/iu65stSIBSPMRdElCIlm/LBy3aA6fj1mhbUTWcPLOWvF4bDNbLEZuzPltnpZOhJo9IuhP3q+o2ZJceJmyyXO4ikuO6Rf/QSXLWl2DocvstfGfWjWmYWP9pgOhvxLWQw9XRksygEgXs0OmgeQW4NyB6NcpgVTdNX3Yj+qh9nUYVh/T43icqzkZTBcIPkpchMNe5Ms4l0r16WHhHdNKOYmfDGsP/KRk3js="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),
         warnings=True,
+        multipart=True,
     )
 
     # Now, attempt to query awards with the valid client type; this should succeed

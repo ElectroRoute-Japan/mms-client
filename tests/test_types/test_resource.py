@@ -237,7 +237,7 @@ def test_resource_data_full():
     print(request)
 
     # Finally, verify that the request was created with the correct parameters
-    assert data == read_request_file("resource_full.xml", False)
+    assert data == read_request_file("resource_full.xml").encode("UTF-8")
     verify_resource_data(
         request,
         output_band_verifiers=[output_band_verifier(100, 1000, 2000, 100, 200, 300)],

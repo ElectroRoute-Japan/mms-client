@@ -104,9 +104,9 @@ def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
 def test_zwrapper_submit_server_error(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class handles server errors as expected."""
     # First, register our test responses with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"", 500)
+    register_mms_request(RequestType.INFO, "test", "derp", b"", 500)
     register_mms_request(
-        RequestType.INFO, "test", b"derp", b"derp", url="https://www3.tdgc.jp/axis2/services/MiWebService"
+        RequestType.INFO, "test", "derp", b"derp", url="https://www3.tdgc.jp/axis2/services/MiWebService"
     )
 
     # Next, create our Zeep client
@@ -118,7 +118,7 @@ def test_zwrapper_submit_server_error(mock_certificate: Certificate):
             requestType=RequestType.INFO,
             requestDataType=RequestDataType.XML,
             requestSignature="test",
-            requestData=b"derp",
+            requestData="derp",
             sendRequestDataOnSuccess=False,
         )
     )
@@ -131,7 +131,7 @@ def test_zwrapper_submit_server_error(mock_certificate: Certificate):
 def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
     """Test that, in the event of a 4xx error, the ZWrapper class raises an exception."""
     # First, register our test responses with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"", 400)
+    register_mms_request(RequestType.INFO, "test", "derp", b"", 400)
 
     # Next, create our Zeep client
     z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
@@ -143,7 +143,7 @@ def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
                 requestType=RequestType.INFO,
                 requestDataType=RequestDataType.XML,
                 requestSignature="test",
-                requestData=b"derp",
+                requestData="derp",
                 sendRequestDataOnSuccess=False,
             )
         )
@@ -157,7 +157,7 @@ def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
 def test_zwrapper_submit_works(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class works as expected."""
     # First, register our test response with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"derp")
+    register_mms_request(RequestType.INFO, "test", "derp", b"derp")
 
     # Next, create our Zeep client
     z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
@@ -168,7 +168,7 @@ def test_zwrapper_submit_works(mock_certificate: Certificate):
             requestType=RequestType.INFO,
             requestDataType=RequestDataType.XML,
             requestSignature="test",
-            requestData=b"derp",
+            requestData="derp",
             sendRequestDataOnSuccess=False,
         )
     )

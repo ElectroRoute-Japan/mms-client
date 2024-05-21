@@ -4,6 +4,7 @@ from base64 import b64encode
 from datetime import date as Date
 from decimal import Decimal
 from pathlib import Path
+from re import compile as rcompile
 from typing import Callable
 from typing import Dict
 from typing import List
@@ -67,16 +68,12 @@ def read_file(file: str) -> bytes:
         return f.read()
 
 
-def read_request_file(file: str, leave_one: bool = True) -> bytes:
+def read_request_file(file: str) -> str:
     """Read the contents of the given XML request file."""
     base = read_file(file).decode("UTF-8")
     base = base.replace("    ", "").replace("\t", "").replace("\r", "")
-    if leave_one:
-        index = base.find("\n") + 1
-        base = base[:index] + base[index:].replace("\n", "")
-    else:
-        base = base.replace("\n", "")
-    return base.encode("UTF-8")
+    base = base.replace("\n", "")
+    return base
 
 
 def verify_mms_request(
@@ -84,7 +81,7 @@ def verify_mms_request(
     subsystem: RequestType,
     data_type: RequestDataType,
     signature: str,
-    data: bytes,
+    data: str,
     as_admin: bool = False,
     compressed: bool = False,
     send_request: bool = True,
@@ -125,7 +122,7 @@ def verify_mms_response(
     verify_list(response.attachments, verifiers)
 
 
-def attachment_verifier(name: str, data: bytes, signature: str):
+def attachment_verifier(name: str, data: str, signature: str):
     """Verify that the given attachment was created with the correct parameters."""
 
     def inner(att: Attachment):
@@ -546,13 +543,23 @@ def verify_list(items: list = None, verifiers: list = None):
 def register_mms_request(
     request_type: RequestType,
     signature: str,
-    data: bytes,
+    data: str,
     response: bytes,
     status: int = 200,
     url: str = "https://www2.tdgc.jp/axis2/services/MiWebService",
+    multipart: bool = False,
+    encoded: bool = False,
     **kwargs,
 ):
     """Register a new MMS request and response with the responses library."""
+    matches = (
+        [MultipartPayloadMatcher(request_type, signature, data, encoded)]
+        if multipart
+        else [
+            PayloadMatcher(request_type, signature, data),
+            header_matcher({"Content-Type": "text/xml; charset=utf-8"}),
+        ]
+    )
     responses.add(
         responses.Response(
             method="POST",
@@ -561,10 +568,7 @@ def register_mms_request(
             status=status,
             content_type="text/xml; charset=utf-8",
             auto_calculate_content_length=True,
-            match=[
-                PayloadMatcher(request_type, signature, data),
-                header_matcher({"Content-Type": "text/xml; charset=utf-8"}),
-            ],
+            match=matches,
         )
     )
 
@@ -592,10 +596,70 @@ def create_response(
     ).encode("UTF-8")
 
 
+class MultipartPayloadMatcher:
+    """A custom matcher for comparing XML payloads."""
+
+    def __init__(self, request_type: RequestType, signature: str, data: str, encoded: bool):
+        """Create a new XML payload matcher with the given expected XML payload."""
+        self.request_type = request_type
+        self.signature = signature
+        self.encoded = encoded
+        if self.encoded:
+            b64 = b64encode(data.encode("UTF-8")).decode("UTF-8")
+            self.data = "".join(b64[i : i + 76] + "\n" for i in range(0, len(b64), 76))
+        else:
+            self.data = b64encode(data.encode("UTF-8")).decode("UTF-8") if encoded else data
+        self._regex = rcompile(
+            r"(?s)--MIMEBoundary_(?P<boundary>[\w=]*).*Content-ID:\s<(?P<mtom>[\w=]*).*cid:(?P<cid>\w{16}.*)\"\/>.*"
+        )
+
+    def __call__(self, request: PreparedRequest) -> Tuple[bool, str]:
+        """Return True if the request's body matches the expected XML payload."""
+        # First, convert the request body to a string
+        actual = request.body.decode("UTF-8")
+        print(f"Actual: {actual}")
+
+        # Next, match the request body against the expected pattern
+        match = self._regex.match(actual)
+        if not match:
+            return False, "XML payload did not match expected pattern"
+
+        # Now, verify the content-type header
+        content_type = f'multipart/related; charset="UTF-8"; type="application/xop+xml"; start="<{match.group("mtom")}@electroroute.co.jp>"; boundary="MIMEBoundary_{match.group("boundary")}"; start-info="application/soap+xml"'
+        if request.headers["Content-Type"] != content_type:
+            return (
+                False,
+                f"Content-Type header of {request.headers['Content-Type']} did not match expected value: {content_type}",
+            )
+
+        # Finally, compare the request body to the expected XML payload
+        expected = (
+            f"""--MIMEBoundary_{match.group('boundary')}\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: 7bit\r\n"""
+            """Content-Type: application/xop+xml; charset="utf-8"; type="text/xml"\r\nContent-ID: """
+            f"""<{match.group('mtom')}@electroroute.co.jp>\r\nContent-Transfer-Encoding: binary\n\n"""
+            f"""<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap."""
+            """org/soap/envelope/"><soap-env:Body><ns0:RequestAttInfo xmlns:ns0="urn:abb.com:project/mms/types">"""
+            f"""<requestType>{self.request_type.value}</requestType><adminRole>false</adminRole><requestDataCompressed>"""
+            """false</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
+            """</sendRequestDataOnSuccess><sendResponseDataCompressed>false</sendResponseDataCompressed>"""
+            f"""<requestSignature>{self.signature}</requestSignature><requestData><xop:Include xmlns:xop="http://"""
+            f"""www.w3.org/2004/08/xop/include" href="cid:{match.group('cid')}"/></requestData></ns0:RequestAttInfo>"""
+            f"""</soap-env:Body></soap-env:Envelope>\n--MIMEBoundary_{match.group('boundary')}\nContent-Transfer-"""
+            f"""Encoding: {"base64" if self.encoded else "binary"}\nContent-ID: <{match.group('cid')}>\nContent-Type: """
+            f"""application/octet-stream; charset="utf-8"\n\n{self.data}\n--MIMEBoundary_{match.group('boundary')}--\n"""
+        )
+        print(f"Expected: {expected}")
+        try:
+            assert actual == expected
+        except AssertionError as e:
+            print(e)
+        return actual == expected, "XML payloads do not match"
+
+
 class PayloadMatcher:
     """A custom matcher for comparing XML payloads."""
 
-    def __init__(self, request_type: RequestType, signature: str, data: bytes):
+    def __init__(self, request_type: RequestType, signature: str, data: str):
         """Create a new XML payload matcher with the given expected XML payload."""
         self.expected = (
             """<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope """
@@ -604,8 +668,8 @@ class PayloadMatcher:
             """false</adminRole><requestDataCompressed>false</requestDataCompressed><requestDataType>XML"""
             """</requestDataType><sendRequestDataOnSuccess>false</sendRequestDataOnSuccess>"""
             f"""<sendResponseDataCompressed>false</sendResponseDataCompressed><requestSignature>{signature}"""
-            f"""</requestSignature><requestData>{b64encode(data).decode("UTF-8")}</requestData></ns0:RequestAttInfo>"""
-            """</soap-env:Body></soap-env:Envelope>"""
+            f"""</requestSignature><requestData>{data}</requestData></ns0:RequestAttInfo></soap-env:Body>"""
+            """</soap-env:Envelope>"""
         ).encode("utf-8")
 
     def __call__(self, request: PreparedRequest) -> Tuple[bool, str]:

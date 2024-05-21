@@ -2,41 +2,34 @@
 
 import pytest
 from mock import patch
-from pyfakefs.fake_filesystem_unittest import Patcher
 
 from mms_client.security.certs import Certificate
 
 
-def test_init_works():
+@patch("mms_client.security.certs.load_key_and_certificates", return_value=(12, None, None))
+def test_init_keytype_invalid(mock):
+    """Test that the Certificate class raises a TypeError when the private key is not an RSAPrivateKey."""
+    # Attempt to create a new CryptoWrapper with the fake certificate; this should fail
+    with pytest.raises(TypeError) as ex_info:
+        _ = Certificate(b"derp", "passphrase")
+
+    # Verify the details of the raised exception
+    assert str(ex_info.value) == "Private key of type (int) was not expected."
+
+
+def test_init_works(mock_certificate):
     """Test that the Certificate class can be initialized."""
-    # Create our certificate using a fake cert file and passphrase
-    cert = Certificate(b"derp", "passphrase")
-
-    # Verify that the certificate was created with the correct parameters
-    assert cert.certificate == b"derp"
-    assert cert.passphrase == "passphrase"
+    assert len(mock_certificate.certificate) > 0
+    assert not mock_certificate.passphrase
 
 
-def test_to_adapter_works(mocker, dir_mocker):
+def test_to_adapter_works(mock_certificate, mocker):
     """Test that the to_adapter method works as expected."""
-    # First, create a fake certificate file
-    dir_mocker.create_file("cert.p12", contents=b"derp")
-
-    # Next, create a certificate and convert it to an adapter
+    # Create a certificate and convert it to an adapter
     mock = mocker.MagicMock()
     with patch("mms_client.security.certs.Pkcs12Adapter", mock):
-        cert = Certificate("cert.p12", "passphrase")
-        _ = cert.to_adapter()
+        _ = mock_certificate.to_adapter()
 
-    # Finally, verify that the adapter was created with the correct parameters
-    assert cert.certificate == b"derp"
-    assert cert.passphrase == "passphrase"
-    assert mock.call_args.kwargs["pkcs12_data"] == b"derp"
-    assert mock.call_args.kwargs["pkcs12_password"] == "passphrase"
-
-
-@pytest.fixture(scope="function")
-def dir_mocker():
-    """Create a fake file-system we can use for testing."""
-    with Patcher() as patcher:
-        yield patcher.fs
+    # Verify that the adapter was created with the correct parameters
+    assert mock.call_args.kwargs["pkcs12_data"] == mock_certificate.certificate
+    assert mock.call_args.kwargs["pkcs12_password"] == mock_certificate.passphrase

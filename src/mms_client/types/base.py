@@ -115,11 +115,8 @@ class SchemaType(Enum):
     OMI = "omi.xsd"
 
 
-class PayloadBase(BaseXmlModel, nsmap={"xsi": "http://www.w3.org/2001/XMLSchema-instance"}):
+class PayloadBase(BaseXmlModel):
     """Represents the base fields for an MMS request payload."""
-
-    # The XML schema to use for validation
-    location: SchemaType = attr(name="noNamespaceSchemaLocation", ns="xsi")
 
 
 class BaseResponse(BaseXmlModel, Generic[E], tag="BaseResponse"):
