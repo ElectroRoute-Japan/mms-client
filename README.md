@@ -11,6 +11,9 @@ The underlying API sends and receives XML documents. Each of these request or re
 
 After the data has been converted and added to the outer request object, it is sent to the appropriate server endpoint via a Zeep client. The client certificate is also injected into the request using a PCKS12 adaptor.
 
+## Domain
+The domain to use when signing the content ID to MTOM attachments is specified when creating the client. This is not verified by the server, but it is used to generate the content ID for the MTOM attachments. As such, it is important to ensure that the domain is correct.
+
 # Serialization
 This library relies on Pydantic 2 and the pydantic-xml library for serialization/deserialization. As such, any type in this library can be converted to not only XML, but to JSON as well. This is extremely useful if you're trying to build a pass-through API service or something similar.
 
@@ -110,7 +113,7 @@ from mms_client.utils.web import ClientType
 cert = Certificate("/path/to/my/cert.p12", "fake_passphrase")
 
 # Create a new MMS client
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert)
+client = MmsClient(domain="mydomain.com", participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert)
 
 # Create our request offer
 request_offer = OfferData(
@@ -144,14 +147,14 @@ There's a lot of code here but it's not terribly difficult to understand. All th
 If you want to test your MMS connection, you can try using the test server:
 
 ```python
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, test=True)
+client = MmsClient(domain="mydomain.com", participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, test=True)
 ```
 
 ## Connecting as a Market Admin
 If you're connecting as a market operator (MO), you can connect in admin mode:
 
 ```python
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, is_admin=True)
+client = MmsClient(domain="mydomain.com", participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, is_admin=True)
 ```
 
 ## Auditing XML Requests & Responses
@@ -170,7 +173,7 @@ class TestAuditPlugin(AuditPlugin):
     def audit_response(self, mms_response: bytes) -> None:
         self.response = mms_response
 
-client = MmsClient(participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, plugins=[TestAuditPlugin()])
+client = MmsClient(domain="mydomain.com", participant="F100", user="FAKEUSER", client_type=ClientType.BSP, cert, plugins=[TestAuditPlugin()])
 ```
 
 This same input allows for the user to create their own plugins and add them to the Zeep client, allowing for a certain amount of extensibility.

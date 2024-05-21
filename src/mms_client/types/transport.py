@@ -55,7 +55,7 @@ class Attachment(BaseModel):
     name: str = Field(alias="name")
 
     # The attachment file data
-    data: bytes = Field(alias="binaryData")
+    data: str = Field(alias="binaryData")
 
 
 class MmsRequest(BaseModel):
@@ -83,7 +83,7 @@ class MmsRequest(BaseModel):
     signature: str = Field(alias="requestSignature")
 
     # The base-64 encoded payload of the request
-    payload: bytes = Field(alias="requestData")
+    payload: str = Field(alias="requestData")
 
     # Any attached files to be sent with the request. Only 20 of these are allowed for OMI requests. For MI requests,
     # the limit is 40.

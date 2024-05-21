@@ -72,7 +72,7 @@ def test_serialize_data():
     data = serializer.serialize(request, offer)
 
     # Finally, verify that the request was serialized as we expect
-    assert data == read_request_file("serialization_2.xml")
+    assert data.decode("UTF-8") == read_request_file("serialization_2.xml")
 
 
 def test_serialize_multi_data():
@@ -119,7 +119,7 @@ def test_serialize_multi_data():
     data = serializer.serialize_multi(request, [offer], OfferData)
 
     # Finally, verify that the request was serialized as we expect
-    assert data == read_request_file("serialization_2.xml")
+    assert data.decode("UTF-8") == read_request_file("serialization_2.xml")
 
 
 def test_deserialize_payload_key_invalid():
@@ -129,7 +129,7 @@ def test_deserialize_payload_key_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(read_request_file("serialization_1.xml", False), MarketSubmit, OfferData)
+        _ = serialzier.deserialize(read_request_file("serialization_1.xml").encode("UTF-8"), MarketSubmit, OfferData)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected payload key 'ReportData' not found in response"
@@ -155,7 +155,7 @@ def test_deserialize_data_type_invalid():
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
     with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(read_request_file("serialization_1.xml"), MarketSubmit, OfferCancel)
+        _ = serialzier.deserialize(read_request_file("serialization_1.xml").encode("UTF-8"), MarketSubmit, OfferCancel)
 
     # Finally, verify that the error message is as we expect
     assert str(ex_info.value) == "Expected data type 'OfferCancel' not found in response"

@@ -80,7 +80,7 @@ class Serializer:
 
         # Finally, convert the payload to XML and return it
         # NOTE: we provided the encoding here so this will return bytes, not a string
-        return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)  # type: ignore[return-value]
+        return self._to_canoncialized_xml(payload)
 
     def serialize_multi(self, request_envelope: E, request_data: List[P], request_type: Type[P]) -> bytes:
         """Serialize the envelope and data to a byte string for sending to the MMS server.
@@ -104,7 +104,7 @@ class Serializer:
 
         # Finally, convert the payload to XML and return it
         # NOTE: we provided the encoding here so this will return bytes, not a string
-        return payload.to_xml(skip_empty=True, encoding="utf-8", xml_declaration=True)  # type: ignore[return-value]
+        return self._to_canoncialized_xml(payload)
 
     def deserialize(self, data: bytes, envelope_type: Type[E], data_type: Type[P]) -> Response[E, P]:
         """Deserialize the data to a response object.
@@ -131,6 +131,30 @@ class Serializer:
         """
         tree = self._from_xml(data)
         return self._from_tree_multi(tree, envelope_type, data_type)
+
+    def _to_canoncialized_xml(self, payload: PayloadBase) -> bytes:
+        """Convert the payload to a canonicalized XML string.
+
+        Arguments:
+        payload (PayloadBase): The payload to be converted.
+
+        Returns:    The canonicalized XML string.
+        """
+        # First, convert the payload to a raw XML string
+        raw: bytes = payload.to_xml(
+            skip_empty=True,
+            encoding="utf-8",
+            xml_declaration=False,
+        )  # type: ignore[assignment]
+
+        # Next, parse it back into an XML tree
+        unparsed = parse(BytesIO(raw))
+
+        # Finally, convert the XML tree to a canonicalized XML string and return it
+        buffer = BytesIO()
+        unparsed.write_c14n(buffer)
+        buffer.seek(0)
+        return buffer.read()
 
     def _from_tree(self, raw: Element, envelope_type: Type[E], data_type: Type[P]) -> Response[E, P]:
         """Convert the raw data to a response object.

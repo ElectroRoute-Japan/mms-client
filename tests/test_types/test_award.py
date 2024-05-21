@@ -187,7 +187,7 @@ def test_award_results_response_full():
     data = response.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the response was created with the correct parameters
-    assert data == read_request_file("awards_response_full.xml", False)
+    assert data == read_request_file("awards_response_full.xml").encode("UTF-8")
     verify_award_response(
         response,
         market_type=MarketType.DAY_AHEAD,

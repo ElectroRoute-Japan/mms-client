@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
-<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="mi-market.xsd">
-    <MarketQuery Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1">
-        <AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00+09:00" EndTime="2024-04-12T18:00:00+09:00" AfterGC="1"/>
+<MarketData>
+    <MarketQuery Date="2024-04-12" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER">
+        <AwardResultsQuery AfterGC="1" Area="03" EndTime="2024-04-12T18:00:00+09:00" LinkedArea="02" MarketType="DAM" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00+09:00"></AwardResultsQuery>
     </MarketQuery>
 </MarketData>

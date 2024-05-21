@@ -18,14 +18,14 @@ def test_mms_request_defaults():
         requestType=RequestType.INFO,
         requestDataType=RequestDataType.XML,
         requestSignature="FAKE_SIGNATURE",
-        requestData=b"FAKE_PAYLOAD",
+        requestData="FAKE_PAYLOAD",
     )
 
     # Next, convert the request to a dictionary
     data = request.to_arguments()
 
     # Finally, verify that the request was created with the correct parameters
-    verify_mms_request(request, RequestType.INFO, RequestDataType.XML, "FAKE_SIGNATURE", b"FAKE_PAYLOAD")
+    verify_mms_request(request, RequestType.INFO, RequestDataType.XML, "FAKE_SIGNATURE", "FAKE_PAYLOAD")
     assert data == {
         "requestType": "mp.info",
         "adminRole": False,
@@ -34,7 +34,7 @@ def test_mms_request_defaults():
         "sendRequestDataOnSuccess": True,
         "sendResponseDataCompressed": False,
         "requestSignature": "FAKE_SIGNATURE",
-        "requestData": b"FAKE_PAYLOAD",
+        "requestData": "FAKE_PAYLOAD",
         "attachmentData": [],
     }
 
@@ -45,13 +45,13 @@ def test_mms_request_full():
     request = MmsRequest(
         requestType=RequestType.INFO,
         adminRole=True,
-        attachmentData=[Attachment(signature="FAKE_SIGNATURE", name="FAKE_NAME", binaryData=b"FAKE_DATA")],
+        attachmentData=[Attachment(signature="FAKE_SIGNATURE", name="FAKE_NAME", binaryData="FAKE_DATA")],
         requestDataCompressed=True,
         requestDataType=RequestDataType.JSON,
         sendRequestDataOnSuccess=False,
         sendResponseDataCompressed=True,
         requestSignature="FAKE_SIGNATURE",
-        requestData=b"FAKE_PAYLOAD",
+        requestData="FAKE_PAYLOAD",
     )
 
     # Next, convert the request to a dictionary
@@ -63,12 +63,12 @@ def test_mms_request_full():
         RequestType.INFO,
         RequestDataType.JSON,
         "FAKE_SIGNATURE",
-        b"FAKE_PAYLOAD",
+        "FAKE_PAYLOAD",
         True,
         True,
         False,
         True,
-        verifiers=[attachment_verifier("FAKE_NAME", b"FAKE_DATA", "FAKE_SIGNATURE")],
+        verifiers=[attachment_verifier("FAKE_NAME", "FAKE_DATA", "FAKE_SIGNATURE")],
     )
     assert data == {
         "requestType": "mp.info",
@@ -78,8 +78,8 @@ def test_mms_request_full():
         "sendRequestDataOnSuccess": False,
         "sendResponseDataCompressed": True,
         "requestSignature": "FAKE_SIGNATURE",
-        "requestData": b"FAKE_PAYLOAD",
-        "attachmentData": [{"signature": "FAKE_SIGNATURE", "name": "FAKE_NAME", "binaryData": b"FAKE_DATA"}],
+        "requestData": "FAKE_PAYLOAD",
+        "attachmentData": [{"signature": "FAKE_SIGNATURE", "name": "FAKE_NAME", "binaryData": "FAKE_DATA"}],
     }
 
 
@@ -106,7 +106,7 @@ def test_mms_response_full():
         "warnings": True,
         "responseBinary": True,
         "responseCompressed": True,
-        "attachmentData": [{"signature": "FAKE_SIGNATURE", "name": "FAKE_NAME", "binaryData": b"FAKE_DATA"}],
+        "attachmentData": [{"signature": "FAKE_SIGNATURE", "name": "FAKE_NAME", "binaryData": "FAKE_DATA"}],
     }
 
     # Next, attempt to convert the data to a MmsResponse object
@@ -122,5 +122,5 @@ def test_mms_response_full():
         True,
         True,
         True,
-        verifiers=[attachment_verifier("FAKE_NAME", b"FAKE_DATA", "FAKE_SIGNATURE")],
+        verifiers=[attachment_verifier("FAKE_NAME", "FAKE_DATA", "FAKE_SIGNATURE")],
     )

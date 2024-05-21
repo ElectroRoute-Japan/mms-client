@@ -1,6 +1,5 @@
-<?xml version='1.0' encoding='utf-8'?>
-<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="mi-market.xsd">
-    <MarketCancel Date="2024-03-15" ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1">
-        <OfferCancel ResourceName="FAKE_RESO" StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" MarketType="DAM"/>
+<MarketData>
+    <MarketCancel Date="2024-03-15" MarketType="DAM" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER">
+        <OfferCancel EndTime="2024-03-15T21:00:00" MarketType="DAM" ResourceName="FAKE_RESO" StartTime="2024-03-15T12:00:00"></OfferCancel>
     </MarketCancel>
 </MarketData>

@@ -42,7 +42,7 @@ from tests.testutils import verify_messages
 def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, compressed: bool, message: str):
     """Test that an exception is raised if a non-XML response is received."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -56,18 +56,19 @@ def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, c
     register_mms_request(
         RequestType.INFO,
         (
-            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
-            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
-            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
-            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
-            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
-            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
-            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
+            "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
+            "9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb"
+            "/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2"
+            "/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY"
+            "2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlN"
+            "JC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("base_request.xml"),
         read_file("base_response.xml"),
         data_type=data_type,
         compressed=compressed,
+        multipart=True,
     )
 
     # Now, create our request envelope and payload
@@ -96,7 +97,7 @@ def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, c
 def test_txt_received(mock_certificate):
     """Test that an exception is raised if a TXT response is received."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -110,17 +111,18 @@ def test_txt_received(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
-            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
-            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
-            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
-            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
-            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
-            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
+            "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
+            "9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb"
+            "/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2"
+            "/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY"
+            "2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlN"
+            "JC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("base_request.xml"),
         b"Some error message",
         data_type=ResponseDataType.TXT,
+        multipart=True,
     )
 
     # Now, create our request envelope and payload
@@ -149,7 +151,7 @@ def test_txt_received(mock_certificate):
 def test_request_one_response_invalid(mock_certificate):
     """Test that an exception is raised if the response is invalid."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -163,17 +165,18 @@ def test_request_one_response_invalid(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
-            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
-            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
-            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
-            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
-            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
-            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
+            "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
+            "9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb"
+            "/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2"
+            "/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY"
+            "2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlN"
+            "JC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("base_request.xml"),
         read_file("base_failed_response.xml"),
         success=False,
+        multipart=True,
     )
 
     # Now, create our request envelope and payload
@@ -225,7 +228,7 @@ def test_request_one_response_invalid(mock_certificate):
 def test_request_many_response_invalid(mock_certificate):
     """Test that an exception is raised if the response is invalid."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -239,17 +242,18 @@ def test_request_many_response_invalid(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "eVnILLetkUevnDGEKTUYwuxgQzOAlH6g8keMr/sP84QXHq7geOaB54Mkdp0Gw3ShYXwhZnzkWQMQK1EuSJEGuauNh3MnJ5VJWI6tCnPIv"
-            "5E7cfjH/1OP3Ez0JbjucHUFqqFJrgbJ8dxJxnUuhDX7359oodlmUrFAIXhyzh7XfEjrHLQzhRQsNZV/aa+OgIj0UplHf9Mah62pENa48f"
-            "+ZN9+15v/S7Ob2V4ZOFY5oeB2tyuwjydJkdcDL2hkewblkc4wLJwopk4bGfVWBI3m42kH32YdokPCyRx/PoDQNmCH/QDwJ8gKFMiMULHy"
-            "/hsvmxcogN3bx7xMeaxun+ROyBYpXX2VCQX2P/x8zSn/uoSRXRZyqbbSd1hYnHp2sN47niteGndHMZv1tqKw/rOIccL2598nkUj8PNqw7"
-            "FCpqi9eeHaOkuHOLYLLmexICeE9zhtvz2RWbNLlLaUsMhzcjOYqos2JBUJLOn7uIf+1cZOZVr/9QG62n42pJifZcAjFCraq5k1dlpLCZr"
-            "SB7bgP0uterkeTbau1TfVQ+H+iFC7rL9/N7zUHg21KxlQme8p+BQIDGXSEswMucj+TaY3H1VuZAL8bmz+xv0d4L47CbvYf8A1kwOc+2Ed"
-            "BvIBTy9QCj+/x92xbopX8knV3/rqUlBJjQR1ZcGIAOn+Yf2DG6iQw="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
+            "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
+            "9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb"
+            "/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2"
+            "/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY"
+            "2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlN"
+            "JC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("base_request.xml"),
         read_file("base_failed_response.xml"),
         success=False,
+        multipart=True,
     )
 
     # Now, create our request envelope and payload

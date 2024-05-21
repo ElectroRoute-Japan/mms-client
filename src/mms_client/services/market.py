@@ -44,7 +44,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         resp_data_type=ReserveRequirement,
     )
     def query_reserve_requirements(
-        self: ClientProto, request: ReserveRequirementQuery, date: Optional[Date] = None
+        self: ClientProto, request: ReserveRequirementQuery, days: int, date: Optional[Date] = None
     ) -> List[ReserveRequirement]:
         """Query the MMS server for reserve requirements.
 
@@ -54,6 +54,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         request (ReserveRequirementQuery):  The query to submit to the MMS server.
         date (Date):                        The date of the transaction in the format "YYYY-MM-DD". This value defaults
                                             to the current date.
+        days (int):                         The number of days ahead for which the data is being queried.
 
         Returns:    A list of reserve requirements that match the query.
         """
@@ -62,7 +63,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
-            days=1,
+            days=days,
         )
 
     @mms_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, [ClientType.BSP])
@@ -167,7 +168,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_endpoint("MarketQuery_AwardResultsQuery", config, RequestType.INFO, resp_data_type=AwardResponse)
+    @mms_endpoint("MarketQuery_AwardResultsQuery", config, RequestType.MARKET, resp_data_type=AwardResponse)
     def query_awards(self: ClientProto, request: AwardQuery, days: int, date: Optional[Date] = None) -> AwardResponse:
         """Query the MMS server for award results.
 

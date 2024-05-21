@@ -57,14 +57,14 @@ def test_tso_service_endpoint_select_works(interface: Interface, error: bool, te
 def test_zwrapper_client_invalid(mocker):
     """Test that the ZWrapper constructor raises an error when the given client is invalid."""
     with pytest.raises(ValueError) as exc_info:
-        _ = ZWrapper("invalid", Interface.OMI, mocker.MagicMock())
+        _ = ZWrapper("fake.com", "invalid", Interface.OMI, mocker.MagicMock())
     assert str(exc_info.value) == "Invalid client, 'invalid'. Only 'bsp', 'mo', and 'tso' are supported."
 
 
 def test_zwrapper_interface_invalid(mocker):
     """Test that the ZWrapper constructor raises an error when the given interface is invalid."""
     with pytest.raises(ValueError) as exc_info:
-        _ = ZWrapper(ClientType.BSP, "invalid", mocker.MagicMock())
+        _ = ZWrapper("fake.com", ClientType.BSP, "invalid", mocker.MagicMock())
     assert str(exc_info.value) == "Invalid interface, 'invalid'. Only 'mi' and 'omi' are supported."
 
 
@@ -82,7 +82,7 @@ def test_zwrapper_interface_invalid(mocker):
 def test_zwrapper_client_interface_valid(mocker, client_type: ClientType, interface: Interface, addr: str):
     """Test that the ZWrapper constructor does not raise an error when the given client and interface are valid."""
     mock_cert = mocker.MagicMock()
-    zmi = ZWrapper(client_type, interface, mock_cert)
+    zmi = ZWrapper("fake.com", client_type, interface, mock_cert)
     assert zmi._service._binding_options["address"] == addr
 
 
@@ -95,7 +95,7 @@ def test_zwrapper_client_interface_valid(mocker, client_type: ClientType, interf
 )
 def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
     """Test that the ZWrapper constructor instantiates the correct client."""
-    z = ZWrapper(ClientType.BSP, Interface.MI, mocker.MagicMock(), test=test)
+    z = ZWrapper("fake.com", ClientType.BSP, Interface.MI, mocker.MagicMock(), test=test)
     assert z._endpoint == BSP_MO_URLS[Interface.MI]
     assert z._endpoint.selected == expected
 
@@ -104,13 +104,13 @@ def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
 def test_zwrapper_submit_server_error(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class handles server errors as expected."""
     # First, register our test responses with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"", 500)
+    register_mms_request(RequestType.INFO, "test", "derp", b"", 500)
     register_mms_request(
-        RequestType.INFO, "test", b"derp", b"derp", url="https://www3.tdgc.jp/axis2/services/MiWebService"
+        RequestType.INFO, "test", "derp", b"derp", url="https://www3.tdgc.jp/axis2/services/MiWebService"
     )
 
     # Next, create our Zeep client
-    z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
+    z = ZWrapper("fake.com", ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
 
     # Next, attempt to submit a request and retrieve the response
     resp = z.submit(
@@ -118,7 +118,7 @@ def test_zwrapper_submit_server_error(mock_certificate: Certificate):
             requestType=RequestType.INFO,
             requestDataType=RequestDataType.XML,
             requestSignature="test",
-            requestData=b"derp",
+            requestData="derp",
             sendRequestDataOnSuccess=False,
         )
     )
@@ -131,10 +131,10 @@ def test_zwrapper_submit_server_error(mock_certificate: Certificate):
 def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
     """Test that, in the event of a 4xx error, the ZWrapper class raises an exception."""
     # First, register our test responses with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"", 400)
+    register_mms_request(RequestType.INFO, "test", "derp", b"", 400)
 
     # Next, create our Zeep client
-    z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
+    z = ZWrapper("fake.com", ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
 
     # Now, attempt to submit a request and retrieve the response; this should fail
     with pytest.raises(TransportError) as exc_info:
@@ -143,7 +143,7 @@ def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
                 requestType=RequestType.INFO,
                 requestDataType=RequestDataType.XML,
                 requestSignature="test",
-                requestData=b"derp",
+                requestData="derp",
                 sendRequestDataOnSuccess=False,
             )
         )
@@ -157,10 +157,10 @@ def test_zwrapper_unrecoverable_error(mock_certificate: Certificate):
 def test_zwrapper_submit_works(mock_certificate: Certificate):
     """Test that the submit method of the ZWrapper class works as expected."""
     # First, register our test response with the responses library
-    register_mms_request(RequestType.INFO, "test", b"derp", b"derp")
+    register_mms_request(RequestType.INFO, "test", "derp", b"derp")
 
     # Next, create our Zeep client
-    z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
+    z = ZWrapper("fake.com", ClientType.BSP, Interface.MI, mock_certificate.to_adapter())
 
     # Now, attempt to submit a request and retrieve the response
     resp = z.submit(
@@ -168,7 +168,7 @@ def test_zwrapper_submit_works(mock_certificate: Certificate):
             requestType=RequestType.INFO,
             requestDataType=RequestDataType.XML,
             requestSignature="test",
-            requestData=b"derp",
+            requestData="derp",
             sendRequestDataOnSuccess=False,
         )
     )
