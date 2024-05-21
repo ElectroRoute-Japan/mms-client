@@ -57,7 +57,13 @@ def test_query_reserve_requirements_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "j/QJWIqedO/PWDHdHSa9MHDyHvqx0UIkcFc1CAzWRku+8mXL0UFLtI01zP0xZsvD3SUjktFf5VauyM5u+Ypc9vAip9PF17Msv/0bREeTDbWEWGgcFic7Mue5783DaWFvcgwLopH2DkqGCNTEknrnF9y0YIj0FNezMbC7LCZ7CV4akjXzJtTAcV71OcsyyG1uFmgz3Z8oumxctkYYfuJJIQyyipkwo6FCHsKpNnFVEe6HDo2jGYcNmRLUxJ7iJmKvfb6mo0/zn7NywyHRJ5ci8UILvQaqJguvZfwEgwOfGuoO9zI9tgtThP8gmTFPKWkH0UtEo/cCkFTIfxftC8FkCPv3SfNB9wo/jQphgwlYIlVKM6on0XP0DfI5HVZFQXssgsX5UfYdurPJIvaTP86VpoWyV6FwCjtv6k5n07QkMpulyQDtBP5HhYcIBTKb8mcnCrZ584aO0AfGHutlfFwMN5RjyFzxwu4hwpdn+69nuPSo68gavWZjQ/b5nhb7piW8CrxwT0CAl+C6JsyU4lcFveLAyMjKMKfk8Ji+Vhr0c35GFf8MS5OhFTNLnvWIBIZfsqMyttEDscOMa4VfDx00bZRAQlOdn0rk0txCkoctWKIeA+xKiBXVfmshtPDFZbjnfm/TzeaHYROrK1IiJjqxvn54N4QdluHspXvdCDEeMLs="
+            "j/QJWIqedO/PWDHdHSa9MHDyHvqx0UIkcFc1CAzWRku+8mXL0UFLtI01zP0xZsvD3SUjktFf5VauyM5u+Ypc9vAip9PF17Msv/0bREeTD"
+            "bWEWGgcFic7Mue5783DaWFvcgwLopH2DkqGCNTEknrnF9y0YIj0FNezMbC7LCZ7CV4akjXzJtTAcV71OcsyyG1uFmgz3Z8oumxctkYYfu"
+            "JJIQyyipkwo6FCHsKpNnFVEe6HDo2jGYcNmRLUxJ7iJmKvfb6mo0/zn7NywyHRJ5ci8UILvQaqJguvZfwEgwOfGuoO9zI9tgtThP8gmTF"
+            "PKWkH0UtEo/cCkFTIfxftC8FkCPv3SfNB9wo/jQphgwlYIlVKM6on0XP0DfI5HVZFQXssgsX5UfYdurPJIvaTP86VpoWyV6FwCjtv6k5n"
+            "07QkMpulyQDtBP5HhYcIBTKb8mcnCrZ584aO0AfGHutlfFwMN5RjyFzxwu4hwpdn+69nuPSo68gavWZjQ/b5nhb7piW8CrxwT0CAl+C6J"
+            "syU4lcFveLAyMjKMKfk8Ji+Vhr0c35GFf8MS5OhFTNLnvWIBIZfsqMyttEDscOMa4VfDx00bZRAQlOdn0rk0txCkoctWKIeA+xKiBXVfm"
+            "shtPDFZbjnfm/TzeaHYROrK1IiJjqxvn54N4QdluHspXvdCDEeMLs="
         ),
         read_request_file("query_reserve_requirements_request.xml"),
         read_file("query_reserve_requirements_response.xml"),
@@ -130,7 +136,13 @@ def test_put_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9guOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlNJC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
+            "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
+            "9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb"
+            "/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2"
+            "/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY"
+            "2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlN"
+            "JC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("put_offer_request.xml"),
         read_file("put_offer_response.xml"),
@@ -201,7 +213,13 @@ def test_put_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9guOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlNJC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
+            "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
+            "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
+            "9ednzmMeGBuUP8zh1KF6k/p8x7LsM8FPbOvV7Bwuw9bPTxeAWcOnGiPycaBL/wW3iJfzIDX7k9xmd9f8UpgF6kxxAL4KxboF+gyiSezOb"
+            "/DhUaTLiFZEw4jr993g2HsuNaV4E64jt6+XksUB8xNwsdtxfav7ItRoi/1/TWgAoHKK4bn9jBxk4hsEGJD3UwPzBxpyJD4flmfdwGZCp2"
+            "/huDCItEh3Ej5GcVsUY5OjSglyogV3YwxZBVpWpMflxHRvtiYSGnCC+YCXedhu8nNm1vWwowGb8Pf31fagNT5PB+ghEu/DIe+PEr215FY"
+            "2xMxYpmqzp5Vxcyg4aeC6A0XS2rT9XypZRrn+igIln23bCNYVAUpvk5a49CqRwPD+L4GEcGgmH16pCAwfSVvWvqxuzQ41iBsmw8qnXzlN"
+            "JC1RFpRUagio2nL3LkRk2sF0iXeE9oi+70NGaDIJSIyPIV93Qg9RY="
         ),
         read_request_file("put_offer_request.xml"),
         read_file("put_offer_response.xml"),
@@ -245,7 +263,13 @@ def test_query_offers_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "eBki+iSH6OaDGQSRkB6unDPyDxqMnpmZravPSYLztpaYqc1L8Zxx4ZcPFVbM2BJZ3CbKCw4urcRDsCA+4p5Lnx0BwCtCWCknFfrPyJfkg/VHixX2GJygyCzfY39Ysm3Lor8a5m5VjVukhiYG8roTE55wqivEzYX6mBDxSWSKx697c0Kmfy6lsIZaALxdLWMEnZwSgf4i/nSWdqaqFc/6oAmpHYkdp2woeXs4UTgG0BxPsoaDwhHH1HTqSzJqFexgilmOLMKo/9wg/zyEOiwOdp+chaaI4DEYhi7q+d6coFQiN0+pWh4+KA6PeHkQsaAVTurw60MVtw3CQ4EL5Od3lDutndkdVdwsW8/fbY0xsH1/uusqoZjhZine4oRTdOudP2y8pPhE65N//XP9Tgti7DU8I7CaQ9418FgZ/9u9N7Ut3W/CgwWVTuiTG3JJN8UvrO3833ANl0QlhY78az9rEa58MfpZ0mmaxNIH8Y55XqX2BDytsN6YUNlZHYFw0fe2qt+jRursDlbcbAvNn+AGUTEwAdLxzUiHbuEvX/i4Rc7R9mGm3F0XFA6OXb8EOrXCyPuerfpqbVEAW7WRSsEOB4tzq53VnJPbdsNHPD/5z2JdOkHwB2ZtfnqvAZ8yXx0B5FFyS6oiTZbD/tjdU1bGLPgc782d9zqFr4B1Gn7UDro="
+            "eBki+iSH6OaDGQSRkB6unDPyDxqMnpmZravPSYLztpaYqc1L8Zxx4ZcPFVbM2BJZ3CbKCw4urcRDsCA+4p5Lnx0BwCtCWCknFfrPyJfkg"
+            "/VHixX2GJygyCzfY39Ysm3Lor8a5m5VjVukhiYG8roTE55wqivEzYX6mBDxSWSKx697c0Kmfy6lsIZaALxdLWMEnZwSgf4i/nSWdqaqFc"
+            "/6oAmpHYkdp2woeXs4UTgG0BxPsoaDwhHH1HTqSzJqFexgilmOLMKo/9wg/zyEOiwOdp+chaaI4DEYhi7q+d6coFQiN0+pWh4+KA6PeHk"
+            "QsaAVTurw60MVtw3CQ4EL5Od3lDutndkdVdwsW8/fbY0xsH1/uusqoZjhZine4oRTdOudP2y8pPhE65N//XP9Tgti7DU8I7CaQ9418FgZ"
+            "/9u9N7Ut3W/CgwWVTuiTG3JJN8UvrO3833ANl0QlhY78az9rEa58MfpZ0mmaxNIH8Y55XqX2BDytsN6YUNlZHYFw0fe2qt+jRursDlbcb"
+            "AvNn+AGUTEwAdLxzUiHbuEvX/i4Rc7R9mGm3F0XFA6OXb8EOrXCyPuerfpqbVEAW7WRSsEOB4tzq53VnJPbdsNHPD/5z2JdOkHwB2Ztfn"
+            "qvAZ8yXx0B5FFyS6oiTZbD/tjdU1bGLPgc782d9zqFr4B1Gn7UDro="
         ),
         read_request_file("query_offers_request.xml"),
         read_file("put_offer_response.xml"),
@@ -317,7 +341,13 @@ def test_cancel_offer_works(mock_certificate):
     register_mms_request(
         RequestType.INFO,
         (
-            "y1QlSIDeZjY21o00JTxT1HDJYbrNZExq1ZeM/O5dx3hDW9LA3dL9fAKEy/Pfkj2MzmP+f2/hwp7lSBkHhvrD9j/3D0jeTkv4sRVe7WQO6WybDwcN7uMDta2KHUkxO+i85KIUuEX4zKMm8JDwMjyXsiKZQ7zercRpjmqm9oWnli8rQkfh1E0KPirayKErSccmZJWkrIiVkWpzsJGOl2+HSo8E5A6jhZz5D1rrRlru2q6QIM47SEWjTsJ720/CUBZUZsneTMz8r1wAqk9nTeO7cbAYXWt5EWbt85DXy9G5UbJnkdlUXUSMCIOuo3znfmZI4kxMXYWIBMnUDqlflgxt0wD60CaBjxGNhrfV2EmC8QQLjwldS69bIIqF0BD8jOQEkL7GSKrk8WUmqc1Re2crypSGpmjYuprMPsERJCw1LnO65dodkqIZpKrILS99U5Nqm4Jwn53u2hhZWKZtDc3xRxXSx0TasOlL/A+NElXYehra3p6miFTtcx1FSGMxB7AaWrAnHGLci46/klEiWzFeFbjbY7RvaAKM8CS4+3WUZQqpqpp6Md/IWqAXyPN/1QC9O/UqrDsYWIhssK+1Bvljt9e7jJoxiW5fUtMvstZ8D90S4EJLxB6EJb+KDHLyURXevuW+koCGvollsZI58iG9G2UGNu4bb8iQaBNo+x89iqk="
+            "y1QlSIDeZjY21o00JTxT1HDJYbrNZExq1ZeM/O5dx3hDW9LA3dL9fAKEy/Pfkj2MzmP+f2/hwp7lSBkHhvrD9j/3D0jeTkv4sRVe7WQO6"
+            "WybDwcN7uMDta2KHUkxO+i85KIUuEX4zKMm8JDwMjyXsiKZQ7zercRpjmqm9oWnli8rQkfh1E0KPirayKErSccmZJWkrIiVkWpzsJGOl2"
+            "+HSo8E5A6jhZz5D1rrRlru2q6QIM47SEWjTsJ720/CUBZUZsneTMz8r1wAqk9nTeO7cbAYXWt5EWbt85DXy9G5UbJnkdlUXUSMCIOuo3z"
+            "nfmZI4kxMXYWIBMnUDqlflgxt0wD60CaBjxGNhrfV2EmC8QQLjwldS69bIIqF0BD8jOQEkL7GSKrk8WUmqc1Re2crypSGpmjYuprMPsER"
+            "JCw1LnO65dodkqIZpKrILS99U5Nqm4Jwn53u2hhZWKZtDc3xRxXSx0TasOlL/A+NElXYehra3p6miFTtcx1FSGMxB7AaWrAnHGLci46/k"
+            "lEiWzFeFbjbY7RvaAKM8CS4+3WUZQqpqpp6Md/IWqAXyPN/1QC9O/UqrDsYWIhssK+1Bvljt9e7jJoxiW5fUtMvstZ8D90S4EJLxB6EJb"
+            "+KDHLyURXevuW+koCGvollsZI58iG9G2UGNu4bb8iQaBNo+x89iqk="
         ),
         read_request_file("delete_offer_request.xml"),
         read_file("delete_offer_response.xml"),
@@ -359,7 +389,13 @@ def test_query_awards_works(mock_certificate):
     register_mms_request(
         RequestType.MARKET,
         (
-            "BiEsp0K4TkHJv0NbYf82KOyn8bhkEQxX3QlOq5lLYQxzPOdonKDuy/E8huI6PgzX+Md5MckH2WRf14+eKpvJLtc8o9bDbcF+YkSxWr147jj7x28ScDJT4dMdOgMNzvCY2N66a9JD2TSZYEfgmFEy+Aez9KIXMHyiBva+wrQ13WLLyXambGZ3oZsOYK6U5qhgO842HPQu+LlCfory7wiTIOklUop5BxVnT9SDlwRuXv3hUEO3TqnjT8d2nvtuBeAcKMyHD4F83VOF8t0PRZz6haacOOqOBf5nzij5oA5JUdQaCPN2KLx0i0hqbe5L7q8+15D267UY2L5Pd2pfgNoT/8KUE4Rhgdzdsp7m7uQTWpt2xxNjvx/cdV27zRtIk6g57udT034QTtGct8s0+cX+2wMolh7hegPIoh4doyUJFdSXdMtia3sRnD5HGREafaT3pFqH66NJp9/iu65stSIBSPMRdElCIlm/LBy3aA6fj1mhbUTWcPLOWvF4bDNbLEZuzPltnpZOhJo9IuhP3q+o2ZJceJmyyXO4ikuO6Rf/QSXLWl2DocvstfGfWjWmYWP9pgOhvxLWQw9XRksygEgXs0OmgeQW4NyB6NcpgVTdNX3Yj+qh9nUYVh/T43icqzkZTBcIPkpchMNe5Ms4l0r16WHhHdNKOYmfDGsP/KRk3js="
+            "BiEsp0K4TkHJv0NbYf82KOyn8bhkEQxX3QlOq5lLYQxzPOdonKDuy/E8huI6PgzX+Md5MckH2WRf14+eKpvJLtc8o9bDbcF+YkSxWr147"
+            "jj7x28ScDJT4dMdOgMNzvCY2N66a9JD2TSZYEfgmFEy+Aez9KIXMHyiBva+wrQ13WLLyXambGZ3oZsOYK6U5qhgO842HPQu+LlCfory7w"
+            "iTIOklUop5BxVnT9SDlwRuXv3hUEO3TqnjT8d2nvtuBeAcKMyHD4F83VOF8t0PRZz6haacOOqOBf5nzij5oA5JUdQaCPN2KLx0i0hqbe5"
+            "L7q8+15D267UY2L5Pd2pfgNoT/8KUE4Rhgdzdsp7m7uQTWpt2xxNjvx/cdV27zRtIk6g57udT034QTtGct8s0+cX+2wMolh7hegPIoh4d"
+            "oyUJFdSXdMtia3sRnD5HGREafaT3pFqH66NJp9/iu65stSIBSPMRdElCIlm/LBy3aA6fj1mhbUTWcPLOWvF4bDNbLEZuzPltnpZOhJo9I"
+            "uhP3q+o2ZJceJmyyXO4ikuO6Rf/QSXLWl2DocvstfGfWjWmYWP9pgOhvxLWQw9XRksygEgXs0OmgeQW4NyB6NcpgVTdNX3Yj+qh9nUYVh"
+            "/T43icqzkZTBcIPkpchMNe5Ms4l0r16WHhHdNKOYmfDGsP/KRk3js="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),

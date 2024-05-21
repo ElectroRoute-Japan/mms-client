@@ -231,7 +231,13 @@ def test_put_resource_works(mock_certificate):
     register_mms_request(
         RequestType.REGISTRATION,
         (
-            "id0MOFNI1jdOVarYdFWGCWMbVCZfSh/WTqxyO4kuZnWAs2xSMgnP0stWU79q0fdU1oWqCFZalp/GpqYQhYwVBkgVDns/yAqX55lnjiuLqE90vNYeKw9J/+mXpA/+oibaJluwMRq78hVS9BkpKDmcXhD02yagS7GnU8knegykO0fpUyNMh/HsDQiqgoE3rrdDSQxdOfAfiwXOfEoNo7i4BP9XmYK4JOb1QenZBJcZy84yZukuw3quC1NguKtCFEHRAlLFPbVzD1N36Bo+5SYnysHBevOLDwP1Bdv+nVDUAGGTdDXcjo0ZiqYrCjMK7GtVnDEtgLolCviPcRQx8jfi1/6ngJVOO+DJaT+raNsby3T7IxRJl+IFfxpzg6SrNxNPCCS/aUxYHv+Iba/b4tAyJuwZx9i8FAZJclZhceVMdZq4GG2aju25TlJI2JxVGOusKl17SWUp+616Zd5nsvPrvCmumQWpvjxSUHG932/h8fqX2cM2E8d4jirmDu00tHXDOtfpC479W99+LzE5HPLe6iDBWFT1dpGYNV3oCek4T1vsLGZGGcjLnNKcLvpEVvprpoYMku2LMTu+Yy2ba8FppUPoBF1DGJr4Webec/yUdGjO9JeM5e7SGNPxLtw7hMrh4Vau+vSBHNOtQ3vZ2CRvoAlAK+HdXzQooe9/FJOQHIE="
+            "id0MOFNI1jdOVarYdFWGCWMbVCZfSh/WTqxyO4kuZnWAs2xSMgnP0stWU79q0fdU1oWqCFZalp/GpqYQhYwVBkgVDns/yAqX55lnjiuLq"
+            "E90vNYeKw9J/+mXpA/+oibaJluwMRq78hVS9BkpKDmcXhD02yagS7GnU8knegykO0fpUyNMh/HsDQiqgoE3rrdDSQxdOfAfiwXOfEoNo7"
+            "i4BP9XmYK4JOb1QenZBJcZy84yZukuw3quC1NguKtCFEHRAlLFPbVzD1N36Bo+5SYnysHBevOLDwP1Bdv+nVDUAGGTdDXcjo0ZiqYrCjM"
+            "K7GtVnDEtgLolCviPcRQx8jfi1/6ngJVOO+DJaT+raNsby3T7IxRJl+IFfxpzg6SrNxNPCCS/aUxYHv+Iba/b4tAyJuwZx9i8FAZJclZh"
+            "ceVMdZq4GG2aju25TlJI2JxVGOusKl17SWUp+616Zd5nsvPrvCmumQWpvjxSUHG932/h8fqX2cM2E8d4jirmDu00tHXDOtfpC479W99+L"
+            "zE5HPLe6iDBWFT1dpGYNV3oCek4T1vsLGZGGcjLnNKcLvpEVvprpoYMku2LMTu+Yy2ba8FppUPoBF1DGJr4Webec/yUdGjO9JeM5e7SGN"
+            "PxLtw7hMrh4Vau+vSBHNOtQ3vZ2CRvoAlAK+HdXzQooe9/FJOQHIE="
         ),
         read_request_file("put_resource_request.xml"),
         read_file("put_resource_response.xml"),
@@ -417,7 +423,13 @@ def test_query_resources_works(mock_certificate):
     register_mms_request(
         RequestType.REGISTRATION,
         (
-            "CdYPCLid6clLRClHQKnU06lscstA9XqyEIPc8qjYR2gi2O3GvcUuqWYQYBgaJ4kj9vrAIFgRUtk24cy0AeCX3cUp7lgpDI/2d5hSx4bx1n6m7ufUJvCeqe8+FC38gZSMGBqFiCNmP/OWU9M3Dfr66fqzmX52yCK/wDNVC6Y7XUfCWkImYMSniTy1OCi+vFZ5bnWIO9FDo33GHioZ+2vyCQ1P8pGy4YnxL8Iv9Iit4p+hctZsIJmb/IZEFZqEc3DmnWsxllSEVy/kPd/HYv60FxUPH3c5Zvcg2YHC7gsLNs4YC+8ZRKwEj4QTp4mkEkC45NvnYcjBxW9QkJ8UkPMY3QL0Sdrmmj12uq/dLRyObZvJwlC5MJkns+Jhm/uOAHd1/cVVoAoKIGCw8csYROy9/qb7ifI+Zkx64dSMFVXuuIOuP4O9yo6JwHBcB3XTLg/wFiTT6kp/YL6f18FBLxkY956El51fZTYKYAjiI4x2sANsy1Fd4GRiDNRRQnMMlQwI7evMJEeQEo+s0CLiD6kFdmgzBB9ZdkIIZ9iYipGs1MEoxNKhkLwtOEHVdmAi0Lb8nUvkUAXut97xLCwE03NRPoNkaMjzOMABLGRNPjAO0OMHEjIKP4UVS/AqoVGzT9c9Kakf8qoPuuOBLJ3+/vdkpENps0Aj1dVKuy9oTC5iIAY="
+            "CdYPCLid6clLRClHQKnU06lscstA9XqyEIPc8qjYR2gi2O3GvcUuqWYQYBgaJ4kj9vrAIFgRUtk24cy0AeCX3cUp7lgpDI/2d5hSx4bx1"
+            "n6m7ufUJvCeqe8+FC38gZSMGBqFiCNmP/OWU9M3Dfr66fqzmX52yCK/wDNVC6Y7XUfCWkImYMSniTy1OCi+vFZ5bnWIO9FDo33GHioZ+2"
+            "vyCQ1P8pGy4YnxL8Iv9Iit4p+hctZsIJmb/IZEFZqEc3DmnWsxllSEVy/kPd/HYv60FxUPH3c5Zvcg2YHC7gsLNs4YC+8ZRKwEj4QTp4m"
+            "kEkC45NvnYcjBxW9QkJ8UkPMY3QL0Sdrmmj12uq/dLRyObZvJwlC5MJkns+Jhm/uOAHd1/cVVoAoKIGCw8csYROy9/qb7ifI+Zkx64dSM"
+            "FVXuuIOuP4O9yo6JwHBcB3XTLg/wFiTT6kp/YL6f18FBLxkY956El51fZTYKYAjiI4x2sANsy1Fd4GRiDNRRQnMMlQwI7evMJEeQEo+s0"
+            "CLiD6kFdmgzBB9ZdkIIZ9iYipGs1MEoxNKhkLwtOEHVdmAi0Lb8nUvkUAXut97xLCwE03NRPoNkaMjzOMABLGRNPjAO0OMHEjIKP4UVS/"
+            "AqoVGzT9c9Kakf8qoPuuOBLJ3+/vdkpENps0Aj1dVKuy9oTC5iIAY="
         ),
         read_request_file("query_resources_request.xml"),
         read_file("put_resource_response.xml"),
