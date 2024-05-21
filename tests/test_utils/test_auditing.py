@@ -46,7 +46,7 @@ def test_auditer_works(mock_certificate: Certificate):
 
     # Next, create our Zeep client
     auditor = FakeAuditPlugin()
-    z = ZWrapper(ClientType.BSP, Interface.MI, mock_certificate.to_adapter(), plugins=[auditor])
+    z = ZWrapper("fake.com", ClientType.BSP, Interface.MI, mock_certificate.to_adapter(), plugins=[auditor])
 
     # Now, attempt to submit a request and retrieve the response
     resp = z.submit(

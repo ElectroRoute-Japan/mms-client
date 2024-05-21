@@ -47,7 +47,7 @@ from tests.testutils import verify_resource_data
 def test_put_resource_invalid_client(mock_certificate):
     """Test that the put_resource method raises an exception when called by a non-BSP client."""
     # First, create our MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
 
     # Next, create our test resource data
     request = ResourceData(
@@ -84,7 +84,7 @@ def test_put_resource_invalid_client(mock_certificate):
 def test_put_resource_works(mock_certificate):
     """Test that the put_resource method works as expected."""
     # First, create our MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test resource data
     request = ResourceData(
@@ -386,7 +386,7 @@ def test_put_resource_works(mock_certificate):
 def test_query_resources_invalid_client(mock_certificate):
     """Test that the query_resources method raises an exception when called by a non-BSP client."""
     # First, create our MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
 
     # Next, create our test resource query
     query = ResourceQuery(
@@ -410,7 +410,7 @@ def test_query_resources_invalid_client(mock_certificate):
 def test_query_resources_works(mock_certificate):
     """Test that the query_resources method works as expected."""
     # First, create our MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test resource query
     query = ResourceQuery(

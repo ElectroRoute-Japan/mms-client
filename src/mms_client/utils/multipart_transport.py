@@ -52,12 +52,18 @@ def get_boundary() -> str:
     return f"MIMEBoundary_{now_b64()}".center(33, "=")
 
 
-def get_content_id() -> str:
-    """Return a randomized MIME content ID string."""
-    return f"<{now_b64()}@electroroute.co.jp>"
+def get_content_id(domain: str) -> str:
+    """Return a randomized MIME content ID string.
+
+    Arguments:
+    domain (str):   The domain of the content ID.
+
+    Returns:    The randomized MIME content ID string.
+    """
+    return f"<{now_b64()}@{domain}>"
 
 
-def overwrie_attachnode(node):
+def overwrite_attachnode(node):
     """Overwrite the attachment node.
 
     Arguments:
@@ -106,16 +112,17 @@ def get_envelopepart(envelope: Element, content_id: str) -> MIMEApplication:
 class Attachment:
     """Represents an attachment to be sent with a multipart request."""
 
-    def __init__(self, name: str, data: bytes):
+    def __init__(self, name: str, data: bytes, domain: str):
         """Create a new attachment.
 
         Arguments:
         name (str):   The name of the attachment.
         data (bytes): The data to be attached.
+        domain (str): The domain of the content ID.
         """
         self.name = name
         self.data = data
-        self.cid = f"{get_id()}-{name}@electroroute.co.jp"
+        self.cid = f"{get_id()}-{name}@{domain}"
         self.tag = FILETAG + self.cid
 
 
@@ -124,6 +131,7 @@ class MultipartTransport(Transport):
 
     def __init__(
         self,
+        domain: str,
         cache: Optional[VersionedCacheBase] = None,
         timeout: int = 300,
         operation_timeout: Optional[int] = None,
@@ -132,11 +140,15 @@ class MultipartTransport(Transport):
         """Create a new MTOMS transport.
 
         Arguments:
+        domain (str):                           The domain of the content ID to use.
         cache (VersionedCacheBase, optional):   The cache to be used for the transport.
         timeout (int):                          The timeout for the transport.
         operation_timeout (int, optional):      The operation timeout for the transport.
         session (Session, optional):            The session to be used for the transport.
         """
+        # Save the domain for later use
+        self._domain = domain
+
         # Setup a dictionary to store the attachments after they're registered
         self._attachments: Dict[str, Attachment] = {}
 
@@ -160,7 +172,7 @@ class MultipartTransport(Transport):
 
         Returns:    The content ID of the attachment, which should be used in place of the attachment data.
         """
-        attachment = Attachment(name, data)
+        attachment = Attachment(name, data, self._domain)
         self._attachments[attachment.cid] = attachment
         return attachment.tag
 
@@ -197,11 +209,11 @@ class MultipartTransport(Transport):
         Returns:    The XML envelope with the attachments.
         """
         # First, get an identifier for the request and then use it to create a new multipart request
-        content_id = get_content_id()
+        content_id = get_content_id(self._domain)
         mtom_part = get_multipart(content_id)
 
         # Next, let's set the XOP:Include nodes for each attachment
-        files = [overwrie_attachnode(f) for f in filetags]
+        files = [overwrite_attachnode(f) for f in filetags]
 
         # Now, create the request envelope and attach it to the multipart request
         env_part = get_envelopepart(envelope, content_id)

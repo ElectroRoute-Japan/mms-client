@@ -42,7 +42,7 @@ from tests.testutils import verify_messages
 def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, compressed: bool, message: str):
     """Test that an exception is raised if a non-XML response is received."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -97,7 +97,7 @@ def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, c
 def test_txt_received(mock_certificate):
     """Test that an exception is raised if a TXT response is received."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -151,7 +151,7 @@ def test_txt_received(mock_certificate):
 def test_request_one_response_invalid(mock_certificate):
     """Test that an exception is raised if the response is invalid."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,
@@ -228,7 +228,7 @@ def test_request_one_response_invalid(mock_certificate):
 def test_request_many_response_invalid(mock_certificate):
     """Test that an exception is raised if the response is invalid."""
     # First, create our base client and endpoint configuration
-    client = BaseClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
         "Test",
         ClientType.BSP,

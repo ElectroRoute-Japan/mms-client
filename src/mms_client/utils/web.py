@@ -134,6 +134,7 @@ class ZWrapper:
 
     def __init__(
         self,
+        domain: str,
         client: ClientType,
         interface: Interface,
         adapter: Pkcs12Adapter,
@@ -144,6 +145,7 @@ class ZWrapper:
         """Create a new Zeep wrapper object for a specific MMS service endpoint.
 
         Arguments:
+        domain (str):               The domain to use when signing the content ID to MTOM attachments.
         client (ClientType):        The type of client to use. This can be either "bsp" (Balancing Service Provider) or
                                     "tso" (Transmission System Operator). This will determine which service endpoint to
                                     use.
@@ -191,7 +193,7 @@ class ZWrapper:
 
         # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings and then,
         # from that client, we create the SOAP service with the given service binding and selected endpoint.
-        self._transport = MultipartTransport(cache=SqliteCache() if cache else None, session=sess)
+        self._transport = MultipartTransport(domain, cache=SqliteCache() if cache else None, session=sess)
         self._client = Client(
             wsdl=str(location.resolve()),
             transport=self._transport,

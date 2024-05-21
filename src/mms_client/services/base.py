@@ -249,6 +249,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
     def __init__(
         self,
+        domain: str,
         participant: str,
         user: str,
         client_type: ClientType,
@@ -260,6 +261,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         """Create a new MMS client with the given participant, user, client type, and authentication.
 
         Arguments:
+        domain (str):               The domain to use when signing the content ID to MTOM attachments.
         participant (str):          The MMS code of the business entity to which the requesting user belongs.
         user (str):                 The user name of the person making the request.
         client_type (ClientType):   The type of client to use for making requests to the MMS server.
@@ -270,6 +272,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         test (bool):                Whether to use the test server.
         """
         # First, save the base field associated with the client
+        self._domain = domain
         self._participant = participant
         self._user = user
         self._client_type = client_type
@@ -631,6 +634,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         if service.interface not in self._wrappers:
             logger.debug(f"Creating wrapper for {service.interface.name} interface.")
             self._wrappers[service.interface] = ZWrapper(
+                self._domain,
                 self._client_type,
                 service.interface,
                 self._cert.to_adapter(),

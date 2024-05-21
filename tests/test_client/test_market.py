@@ -45,7 +45,7 @@ from tests.testutils import verify_reserve_requirement
 def test_query_reserve_requirements_works(mock_certificate):
     """Test that the query_reserve_requirements method works as expected."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test reserve requirement query
     request = ReserveRequirementQuery(
@@ -98,7 +98,7 @@ def test_query_reserve_requirements_works(mock_certificate):
 def test_put_offer_invalid_client(mock_certificate):
     """Test that the put_offer method raises a ValueError when called by an invalid client type."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
 
     # Next, create our test offer data
     request = OfferData(
@@ -121,7 +121,7 @@ def test_put_offer_invalid_client(mock_certificate):
 def test_put_offer_works(mock_certificate):
     """Test that the put_offer method works as expected."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test offer data
     request = OfferData(
@@ -175,7 +175,7 @@ def test_put_offer_works(mock_certificate):
 def test_put_offers_invalid_client(mock_certificate):
     """Test that the put_offers method raises a ValueError when called by an invalid client type."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
 
     # Next, create our test offer data
     request = OfferData(
@@ -198,7 +198,7 @@ def test_put_offers_invalid_client(mock_certificate):
 def test_put_offers_works(mock_certificate):
     """Test that the put_offer method works as expected."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test offer data
     request = OfferData(
@@ -254,7 +254,7 @@ def test_put_offers_works(mock_certificate):
 def test_query_offers_works(mock_certificate):
     """Test that the query_offers method works as expected."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test offer data
     request = OfferQuery(market_type=MarketType.DAY_AHEAD, area=AreaCode.CHUBU, resource="FAKE_RESO")
@@ -303,7 +303,7 @@ def test_query_offers_works(mock_certificate):
 def test_cancel_offer_invalid_client(mock_certificate):
     """Test that the cancel_offer method raises a ValueError when called by an invalid client type."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.TSO, mock_certificate, test=True)
 
     # Next, create our test offer cancellation
     request = OfferCancel(
@@ -327,7 +327,7 @@ def test_cancel_offer_invalid_client(mock_certificate):
 def test_cancel_offer_works(mock_certificate):
     """Test that the cancel_offer method works as expected."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test offer cancellation
     request = OfferCancel(
@@ -372,7 +372,7 @@ def test_cancel_offer_works(mock_certificate):
 def test_query_awards_works(mock_certificate):
     """Test that the query_awards method works as expected."""
     # First, create our test MMS client
-    client = MmsClient("F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test award query
     request = AwardQuery(

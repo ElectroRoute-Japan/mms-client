@@ -625,7 +625,7 @@ class MultipartPayloadMatcher:
             return False, "XML payload did not match expected pattern"
 
         # Now, verify the content-type header
-        content_type = f'multipart/related; charset="UTF-8"; type="application/xop+xml"; start="<{match.group("mtom")}@electroroute.co.jp>"; boundary="MIMEBoundary_{match.group("boundary")}"; start-info="application/soap+xml"'
+        content_type = f'multipart/related; charset="UTF-8"; type="application/xop+xml"; start="<{match.group("mtom")}@fake.com>"; boundary="MIMEBoundary_{match.group("boundary")}"; start-info="application/soap+xml"'
         if request.headers["Content-Type"] != content_type:
             return (
                 False,
@@ -636,11 +636,11 @@ class MultipartPayloadMatcher:
         expected = (
             f"""--MIMEBoundary_{match.group('boundary')}\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: 7bit\r\n"""
             """Content-Type: application/xop+xml; charset="utf-8"; type="text/xml"\r\nContent-ID: """
-            f"""<{match.group('mtom')}@electroroute.co.jp>\r\nContent-Transfer-Encoding: binary\n\n"""
-            f"""<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap."""
-            """org/soap/envelope/"><soap-env:Body><ns0:RequestAttInfo xmlns:ns0="urn:abb.com:project/mms/types">"""
-            f"""<requestType>{self.request_type.value}</requestType><adminRole>false</adminRole><requestDataCompressed>"""
-            """false</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
+            f"""<{match.group('mtom')}@fake.com>\r\nContent-Transfer-Encoding: binary\n\n<?xml version='1.0' """
+            f"""encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">"""
+            """<soap-env:Body><ns0:RequestAttInfo xmlns:ns0="urn:abb.com:project/mms/types"><requestType>"""
+            f"""{self.request_type.value}</requestType><adminRole>false</adminRole><requestDataCompressed>false"""
+            """</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
             """</sendRequestDataOnSuccess><sendResponseDataCompressed>false</sendResponseDataCompressed>"""
             f"""<requestSignature>{self.signature}</requestSignature><requestData><xop:Include xmlns:xop="http://"""
             f"""www.w3.org/2004/08/xop/include" href="cid:{match.group('cid')}"/></requestData></ns0:RequestAttInfo>"""
