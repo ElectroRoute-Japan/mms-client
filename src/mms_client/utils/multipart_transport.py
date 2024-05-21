@@ -92,7 +92,7 @@ def get_multipart(content_id: str) -> MIMEMultipart:
     return part
 
 
-def get_envelopepart(envelope: Element, content_id: str) -> MIMEApplication:
+def get_envelope_part(envelope: Element, content_id: str) -> MIMEApplication:
     """Create the MIME envelope part.
 
     Arguments:
@@ -216,7 +216,7 @@ class MultipartTransport(Transport):
         files = [overwrite_attachnode(f) for f in filetags]
 
         # Now, create the request envelope and attach it to the multipart request
-        env_part = get_envelopepart(envelope, content_id)
+        env_part = get_envelope_part(envelope, content_id)
         mtom_part.attach(env_part)
 
         # Attach each file to the multipart request
