@@ -99,7 +99,13 @@ def test_list_bsp_resources_works(mock_date, mock_certificate):
     register_mms_request(
         RequestType.REPORT,
         (
-            "mNjcHz2s55SiilIuhX87jAsSwo/lS8Oxh550nngrAVLSC0V/opH2iRnnRMI4J/oP5sGQ27fEtaYl08Ipqo5RwvzLOUbDaKQJgw2QIPe0/F1TgG06ZmrvQiOhtCMNgoaTXaDdyKJUMN4Q546LiWxQd/5aQdjEiJwVUjyfPXjse159LMeDdbBN8ZfPVTtYpq3yBpcg48YxYAU1I58IAmBDnJu8tqQ4t8528h/Uh0hVJpW4qbindOclO+ZaPl5GY5gCVdA/7uAiSCq1o+anb1A4EofZnZ/UxjOwGZHj2EE4db+e+cotd5tBkL60geL/J+SnKJuw6duHvYAMwEJYe42iBF7TujYLaYFGtcWc8KcJksxhP7sIpaDhuvyy9PQvJS+iNqeC0PDFVnHfmj0CXYDm068aL/V+4PWMayR88M4LxRwbe9LuWG56PcPiKwuxCG9YlM9BC9ZGwQ8NW8vbrgubIP+yjwtQg470LvcI8NP13258PaF9UP9Rro3Vhu1qH8SOxm4128tpMQGe09SvG815VhbjnicsY3UMqHZiLfzmk3o6V9x/P5bj+mxp47ZdmnvFtbz1tyhil5/koKhiXqtp7iHbRBr+ULFOnwbOMTHDb9D0SfDVTMnvZWPRW9LJ77HdcMzt1Ak79bERsKnXkvL8aTnQs22cje1P9kX2pFYAAUM="
+            "mNjcHz2s55SiilIuhX87jAsSwo/lS8Oxh550nngrAVLSC0V/opH2iRnnRMI4J/oP5sGQ27fEtaYl08Ipqo5RwvzLOUbDaKQJgw2QIPe0/"
+            "F1TgG06ZmrvQiOhtCMNgoaTXaDdyKJUMN4Q546LiWxQd/5aQdjEiJwVUjyfPXjse159LMeDdbBN8ZfPVTtYpq3yBpcg48YxYAU1I58IAm"
+            "BDnJu8tqQ4t8528h/Uh0hVJpW4qbindOclO+ZaPl5GY5gCVdA/7uAiSCq1o+anb1A4EofZnZ/UxjOwGZHj2EE4db+e+cotd5tBkL60geL"
+            "/J+SnKJuw6duHvYAMwEJYe42iBF7TujYLaYFGtcWc8KcJksxhP7sIpaDhuvyy9PQvJS+iNqeC0PDFVnHfmj0CXYDm068aL/V+4PWMayR8"
+            "8M4LxRwbe9LuWG56PcPiKwuxCG9YlM9BC9ZGwQ8NW8vbrgubIP+yjwtQg470LvcI8NP13258PaF9UP9Rro3Vhu1qH8SOxm4128tpMQGe0"
+            "9SvG815VhbjnicsY3UMqHZiLfzmk3o6V9x/P5bj+mxp47ZdmnvFtbz1tyhil5/koKhiXqtp7iHbRBr+ULFOnwbOMTHDb9D0SfDVTMnvZW"
+            "PRW9LJ77HdcMzt1Ak79bERsKnXkvL8aTnQs22cje1P9kX2pFYAAUM="
         ),
         read_request_file("download_report_request_full.xml"),
         read_file("download_report_response_full.xml"),
