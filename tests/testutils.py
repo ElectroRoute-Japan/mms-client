@@ -23,7 +23,6 @@ from mms_client.types.award import AwardResponse
 from mms_client.types.award import AwardResult
 from mms_client.types.award import ContractResult
 from mms_client.types.award import ContractSource
-from mms_client.types.base import Message
 from mms_client.types.base import Messages
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BooleanFlag
@@ -41,6 +40,25 @@ from mms_client.types.offer import OfferStack
 from mms_client.types.registration import QueryAction
 from mms_client.types.registration import QueryType
 from mms_client.types.registration import RegistrationQuery
+from mms_client.types.report import AccessClass
+from mms_client.types.report import ApplicationType
+from mms_client.types.report import BSPResourceListItem
+from mms_client.types.report import Date
+from mms_client.types.report import FileType
+from mms_client.types.report import ListReportRequest
+from mms_client.types.report import ListReportResponse
+from mms_client.types.report import NewReportRequest
+from mms_client.types.report import OutboundData
+from mms_client.types.report import Parameter
+from mms_client.types.report import ParameterName
+from mms_client.types.report import Periodicity
+from mms_client.types.report import ReportBase
+from mms_client.types.report import ReportDownloadRequest
+from mms_client.types.report import ReportItem
+from mms_client.types.report import ReportName
+from mms_client.types.report import ReportSubType
+from mms_client.types.report import ReportType
+from mms_client.types.report import Timezone
 from mms_client.types.reserve import Requirement
 from mms_client.types.reserve import ReserveRequirement
 from mms_client.types.reserve import ReserveRequirementQuery
@@ -133,22 +151,13 @@ def attachment_verifier(name: str, data: str, signature: str):
     return inner
 
 
-def code_verifier(code: str):
-    """Return a function that verifies a message has the expected code."""
-
-    def inner(message: Message):
-        assert message.code == code
-
-    return inner
-
-
 def messages_verifier(errors: list, warnings: list, infos: list):
     """Return a function that verifies that a message has the expected errors, warnings, and information."""
 
     def inner(messages: Messages):
-        verify_list(messages.errors, errors)
-        verify_list(messages.warnings, warnings)
-        verify_list(messages.information, infos)
+        assert sorted(messages.errors) == errors
+        assert sorted(messages.warnings) == warnings
+        assert sorted(messages.information) == infos
 
     return inner
 
@@ -156,7 +165,7 @@ def messages_verifier(errors: list, warnings: list, infos: list):
 def verify_messages(messages: Dict[str, Messages], verifiers: dict):
     """Verify that the messages are as we expect."""
     assert len(messages) == len(verifiers)
-    print(messages)
+    # print(messages)
     for key, verifier in verifiers.items():
         verifier(messages[key])
 
@@ -199,6 +208,158 @@ def verify_registration_query(
     assert req.action == action
     assert req.query_type == query_type
     assert req.date == date
+
+
+def verify_report_base(req: ReportBase, application_type: ApplicationType, participant: str):
+    """Verify that the ReportBase was created with the correct parameters."""
+    assert req.application_type == application_type
+    assert req.participant == participant
+
+
+def verify_report_create_request(
+    req: NewReportRequest,
+    report_type: ReportType,
+    report_sub_type: ReportSubType,
+    periodicity: Periodicity,
+    report_name: ReportName,
+    date: Date,
+    bsp_name: str,
+    verifiers: list,
+):
+    """Verify that the ReportCreateRequest was created with the correct parameters."""
+    assert req.report_type == report_type
+    assert req.report_sub_type == report_sub_type
+    assert req.periodicity == periodicity
+    assert req.name == report_name
+    assert req.date == date
+    assert req.bsp_name == bsp_name
+    verify_list(req.parameters, verifiers)
+
+
+def parameter_verifier(name: ParameterName, value: str):
+    """Verify that the given parameter was created with the correct parameters."""
+
+    def inner(param: Parameter):
+        assert param.name == name
+        assert param.value == value
+
+    return inner
+
+
+def verify_list_report_request(
+    req: ListReportRequest,
+    report_type: ReportType,
+    report_sub_type: ReportSubType,
+    periodicity: Periodicity,
+    date: Date,
+    name: ReportName,
+):
+    """Verify that the ListReportRequest was created with the correct parameters."""
+    assert req.report_type == report_type
+    assert req.report_sub_type == report_sub_type
+    assert req.periodicity == periodicity
+    assert req.date == date
+    assert req.name == name
+
+
+def verify_list_report_response(
+    resp: ListReportResponse,
+    report_type: ReportType,
+    report_sub_type: ReportSubType,
+    periodicity: Periodicity,
+    date: Date,
+    name: ReportName,
+    verifiers: list,
+):
+    """Verify that the ListReportResponse was created with the correct parameters."""
+    assert resp.report_type == report_type
+    assert resp.report_sub_type == report_sub_type
+    assert resp.periodicity == periodicity
+    assert resp.date == date
+    assert resp.name == name
+    verify_list(resp.reports, verifiers)
+
+
+def report_item_verifier(
+    report_type: ReportType,
+    report_sub_type: ReportSubType,
+    periodicity: Periodicity,
+    date: Date,
+    name: ReportName,
+    access_class: AccessClass,
+    filename: str,
+    file_type: FileType,
+    transaction_id: str,
+    file_size: int,
+    is_binary: bool,
+    expiry_date: Date,
+    description: str,
+):
+    """Verify that the given report item was created with the correct parameters."""
+
+    def inner(item: ReportItem):
+        assert item.report_type == report_type
+        assert item.report_sub_type == report_sub_type
+        assert item.periodicity == periodicity
+        assert item.date == date
+        assert item.name == name
+        assert item.access_class == access_class
+        assert item.filename == filename
+        assert item.file_type == file_type
+        assert item.transaction_id == transaction_id
+        assert item.file_size == file_size
+        assert item.is_binary == is_binary
+        assert item.expiry_date == expiry_date
+        assert item.description == description
+
+    return inner
+
+
+def verify_report_download_request(
+    req: ReportDownloadRequest,
+    report_type: ReportType,
+    report_sub_type: ReportSubType,
+    periodicity: Periodicity,
+    name: ReportName,
+    date: Date,
+    access_class: AccessClass,
+    filename: str,
+    file_type: FileType,
+):
+    """Verify that the ReportDownloadRequest was created with the correct parameters."""
+    assert req.report_type == report_type
+    assert req.report_sub_type == report_sub_type
+    assert req.periodicity == periodicity
+    assert req.name == name
+    assert req.date == date
+    assert req.access_class == access_class
+    assert req.filename == filename
+    assert req.file_type == file_type
+
+
+def verify_outbound_data(
+    req: OutboundData, report_name: ReportName, report_type: Periodicity, date: Date, publish_time: DateTime
+):
+    """Verify that the OutboundData was created with the correct parameters."""
+    assert req.dataset_name == report_name
+    assert req.dataset_type == report_type
+    assert req.date == date
+    assert req.date_type == QueryType.TRADE
+    assert req.timezone == Timezone.JST
+    assert req.publish_time == publish_time
+
+
+def verify_bsp_resource_list_item(
+    req: BSPResourceListItem,
+    **kwargs,
+):
+    """Verify that the given BSPResourceListItem was created with the correct parameters."""
+    for field in req.model_fields.keys():
+        print(f"Field: {field}")
+        if field in kwargs:
+            assert getattr(req, field) == kwargs[field]
+        else:
+            assert getattr(req, field) is None
 
 
 def verify_award_query(req: AwardQuery, market_type: MarketType, start: DateTime, end: DateTime, **kwargs):

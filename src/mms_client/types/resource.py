@@ -16,10 +16,14 @@ from pydantic_xml import wrapped
 
 from mms_client.types.base import Payload
 from mms_client.types.enums import AreaCode
+from mms_client.types.enums import BaseLineSettingMethod
 from mms_client.types.enums import BooleanFlag
 from mms_client.types.enums import CommandMonitorMethod
+from mms_client.types.enums import ContractType
 from mms_client.types.enums import Frequency
+from mms_client.types.enums import RemainingReserveAvailability
 from mms_client.types.enums import ResourceType
+from mms_client.types.enums import SignalType
 from mms_client.types.fields import ASCII_TEXT
 from mms_client.types.fields import JAPANESE_ASCII_TEXT
 from mms_client.types.fields import JAPANESE_TEXT
@@ -170,40 +174,6 @@ class StopEventType(Enum):
     OUTPUT_SETPOINT19 = "19"
     OUTPUT_SETPOINT20 = "20"
     DISCONNECTION = "21"
-
-
-class ContractType(Enum):
-    """Describes the type of contract for a power generation unit."""
-
-    MARKET = "1"
-    MARKET_AND_POWER_SUPPLY_2 = "2"
-    POWER_SUPPLY_2 = "3"
-    ONLY_POWER_SUPPLY_1 = "4"
-    MARKET_AND_REMAINING_RESERVE_UTILIZATION = "5"
-    REMAINING_RESERVE_UTILIZATION = "6"
-
-
-class RemainingReserveAvailability(Enum):
-    """Describes the availability of remaining reserves for a power generation unit."""
-
-    NOT_AVAILABLE = "0"
-    AVAILABLE_FOR_UP_ONLY = "1"
-    AVAILABLE_FOR_DOWN_ONLY = "2"
-    AVAILABLE_FOR_UP_AND_DOWN = "3"
-
-
-class SignalType(Enum):
-    """Describes the type of signal used to monitor and command a power generation unit."""
-
-    ACTUAL_OUTPUT_ORDER = "1"
-    DIFFERENTIAL_OUTPUT_ORDER = "2"
-
-
-class BaseLineSettingMethod(Enum):
-    """Describe how the baseline is set for a power generation unit."""
-
-    PREDICTION_BASE = "1"
-    MEASUREMENT_BASE = "2"
 
 
 class ThermalType(Enum):

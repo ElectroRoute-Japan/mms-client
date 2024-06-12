@@ -23,7 +23,6 @@ from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
-from tests.testutils import code_verifier
 from tests.testutils import messages_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
@@ -44,12 +43,10 @@ def test_non_xml_received_error(mock_certificate, data_type: ResponseDataType, c
     # First, create our base client and endpoint configuration
     client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
-        "Test",
-        ClientType.BSP,
-        ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
-        RequestType.INFO,
-        None,
-        None,
+        name="Test",
+        allowed_clients=[ClientType.BSP],
+        service=ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
+        request_type=RequestType.INFO,
     )
 
     # Next, register our test response with the responses library
@@ -99,12 +96,10 @@ def test_txt_received(mock_certificate):
     # First, create our base client and endpoint configuration
     client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
-        "Test",
-        ClientType.BSP,
-        ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
-        RequestType.INFO,
-        None,
-        None,
+        name="Test",
+        allowed_clients=[ClientType.BSP],
+        service=ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
+        request_type=RequestType.INFO,
     )
 
     # Next, register our test response with the responses library
@@ -153,12 +148,10 @@ def test_request_one_response_invalid(mock_certificate):
     # First, create our base client and endpoint configuration
     client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
-        "Test",
-        ClientType.BSP,
-        ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
-        RequestType.INFO,
-        None,
-        None,
+        name="Test",
+        allowed_clients=[ClientType.BSP],
+        service=ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
+        request_type=RequestType.INFO,
     )
 
     # Next, register our test response with the responses library
@@ -201,24 +194,24 @@ def test_request_one_response_invalid(mock_certificate):
         exc_info.value.messages,
         {
             "MarketData": messages_verifier(
-                [code_verifier("Error1")],
-                [code_verifier("Warning2"), code_verifier("Warning1")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Error1"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                [code_verifier("Error1")],
-                [code_verifier("Warning2"), code_verifier("Warning1")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Error1"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData": messages_verifier(
                 [],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData.OfferStack[0]": messages_verifier(
                 [],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
         },
     )
@@ -230,12 +223,10 @@ def test_request_many_response_invalid(mock_certificate):
     # First, create our base client and endpoint configuration
     client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
     config = EndpointConfiguration(
-        "Test",
-        ClientType.BSP,
-        ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
-        RequestType.INFO,
-        None,
-        None,
+        name="Test",
+        allowed_clients=[ClientType.BSP],
+        service=ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
+        request_type=RequestType.INFO,
     )
 
     # Next, register our test response with the responses library
@@ -278,24 +269,24 @@ def test_request_many_response_invalid(mock_certificate):
         exc_info.value.messages,
         {
             "MarketData": messages_verifier(
-                [code_verifier("Error1")],
-                [code_verifier("Warning2"), code_verifier("Warning1")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Error1"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                [code_verifier("Error1")],
-                [code_verifier("Warning2"), code_verifier("Warning1")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Error1"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData[0]": messages_verifier(
                 [],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData[0].OfferStack[0]": messages_verifier(
                 [],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
         },
     )

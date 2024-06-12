@@ -1,0 +1,20 @@
+<MarketReport ApplicationType="MARKET_REPORT" ParticipantName="F100" ValidationStatus="PASSED">
+    <ProcessingStatistics TimeInMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" XmlTimeStamp="2024-03-12T11:43:37" />
+    <Messages>
+        <Warning>Warning1</Warning>
+        <Warning>Warning2</Warning>
+        <Information>Info1</Information>
+        <Information>Info2</Information>
+    </Messages>
+    <ReportCreateRequest ReportName="BSP_ResourceList" BSPName="F100" ReportType="REGISTRATION" ReportSubType="RESOURCE" Periodicity="ON_DEMAND" Date="2024-04-12" ValidationStatus="PASSED">
+        <Messages>
+            <Warning>Warning1</Warning>
+            <Warning>Warning2</Warning>
+            <Information>Info1</Information>
+            <Information>Info2</Information>
+            <Information>Successfully logged request for Report BSP_ResourceList. Please use transaction ID derpderp for further reference.</Information>
+        </Messages>
+        <Param Name="START_TIME" Value="2024-04-12T00:00:00"/>
+        <Param Name="END_TIME" Value="2024-04-13T00:00:00"/>
+    </ReportCreateRequest>
+</MarketReport>

@@ -53,14 +53,11 @@ class ServiceConfiguration:
 
 
 @dataclass
-class EndpointConfiguration(Generic[E, P]):
+class EndpointConfiguration(Generic[E, P]):  # pylint: disable=too-many-instance-attributes
     """Configuration for an endpoint on the MMS server."""
 
     # The name of the endpoint
     name: str
-
-    # The allowed client types for the endpoint
-    allowed_clients: Optional[List[ClientType]]
 
     # The service for the endpoint
     service: ServiceConfiguration
@@ -68,11 +65,21 @@ class EndpointConfiguration(Generic[E, P]):
     # The type of request to submit to the MMS server
     request_type: RequestType
 
+    # The allowed client types for the endpoint
+    allowed_clients: Optional[List[ClientType]] = None
+
     # The type of payload to expect in the response
-    response_envelope_type: Optional[Type[E]]
+    response_envelope_type: Optional[Type[E]] = None
 
     # The type of data to expect in the response
-    response_data_type: Optional[Type[P]]
+    response_data_type: Optional[Type[P]] = None
+
+    # Whether the endpoint is for a report request
+    for_report: bool = False
+
+    # An optional serializer used to deserialize the response data for the service. This is only used for report
+    # requests because they have a separate XSD file for responses.
+    serializer: Optional[Serializer] = None
 
 
 class ClientProto(Protocol):
@@ -132,14 +139,7 @@ class ClientProto(Protocol):
         """
 
 
-def mms_endpoint(
-    name: str,
-    service: ServiceConfiguration,
-    request_type: RequestType,
-    allowed_clients: Optional[List[ClientType]] = None,
-    resp_envelope_type: Optional[Type[E]] = None,
-    resp_data_type: Optional[Type[P]] = None,
-):
+def mms_endpoint(**kwargs):
     """Create a decorator for an MMS endpoint.
 
     This decorator is used to mark a method as an MMS endpoint. It will add the endpoint configuration to the function
@@ -152,13 +152,16 @@ def mms_endpoint(
     request_type (RequestType):         The type of request to submit to the MMS server.
     allowed_clients (List[ClientType]): The types of clients that are allowed to access the endpoint. If this is not
                                         provided, then any client will be allowed.
-    resp_envelope_type (Type[E]):       The type of payload to expect in the response. If this is not provided, then the
+    response_envelope_type (Type[E]):   The type of payload to expect in the response. If this is not provided, then the
                                         response envelope will be assumed to have the same type as the request envelope.
-    resp_data_type (Type[P]):           The type of data to expect in the response. If this is not provided, then the
+    response_data_type (Type[P]):       The type of data to expect in the response. If this is not provided, then the
                                         response data will be assumed to have the same type as the request data.
+    for_report (bool):                  If True, the endpoint is for a report request.
+    serializer (Serializer):            The serializer to use for responses from the endpoint. Overrides the default
+                                        serializer for the service.
     """
     # First, create the endpoint configuration from the given parameters
-    config = EndpointConfiguration(name, allowed_clients, service, request_type, resp_envelope_type, resp_data_type)
+    config = EndpointConfiguration(**kwargs)
 
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
@@ -169,10 +172,18 @@ def mms_endpoint(
             self.verify_audience(config)
 
             # Next, call the wrapped function to get the envelope
-            envelope = func(self, *args, **kwargs)
+            result = func(self, *args, **kwargs)
+            if isinstance(result, tuple):
+                envelope, callback = result
+            else:
+                envelope, callback = result, None
 
             # Now, submit the request to the MMS server and get the response
-            resp, _ = self.request_one(envelope, args[0], config)
+            resp, attachments = self.request_one(envelope, args[0], config)
+
+            # Call the callback function if it was provided
+            if callback:
+                callback(resp, attachments)
 
             # Finally, extract the data from the response and return it
             logger.info(f"{config.name}: Returning {type(resp.data).__name__} data.")
@@ -184,14 +195,7 @@ def mms_endpoint(
     return decorator
 
 
-def mms_multi_endpoint(
-    name: str,
-    service: ServiceConfiguration,
-    request_type: RequestType,
-    allowed_clients: Optional[List[ClientType]] = None,
-    resp_envelope_type: Optional[Type[E]] = None,
-    resp_data_type: Optional[Type[P]] = None,
-):
+def mms_multi_endpoint(**kwargs):
     """Create a decorator for an MMS multi-response endpoint.
 
     This decorator is used to mark a method as an MMS multi-response endpoint. It will add the endpoint configuration to
@@ -205,17 +209,20 @@ def mms_multi_endpoint(
     request_type (RequestType):         The type of request to submit to the MMS server.
     allowed_clients (List[ClientType]): The types of clients that are allowed to access the endpoint. If this is not
                                         provided, then any client will be allowed.
-    resp_envelope_type (Type[E]):       The type of payload to expect in the response. If this is not provided, then
+    response_envelope_type (Type[E]):   The type of payload to expect in the response. If this is not provided, then
                                         the response envelope will be assumed to have the same type as the request
                                         envelope.
-    resp_data_type (Type[P]):           The type of data to expect in the response. If this is not provided, then the
+    response_data_type (Type[P]):       The type of data to expect in the response. If this is not provided, then the
                                         response data will be assumed to have the same type as the request data. Note,
                                         that this is not intended to account for the expected sequence type of the
                                         response data. That is already handled in the wrapped function, so this should
                                         only be set if the inner data type being returned differs from what was sent.
+    for_report (bool):                  If True, the endpoint is for a report request.
+    serializer (Serializer):            The serializer to use for responses from the endpoint. Overrides the default
+                                        serializer for the service.
     """
     # First, create the endpoint configuration from the given parameters
-    config = EndpointConfiguration(name, allowed_clients, service, request_type, resp_envelope_type, resp_data_type)
+    config = EndpointConfiguration(**kwargs)
 
     # Next, create a decorator that will add the endpoint configuration to the function
     def decorator(func):
@@ -226,10 +233,18 @@ def mms_multi_endpoint(
             self.verify_audience(config)
 
             # Next, call the wrapped function to get the envelope
-            envelope = func(self, *args, **kwargs)
+            result = func(self, *args, **kwargs)
+            if isinstance(result, tuple):
+                envelope, callback = result  # pragma: no cover
+            else:
+                envelope, callback = result, None
 
             # Now, submit the request to the MMS server and get the response
-            resp, _ = self.request_many(envelope, args[0], config)
+            resp, attachments = self.request_many(envelope, args[0], config)
+
+            # Call the callback function if it was provided
+            if callback:
+                callback(resp, attachments)  # pragma: no cover
 
             # Finally, extract the data from the response and return it
             logger.info(f"{config.name}: Returning {len(resp.data)} item(s).")
@@ -341,7 +356,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             f"{config.name}: Starting request. Envelope: {type(envelope).__name__}, Data: {type(payload).__name__}",
         )
         request = self._to_mms_request(
-            wrapper, config.request_type, config.service.serializer.serialize(envelope, payload)
+            wrapper, config.request_type, config.service.serializer.serialize(envelope, payload, config.for_report)
         )
 
         # Next, submit the request to the MMS server and get and verify the response.
@@ -354,7 +369,8 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
         data_type = config.response_data_type or type(payload)
-        data: Response[E, P] = config.service.serializer.deserialize(resp.payload, envelope_type, data_type)
+        deserializer = config.serializer or config.service.serializer
+        data: Response[E, P] = deserializer.deserialize(resp.payload, envelope_type, data_type, config.for_report)
         self._verify_response(data, config)
 
         # Return the response data and any attachments
@@ -391,9 +407,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             ),
         )
         serialized = (
-            config.service.serializer.serialize_multi(envelope, payload, data_type)  # type: ignore[arg-type]
+            config.service.serializer.serialize_multi(
+                envelope, payload, data_type, config.for_report  # type: ignore[arg-type]
+            )
             if is_list
-            else config.service.serializer.serialize(envelope, payload)  # type: ignore[type-var]
+            else config.service.serializer.serialize(envelope, payload, config.for_report)  # type: ignore[type-var]
         )
         request = self._to_mms_request(wrapper, config.request_type, serialized)
 
@@ -407,10 +425,12 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         # Finally, deserialize and verify the response
         envelope_type = config.response_envelope_type or type(envelope)
         data_type = config.response_data_type or data_type
-        data: MultiResponse[E, P] = config.service.serializer.deserialize_multi(
+        deserializer = config.serializer or config.service.serializer
+        data: MultiResponse[E, P] = deserializer.deserialize_multi(
             resp.payload,
             envelope_type,
             data_type,  # type: ignore[arg-type]
+            config.for_report,
         )
         self._verify_multi_response(data, config)
 
@@ -574,18 +594,18 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         Returns:    True to indicate that the response is valid, False otherwise.
         """
         # Log the request's processing statistics
-        logger.info(
-            f"{config.name} ({resp.statistics.timestamp_xml}): Recieved {resp.statistics.received}, "
-            f"Valid: {resp.statistics.valid}, Invalid: {resp.statistics.invalid}, "
-            f"Successful: {resp.statistics.successful}, Unsuccessful: {resp.statistics.unsuccessful} "
-            f"in {resp.statistics.time_ms}ms"
-        )
+        if resp.statistics is not None:
+            logger.info(
+                f"{config.name} ({resp.statistics.timestamp_xml}): Recieved {resp.statistics.received}, "
+                f"Valid: {resp.statistics.valid}, Invalid: {resp.statistics.invalid}, "
+                f"Successful: {resp.statistics.successful}, Unsuccessful: {resp.statistics.unsuccessful} "
+                f"in {resp.statistics.time_ms}ms"
+            )
 
         # Check if the response is invalid and if the envelope had any validation issues. If not, then we have a
         # valid base response so return True. Otherwise, return False.
-        return resp.statistics.invalid == 0 and self._verify_response_common(
-            config, type(resp.envelope), resp.envelope_validation
-        )
+        is_invalid = resp.statistics is not None and resp.statistics.invalid
+        return not is_invalid and self._verify_response_common(config, type(resp.envelope), resp.envelope_validation)
 
     def _verify_messages(self, config: EndpointConfiguration, resp: BaseResponse[E]) -> None:
         """Verify the messages in the given response.
@@ -595,12 +615,12 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         resp (BaseResponse):            The response to verify.
         """
         for path, messages in resp.messages.items():
-            for info in messages.information:
-                logger.info(f"{config.name} - {path}: {info.code}")
-            for warning in messages.warnings:
-                logger.warning(f"{config.name} - {path}: {warning.code}")
-            for error in messages.errors:
-                logger.error(f"{config.name} - {path}: {error.code}")
+            for info in messages.information:  # type: ignore[union-attr]
+                logger.info(f"{config.name} - {path}: {info}")
+            for warning in messages.warnings:  # type: ignore[union-attr]
+                logger.warning(f"{config.name} - {path}: {warning}")
+            for error in messages.errors:  # type: ignore[union-attr]
+                logger.error(f"{config.name} - {path}: {error}")
 
     def _verify_response_common(
         self, config: EndpointConfiguration, payload_type: type, resp: ResponseCommon, index: Optional[int] = None

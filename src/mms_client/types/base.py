@@ -8,10 +8,12 @@ from typing import List
 from typing import Optional
 from typing import TypeVar
 
+from lxml.etree import _Element as Element
 from pydantic import PrivateAttr
 from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import BaseXmlModel
 from pydantic_xml import attr
+from pydantic_xml import computed_element
 from pydantic_xml import element
 
 from mms_client.types.fields import transaction_id
@@ -34,17 +36,48 @@ class Message(BaseXmlModel):
     code: str = attr(default="", name="Code", min_length=2, max_length=50, pattern=r"^[a-zA-Z_0-9\-]*$")
 
 
-class Messages(BaseXmlModel, search_mode="unordered"):
+class Messages(BaseXmlModel, search_mode="unordered", arbitrary_types_allowed=True):
     """Represents a collection of messages returned with a payload."""
 
-    # A list of information messages returned with a payload
-    information: List[Message] = element(default=[], tag="Information", nillable=True)
+    # The raw information messages returned with a payload
+    information_raw: List[Element] = element(default=[], tag="Information", nillable=True, exclude=True)
 
-    # A list of warning messages returned with a payload
-    warnings: List[Message] = element(default=[], tag="Warning", nillable=True)
+    # The raw warning messages returned with a payload
+    warnings_raw: List[Element] = element(default=[], tag="Warning", nillable=True, exclude=True)
 
-    # A list of error messages returned with a payload
-    errors: List[Message] = element(default=[], tag="Error", nillable=True)
+    # The raw error messages returned with a payload
+    errors_raw: List[Element] = element(default=[], tag="Error", nillable=True, exclude=True)
+
+    @computed_element
+    def information(self) -> List[str]:
+        """Return the information messages."""
+        return self._parse_messages(self.information_raw)
+
+    @computed_element
+    def warnings(self) -> List[str]:
+        """Return the warning messages."""
+        return self._parse_messages(self.warnings_raw)
+
+    @computed_element
+    def errors(self) -> List[str]:
+        """Return the error messages."""
+        return self._parse_messages(self.errors_raw)
+
+    def _parse_messages(self, raw: List[Element]) -> List[str]:
+        """Parse the messages from the XML tree.
+
+        Arguments:
+        raw (List[Element]): The raw XML tree to parse.
+
+        Returns:    A list of message codes.
+        """
+        messages = []
+        for item in raw:
+            if message := item.attrib.get("Code"):
+                messages.append(message)
+            else:
+                messages.append(item.text or "")
+        return messages
 
 
 class ProcessingStatistics(BaseXmlModel):
@@ -87,7 +120,16 @@ class ResponseCommon(BaseXmlModel, search_mode="unordered"):
 
     # The status of the validation check done on the element. This field is not required for requests, and will be
     # populated in responses. For responses, the default value is "NOT_DONE".
-    validation: ValidationStatus = attr(default=ValidationStatus.NOT_DONE, name="Validation")
+    base_validation: Optional[ValidationStatus] = attr(default=None, name="Validation")
+
+    # The status of the validation check done on the element, specifically for reports. This field is not required for
+    # requests, and will be populated in responses. For responses, the default value is "NOT_DONE".
+    report_validation: Optional[ValidationStatus] = attr(default=None, name="ValidationStatus")
+
+    @property
+    def validation(self) -> ValidationStatus:
+        """Return the validation status of the element."""
+        return self.base_validation or self.report_validation or ValidationStatus.NOT_DONE
 
 
 class Payload(BaseXmlModel, search_mode="unordered"):
@@ -111,6 +153,7 @@ class SchemaType(Enum):
 
     MARKET = "mi-market.xsd"
     REPORT = "mi-report.xsd"
+    REPORT_RESPONSE = "mi-outbnd-reports.xsd"
     REGISTRATION = "mpr.xsd"
     OMI = "omi.xsd"
 
@@ -124,7 +167,7 @@ class BaseResponse(BaseXmlModel, Generic[E], tag="BaseResponse"):
 
     # The processing statistics returned with the payload. This will not be present in requests, and will be populated
     # in responses.
-    statistics: ProcessingStatistics = element(tag="ProcessingStatistics")
+    statistics: Optional[ProcessingStatistics] = element(default=None, tag="ProcessingStatistics")
 
     # The request payload, containing the request data
     _envelope: E = PrivateAttr()

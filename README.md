@@ -187,6 +187,9 @@ This client is not complete. Currently, it supports the following endpoints:
 - MarketQuery_AwardResultsQuery
 - RegistrationSubmit_Resource
 - RegistrationQuery_Resource
+- ReportCreateRequest
+- ReportDownloadRequestTrnID
+- BSP_ResourceList
 
 We can add support for additional endpoints as time goes on, and independent contribution is, of course, welcome. However, support for attachments is currently limited because none of the endpoints we support currently require them. We have implemented attachment support up to the client level, but we haven't developed an architecture for submitting them through an endpoint yet.
 

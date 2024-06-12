@@ -53,12 +53,46 @@ class ResourceType(Enum):
     VPP_DEM = "07"
 
 
+class RemainingReserveAvailability(Enum):
+    """Describes the availability of remaining reserves for a power generation unit."""
+
+    NOT_AVAILABLE = "0"
+    AVAILABLE_FOR_UP_ONLY = "1"
+    AVAILABLE_FOR_DOWN_ONLY = "2"
+    AVAILABLE_FOR_UP_AND_DOWN = "3"
+
+
+class ContractType(Enum):
+    """Describes the type of contract for a power generation unit."""
+
+    MARKET = "1"
+    MARKET_AND_POWER_SUPPLY_2 = "2"
+    POWER_SUPPLY_2 = "3"
+    ONLY_POWER_SUPPLY_1 = "4"
+    MARKET_AND_REMAINING_RESERVE_UTILIZATION = "5"
+    REMAINING_RESERVE_UTILIZATION = "6"
+
+
 class CommandMonitorMethod(Enum):
     """Describes how the power generation unit is monitored and commanded."""
 
     DEDICATED_LINE = "1"
     SIMPLE_COMMAND = "2"
     OFFLINE = "3"
+
+
+class BaseLineSettingMethod(Enum):
+    """Describe how the baseline is set for a power generation unit."""
+
+    PREDICTION_BASE = "1"
+    MEASUREMENT_BASE = "2"
+
+
+class SignalType(Enum):
+    """Describes the type of signal used to monitor and command a power generation unit."""
+
+    ACTUAL_OUTPUT_ORDER = "1"
+    DIFFERENTIAL_OUTPUT_ORDER = "2"
 
 
 class BooleanFlag(Enum):

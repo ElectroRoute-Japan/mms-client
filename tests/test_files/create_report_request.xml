@@ -1,0 +1,4 @@
+<ReportCreateRequest ReportType="REGISTRATION" ReportSubType="RESOURCE" Periodicity="ON_DEMAND" ReportName="BSP_ResourceList" Date="2024-04-12" BSPName="F100">
+    <Param Name="START_TIME" Value="2024-04-12T00:00:00"/>
+    <Param Name="END_TIME" Value="2024-04-13T00:00:00"/>
+</ReportCreateRequest>

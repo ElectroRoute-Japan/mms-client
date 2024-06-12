@@ -1,0 +1,3 @@
+<MarketReport ApplicationType="MARKET_REPORT" ParticipantName="F100">
+    <ReportDownloadRequestTrnID TransactionId="derpderp"></ReportDownloadRequestTrnID>
+</MarketReport>
