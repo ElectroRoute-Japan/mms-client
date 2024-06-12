@@ -263,7 +263,7 @@ class NewReportRequest(ReportMetadata, tag="ReportCreateRequest"):
     """
 
     # The name of the BSP for which the report is being created
-    bsp_name: str = participant("BSPName")
+    bsp_name: Optional[str] = participant("BSPName", True)
 
     # Parameters to be use when configuring the report
     parameters: List[Parameter] = element(tag="Param", max_length=5)

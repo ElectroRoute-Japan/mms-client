@@ -93,6 +93,10 @@ class ClientProto(Protocol):
     def user(self) -> str:
         """Return the user name of the person making the request."""
 
+    @property
+    def client_type(self) -> ClientType:
+        """Return the type of client to use for making requests to the MMS server."""
+
     def verify_audience(self, config: EndpointConfiguration) -> None:
         """Verify that the client type is allowed.
 
@@ -313,6 +317,11 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
     def user(self) -> str:
         """Return the user name of the person making the request."""
         return self._user
+
+    @property
+    def client_type(self) -> ClientType:
+        """Return the type of client to use for making requests to the MMS server."""
+        return self._client_type
 
     def verify_audience(self, config: EndpointConfiguration) -> None:
         """Verify that the client type is allowed.

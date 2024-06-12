@@ -1,6 +1,5 @@
 """Contains the client layer for making report requests to the MMS server."""
 
-from datetime import date as Date
 from logging import getLogger
 from typing import Dict
 from typing import List
@@ -14,18 +13,14 @@ from mms_client.services.base import mms_multi_endpoint
 from mms_client.types.base import Response
 from mms_client.types.report import ApplicationType
 from mms_client.types.report import BSPResourceListItem
+from mms_client.types.report import ListReportRequest
+from mms_client.types.report import ListReportResponse
 from mms_client.types.report import NewReportRequest
 from mms_client.types.report import NewReportResponse
 from mms_client.types.report import OutboundData
-from mms_client.types.report import Parameter
-from mms_client.types.report import ParameterName
-from mms_client.types.report import Periodicity
 from mms_client.types.report import ReportBase
 from mms_client.types.report import ReportDownloadRequestTrnID
 from mms_client.types.report import ReportLineBase
-from mms_client.types.report import ReportName
-from mms_client.types.report import ReportSubType
-from mms_client.types.report import ReportType
 from mms_client.types.transport import RequestType
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
@@ -125,8 +120,9 @@ class ReportClientMixin:  # pylint: disable=unused-argument
 
         Returns:    The request to create the report.
         """
-        # Attach the participant ID to the request
-        request.bsp_name = self.participant
+        # If the client type is BSP, then we can't set the BSP name
+        if self.client_type == ClientType.BSP:
+            request.bsp_name = None
 
         # NOTE: The return type does not match the method definition but the decorator will return the correct type
         # Return the envelope and the callback function
@@ -138,34 +134,28 @@ class ReportClientMixin:  # pylint: disable=unused-argument
             attach_transaction_id,
         )
 
-    # Define the individual report getter functions here
-    _get_bsp_resources_request = report_getter_factory(config, BSPResourceListItem, [ClientType.BSP])
-
-    def list_bsp_resources(self, start: Date, end: Date) -> List[BSPResourceListItem]:
-        """Create a new report request for a list of BSP resources.
-
-        This report should only be used by BSPs.
+    @mms_endpoint(
+        name="ReportListRequest",
+        service=config,
+        request_type=RequestType.REPORT,
+        response_envelope_type=ReportBase,
+        response_data_type=ListReportResponse,
+        for_report=True,
+    )
+    def list_reports(self: ClientProto, request: ListReportRequest) -> ListReportResponse:
+        """Query the existing reports.
 
         Arguments:
-        start (Date):   The start date of the report.
-        end (Date):     The end date of the report.
+        request (ListReportRequest): The request to query the reports.
 
-        Returns:    The request to create the report.
+        Returns:    A list of reports that match the query.
         """
-        report: NewReportResponse = self.create_report(
-            NewReportRequest(
-                bsp_name="D001",  # NOTE: This is a dummy value and will be overwritten by the endpoint
-                report_type=ReportType.REGISTRATION,
-                report_sub_type=ReportSubType.RESOURCES,
-                periodicity=Periodicity.ON_DEMAND,
-                name=ReportName.BSP_RESOURCE_LIST,
-                date=Date.today(),
-                parameters=[
-                    Parameter(name=ParameterName.START_TIME, value=f"{start.isoformat()}T00:00:00"),
-                    Parameter(name=ParameterName.END_TIME, value=f"{end.isoformat()}T00:00:00"),
-                ],
-            )
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        # Return the envelope and the callback function
+        return ReportBase(  # type: ignore[return-value]
+            application_type=ApplicationType.MARKET_REPORT,
+            participant=self.participant,
         )
-        return self._get_bsp_resources_request(
-            ReportDownloadRequestTrnID(transaction_id=report.transaction_id)  # pylint: disable=no-member
-        )
+
+    # Define the individual report getter functions here
+    list_bsp_resources = report_getter_factory(config, BSPResourceListItem, [ClientType.BSP])

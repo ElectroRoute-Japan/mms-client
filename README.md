@@ -188,6 +188,7 @@ This client is not complete. Currently, it supports the following endpoints:
 - RegistrationSubmit_Resource
 - RegistrationQuery_Resource
 - ReportCreateRequest
+- ReportListRequest
 - ReportDownloadRequestTrnID
 - BSP_ResourceList
 

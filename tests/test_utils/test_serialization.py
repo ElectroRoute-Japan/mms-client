@@ -139,7 +139,6 @@ def test_serialize_report():
     """Test that the Serializer class serializes report data as we expect."""
     # First, create a new report request
     create_request = NewReportRequest(
-        bsp_name="F100",
         report_type=ReportType.REGISTRATION,
         report_sub_type=ReportSubType.RESOURCES,
         periodicity=Periodicity.ON_DEMAND,
@@ -147,7 +146,7 @@ def test_serialize_report():
         date=Date(2024, 4, 12),
         parameters=[
             Parameter(name=ParameterName.START_TIME, value="2024-04-12T00:00:00"),
-            Parameter(name=ParameterName.END_TIME, value="2024-04-13T00:00:00"),
+            Parameter(name=ParameterName.END_TIME, value="2024-04-12T23:59:59"),
         ],
     )
 
