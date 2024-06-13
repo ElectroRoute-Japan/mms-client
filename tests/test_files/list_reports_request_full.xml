@@ -1,0 +1,3 @@
+<MarketReport ApplicationType="MARKET_REPORT" ParticipantName="F100">
+    <ReportListRequest Date="2024-04-12" Periodicity="ON_DEMAND" ReportName="BSP_ResourceList" ReportSubType="RESOURCE" ReportType="REGISTRATION"></ReportListRequest>
+</MarketReport>

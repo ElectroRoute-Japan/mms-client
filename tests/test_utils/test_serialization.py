@@ -16,16 +16,28 @@ from mms_client.types.offer import Direction
 from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferStack
+from mms_client.types.report import ApplicationType
+from mms_client.types.report import NewReportRequest
+from mms_client.types.report import NewReportResponse
+from mms_client.types.report import Parameter
+from mms_client.types.report import ParameterName
+from mms_client.types.report import Periodicity
+from mms_client.types.report import ReportBase
+from mms_client.types.report import ReportName
+from mms_client.types.report import ReportSubType
+from mms_client.types.report import ReportType
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
-from tests.testutils import code_verifier
 from tests.testutils import messages_verifier
 from tests.testutils import offer_stack_verifier
+from tests.testutils import parameter_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
 from tests.testutils import verify_market_submit
 from tests.testutils import verify_messages
 from tests.testutils import verify_offer_data
+from tests.testutils import verify_report_base
+from tests.testutils import verify_report_create_request
 
 
 def test_serialize_data():
@@ -68,6 +80,7 @@ def test_serialize_data():
         days=1,
     )
 
+    # Now, create a serializer and serialize the request
     serializer = Serializer(SchemaType.MARKET, "MarketData")
     data = serializer.serialize(request, offer)
 
@@ -120,6 +133,35 @@ def test_serialize_multi_data():
 
     # Finally, verify that the request was serialized as we expect
     assert data.decode("UTF-8") == read_request_file("serialization_2.xml")
+
+
+def test_serialize_report():
+    """Test that the Serializer class serializes report data as we expect."""
+    # First, create a new report request
+    create_request = NewReportRequest(
+        report_type=ReportType.REGISTRATION,
+        report_sub_type=ReportSubType.RESOURCES,
+        periodicity=Periodicity.ON_DEMAND,
+        name=ReportName.BSP_RESOURCE_LIST,
+        date=Date(2024, 4, 12),
+        parameters=[
+            Parameter(name=ParameterName.START_TIME, value="2024-04-12T00:00:00"),
+            Parameter(name=ParameterName.END_TIME, value="2024-04-12T23:59:59"),
+        ],
+    )
+
+    # Next, create a new report envelope
+    market_data = ReportBase(
+        application_type=ApplicationType.MARKET_REPORT,
+        participant="F100",
+    )
+
+    # Now, create a serializer and serialize the request
+    serializer = Serializer(SchemaType.REPORT, "MarketReport")
+    data = serializer.serialize(market_data, create_request, True)
+
+    # Finally, verify that the request was serialized as we expect
+    assert data.decode("UTF-8") == read_request_file("create_report_request_full.xml")
 
 
 def test_deserialize_payload_key_invalid():
@@ -193,24 +235,24 @@ def test_deserialize_works():
         resp.messages,
         {
             "MarketData": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData.OfferStack[0]": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
         },
     )
@@ -235,14 +277,60 @@ def test_deserialize_no_data_works():
         resp.messages,
         {
             "MarketData": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
+            ),
+        },
+    )
+
+
+def test_deserialize_report_works():
+    """Test that the deserialize method of the Serializer class works as expected."""
+    # First, create our test XML payload
+    raw = read_file("create_report_response_full.xml")
+
+    # Next, attempt to deserialize the payload as a report create request
+    resp = Serializer(SchemaType.REPORT, "MarketReport").deserialize(raw, ReportBase, NewReportResponse, True)
+
+    # Finally, verify that the response is as we expect
+    verify_report_base(resp.envelope, ApplicationType.MARKET_REPORT, "F100")
+    verify_response_common(resp.envelope_validation, True, ValidationStatus.PASSED)
+    verify_report_create_request(
+        resp.data,
+        ReportType.REGISTRATION,
+        ReportSubType.RESOURCES,
+        Periodicity.ON_DEMAND,
+        ReportName.BSP_RESOURCE_LIST,
+        Date(2024, 4, 12),
+        bsp_name="F100",
+        verifiers=[
+            parameter_verifier(ParameterName.START_TIME, "2024-04-12T00:00:00"),
+            parameter_verifier(ParameterName.END_TIME, "2024-04-13T00:00:00"),
+        ],
+    )
+    verify_response_common(resp.payload.data_validation, True, ValidationStatus.PASSED)
+    verify_messages(
+        resp.messages,
+        {
+            "MarketReport": messages_verifier(
+                [],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
+            ),
+            "MarketReport.ReportCreateRequest": messages_verifier(
+                [],
+                ["Warning1", "Warning2"],
+                [
+                    "Info1",
+                    "Info2",
+                    "Successfully logged request for Report BSP_ResourceList. Please use transaction ID derpderp for further reference.",
+                ],
             ),
         },
     )
@@ -320,24 +408,24 @@ def test_deserialize_multi_works():
         resp.messages,
         {
             "MarketData": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData[0]": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit.OfferData[0].OfferStack[0]": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
         },
     )
@@ -362,14 +450,14 @@ def test_deserialize_multi_no_data_works():
         resp.messages,
         {
             "MarketData": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                [code_verifier("ErrorCode1"), code_verifier("ErrorCode2")],
-                [code_verifier("Warning1"), code_verifier("Warning2")],
-                [code_verifier("Info1"), code_verifier("Info2")],
+                ["ErrorCode1", "ErrorCode2"],
+                ["Warning1", "Warning2"],
+                ["Info1", "Info2"],
             ),
         },
     )

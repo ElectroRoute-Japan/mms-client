@@ -1,0 +1,6 @@
+<MarketReport ApplicationType="MARKET_REPORT" ParticipantName="F100">
+    <ReportCreateRequest Date="2024-04-12" Periodicity="ON_DEMAND" ReportName="BSP_ResourceList" ReportSubType="RESOURCE" ReportType="REGISTRATION">
+        <Param Name="START_TIME" Value="2024-04-12T00:00:00"></Param>
+        <Param Name="END_TIME" Value="2024-04-12T23:59:59"></Param>
+    </ReportCreateRequest>
+</MarketReport>

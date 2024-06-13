@@ -1,0 +1,46 @@
+<MarketReport ApplicationType="MARKET_REPORT" ParticipantName="F100" ValidationStatus="PASSED">
+    <ProcessingStatistics TimeInMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 12 11:43:37 JST 2024" XmlTimeStamp="2024-03-12T11:43:37" />
+    <Messages>
+        <Warning>Warning1</Warning>
+        <Warning>Warning2</Warning>
+        <Information>Info1</Information>
+        <Information>Info2</Information>
+    </Messages>
+    <ReportListRequest Date="2024-04-12" Periodicity="ON_DEMAND" ReportName="BSP_ResourceList" ReportSubType="RESOURCE" ReportType="REGISTRATION" ValidationStatus="PASSED">
+        <Messages>
+            <Warning>Warning1</Warning>
+            <Warning>Warning2</Warning>
+            <Information>Info1</Information>
+            <Information>Info2</Information>
+        </Messages>
+        <ReportListResponse>
+            <Messages>
+                <Warning>Warning1</Warning>
+                <Warning>Warning2</Warning>
+                <Information>Info1</Information>
+                <Information>Info2</Information>
+            </Messages>
+            <ReportItem
+                 ReportType="REGISTRATION"
+                 ReportSubType="RESOURCE"
+                 Periodicity="ON_DEMAND"
+                 Date="2024-04-12"
+                 ReportName="BSP_ResourceList"
+                 AccessClass="BSP"
+                 FileName="BSP_ResourceList_F100_202404121011.xml"
+                 FileType="XML"
+                 TransactionId="derpderp"
+                 FileSize="981"
+                 BinaryFile="true"
+                 ExpiryDate="2024-04-14"
+                 Description="OND_0023b Resource List for BSP">
+                <Messages>
+                    <Warning>Warning1</Warning>
+                    <Warning>Warning2</Warning>
+                    <Information>Info1</Information>
+                    <Information>Info2</Information>
+                </Messages>
+            </ReportItem>
+        </ReportListResponse>
+    </ReportListRequest>
+</MarketReport>

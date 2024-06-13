@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mms_client"
-version = "v1.7.0"
+version = "v1.8.0"
 description = "API client for accessing the MMS"
 authors = ["Ryan Wood <ryan.wood@electroroute.co.jp>"]
 readme = "README.md"
@@ -33,6 +33,7 @@ pydantic-xml = "^2.9.0"
 lxml = "^5.1.0"
 backoff = "^2.2.1"
 pycryptodomex = "^3.20.0"
+pydantic-extra-types = "^2.7.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.2.0"
@@ -49,7 +50,6 @@ pytest-mock = "^3.12.0"
 mock = "^5.1.0"
 lxml-stubs = "^0.5.1"
 pyfakefs = "^5.3.5"
-pydantic-extra-types = "^2.6.0"
 responses = "^0.25.0"
 types-urllib3 = "^1.26.25.14"
 

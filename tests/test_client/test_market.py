@@ -134,7 +134,7 @@ def test_put_offer_works(mock_certificate):
 
     # Register our test response with the responses library
     register_mms_request(
-        RequestType.INFO,
+        RequestType.MARKET,
         (
             "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
             "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
@@ -211,7 +211,7 @@ def test_put_offers_works(mock_certificate):
 
     # Register our test response with the responses library
     register_mms_request(
-        RequestType.INFO,
+        RequestType.MARKET,
         (
             "z+shp4QJ9WmJG4tmB7FzYVu4TW8QclIF8n9Pp+VIu7Y/O/aySb0M6e4KGKuZrpy4eNiG1hPfM4nL6QXcgXoQFcsLMKyenYVyqW6kJOx9g"
             "uOiVWXlzbK/4d3pjaDR8RbEtEfJNGutAZ94G3rGnmfxg7EMLkOR3MpELZvbdZ0q+uYIeMaqD00jKHnUbF6qdTQO7grvLKaoJK6YODyqZB"
@@ -261,7 +261,7 @@ def test_query_offers_works(mock_certificate):
 
     # Register our test response with the responses library
     register_mms_request(
-        RequestType.INFO,
+        RequestType.MARKET,
         (
             "eBki+iSH6OaDGQSRkB6unDPyDxqMnpmZravPSYLztpaYqc1L8Zxx4ZcPFVbM2BJZ3CbKCw4urcRDsCA+4p5Lnx0BwCtCWCknFfrPyJfkg"
             "/VHixX2GJygyCzfY39Ysm3Lor8a5m5VjVukhiYG8roTE55wqivEzYX6mBDxSWSKx697c0Kmfy6lsIZaALxdLWMEnZwSgf4i/nSWdqaqFc"
@@ -339,7 +339,7 @@ def test_cancel_offer_works(mock_certificate):
 
     # Register our test response with the responses library
     register_mms_request(
-        RequestType.INFO,
+        RequestType.MARKET,
         (
             "y1QlSIDeZjY21o00JTxT1HDJYbrNZExq1ZeM/O5dx3hDW9LA3dL9fAKEy/Pfkj2MzmP+f2/hwp7lSBkHhvrD9j/3D0jeTkv4sRVe7WQO6"
             "WybDwcN7uMDta2KHUkxO+i85KIUuEX4zKMm8JDwMjyXsiKZQ7zercRpjmqm9oWnli8rQkfh1E0KPirayKErSccmZJWkrIiVkWpzsJGOl2"

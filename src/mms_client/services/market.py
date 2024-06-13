@@ -37,11 +37,11 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData"))
 
     @mms_endpoint(
-        "MarketQuery_ReserveRequirementQuery",
-        config,
-        RequestType.INFO,
-        resp_envelope_type=MarketSubmit,
-        resp_data_type=ReserveRequirement,
+        name="MarketQuery_ReserveRequirementQuery",
+        service=config,
+        request_type=RequestType.INFO,
+        response_envelope_type=MarketSubmit,
+        response_data_type=ReserveRequirement,
     )
     def query_reserve_requirements(
         self: ClientProto, request: ReserveRequirementQuery, days: int, date: Optional[Date] = None
@@ -66,7 +66,9 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, [ClientType.BSP])
+    @mms_endpoint(
+        name="MarketSubmit_OfferData", service=config, request_type=RequestType.MARKET, allowed_clients=[ClientType.BSP]
+    )
     def put_offer(
         self: ClientProto, request: OfferData, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> OfferData:
@@ -92,7 +94,9 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_multi_endpoint("MarketSubmit_OfferData", config, RequestType.INFO, [ClientType.BSP])
+    @mms_multi_endpoint(
+        name="MarketSubmit_OfferData", service=config, request_type=RequestType.MARKET, allowed_clients=[ClientType.BSP]
+    )
     def put_offers(
         self: ClientProto, requests: List[OfferData], market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> List[OfferData]:
@@ -119,7 +123,11 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         )
 
     @mms_multi_endpoint(
-        "MarketQuery_OfferQuery", config, RequestType.INFO, resp_envelope_type=MarketSubmit, resp_data_type=OfferData
+        name="MarketQuery_OfferQuery",
+        service=config,
+        request_type=RequestType.MARKET,
+        response_envelope_type=MarketSubmit,
+        response_data_type=OfferData,
     )
     def query_offers(self: ClientProto, request: OfferQuery, days: int, date: Optional[Date] = None) -> List[OfferData]:
         """Query the MMS server for offers.
@@ -142,7 +150,12 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_endpoint("MarketCancel_OfferCancel", config, RequestType.INFO, [ClientType.BSP])
+    @mms_endpoint(
+        name="MarketCancel_OfferCancel",
+        service=config,
+        request_type=RequestType.MARKET,
+        allowed_clients=[ClientType.BSP],
+    )
     def cancel_offer(
         self: ClientProto, request: OfferCancel, market_type: MarketType, days: int, date: Optional[Date] = None
     ) -> OfferCancel:
@@ -168,7 +181,12 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             days=days,
         )
 
-    @mms_endpoint("MarketQuery_AwardResultsQuery", config, RequestType.MARKET, resp_data_type=AwardResponse)
+    @mms_endpoint(
+        name="MarketQuery_AwardResultsQuery",
+        service=config,
+        request_type=RequestType.MARKET,
+        response_data_type=AwardResponse,
+    )
     def query_awards(self: ClientProto, request: AwardQuery, days: int, date: Optional[Date] = None) -> AwardResponse:
         """Query the MMS server for award results.
 

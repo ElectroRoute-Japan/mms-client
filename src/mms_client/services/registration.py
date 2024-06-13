@@ -10,7 +10,6 @@ from mms_client.services.base import ServiceConfiguration
 from mms_client.services.base import mms_endpoint
 from mms_client.services.base import mms_multi_endpoint
 from mms_client.types.registration import QueryAction
-from mms_client.types.registration import QueryType
 from mms_client.types.registration import RegistrationQuery
 from mms_client.types.registration import RegistrationSubmit
 from mms_client.types.resource import ResourceData
@@ -31,7 +30,12 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
     # The configuration for the registration service
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.REGISTRATION, "RegistrationData"))
 
-    @mms_endpoint("RegistrationSubmit_Resource", config, RequestType.REGISTRATION, [ClientType.BSP])
+    @mms_endpoint(
+        name="RegistrationSubmit_Resource",
+        service=config,
+        request_type=RequestType.REGISTRATION,
+        allowed_clients=[ClientType.BSP],
+    )
     def put_resource(self: ClientProto, request: ResourceData) -> ResourceData:
         """Submit a new resource to the MMS server.
 
@@ -51,12 +55,12 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
         return RegistrationSubmit()  # type: ignore[return-value]
 
     @mms_multi_endpoint(
-        "RegistrationQuery_Resource",
-        config,
-        RequestType.REGISTRATION,
+        name="RegistrationQuery_Resource",
+        service=config,
+        request_type=RequestType.REGISTRATION,
         allowed_clients=[ClientType.BSP, ClientType.TSO],
-        resp_envelope_type=RegistrationSubmit,
-        resp_data_type=ResourceData,
+        response_envelope_type=RegistrationSubmit,
+        response_data_type=ResourceData,
     )
     def query_resources(
         self: ClientProto, request: ResourceQuery, action: QueryAction, date: Optional[Date] = None
@@ -79,6 +83,5 @@ class RegistrationClientMixin:  # pylint: disable=unused-argument
         # Inject our parameters into the query and return it.
         return RegistrationQuery(  # type: ignore[return-value]
             action=action,
-            query_type=QueryType.TRADE,
-            date=date or Date.today(),
+            date=date,
         )
