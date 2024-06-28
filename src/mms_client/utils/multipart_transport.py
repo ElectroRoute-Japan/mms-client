@@ -9,15 +9,20 @@ from email.mime.multipart import MIMEMultipart
 from logging import getLogger
 from random import SystemRandom
 from typing import Dict
+from typing import List
 from typing import Optional
+from typing import Tuple
 
 from lxml import etree
 from lxml.etree import _Element as Element
 from pendulum import now
+from requests import Response
 from requests import Session
 from zeep.cache import VersionedCacheBase
 from zeep.transports import Transport
 from zeep.wsdl.utils import etree_to_string
+
+from mms_client.utils.plugin import Plugin
 
 # Set the default logger for the MMS client
 logger = getLogger(__name__)
@@ -136,6 +141,7 @@ class MultipartTransport(Transport):
         timeout: int = 300,
         operation_timeout: Optional[int] = None,
         session: Optional[Session] = None,
+        plugins: Optional[List[Plugin]] = None,
     ):
         """Create a new MTOMS transport.
 
@@ -145,12 +151,17 @@ class MultipartTransport(Transport):
         timeout (int):                          The timeout for the transport.
         operation_timeout (int, optional):      The operation timeout for the transport.
         session (Session, optional):            The session to be used for the transport.
+        plugins (List[Plugin], optional):       The plugins to be used for the transport.
         """
         # Save the domain for later use
         self._domain = domain
 
-        # Setup a dictionary to store the attachments after they're registered
+        # Setup a dictionary to store the attachments and operations after they're registered
         self._attachments: Dict[str, Attachment] = {}
+        self._operations: Dict[str, str] = {}
+
+        # Save our list of plugins
+        self._plugins = plugins or []
 
         # Call the parent constructor
         super().__init__(
@@ -160,23 +171,25 @@ class MultipartTransport(Transport):
             session=session,
         )
 
-    def register_attachment(self, name: str, data: bytes) -> str:
+    def register_attachment(self, operation: str, name: str, data: bytes) -> str:
         """Register an attachment.
 
         Registered attachments will be sent with the request as MTOMS attachments. The content ID of the attachment
         will be returned so that it can be used in the request.
 
         Arguments:
-        name (str):     The name of the attachment.
-        data (bytes):   The data to be attached.
+        operation (str):    The name of the operation.
+        name (str):         The name of the attachment.
+        data (bytes):       The data to be attached.
 
         Returns:    The content ID of the attachment, which should be used in place of the attachment data.
         """
         attachment = Attachment(name, data, self._domain)
         self._attachments[attachment.cid] = attachment
+        self._operations[attachment.cid] = operation
         return attachment.tag
 
-    def post_xml(self, address: str, envelope: Element, headers: dict):
+    def post_xml(self, address: str, envelope: Element, headers: dict) -> Response:
         """Post the XML envelope and attachments.
 
         Arguments:
@@ -186,19 +199,30 @@ class MultipartTransport(Transport):
 
         Returns:    The response from the server.
         """
-        # Search for values that start with our FILETAG
+        # First, search for values that start with our FILETAG
         filetags = envelope.xpath(f"//*[starts-with(text(), '{FILETAG}')]")
 
-        # if there are any attached files, we will set the attachments. Otherwise, just the envelope
+        # Next, if there are any attached files, we will set the attachments. Otherwise, just the envelope
         if filetags:
-            message = self.create_mtom_request(filetags, envelope, headers).encode("UTF-8")
+            message, operation = self.create_mtom_request(filetags, envelope, headers)
         else:
-            message = etree_to_string(envelope)
+            message, operation = etree_to_string(envelope), address
 
-        # Post the request and return the response
-        return self.post(address, message, headers)
+        # Iterate over all the plugins and call their egress methods
+        for plugin in self._plugins:
+            message, headers = plugin.egress(message, headers, operation)
 
-    def create_mtom_request(self, filetags, envelope: Element, headers: dict) -> str:
+        # Now, post the request and get the response
+        resp = self.post(address, message, headers)
+
+        # Iterate over all the plugins and call their ingress methods
+        for plugin in self._plugins:
+            resp._content, resp.headers = plugin.ingress(resp.content, resp.headers, operation)
+
+        # Finally, return the response
+        return resp
+
+    def create_mtom_request(self, filetags, envelope: Element, headers: dict) -> Tuple[bytes, str]:
         """Set MTOM attachments and return the right envelope.
 
         Arguments:
@@ -221,6 +245,7 @@ class MultipartTransport(Transport):
 
         # Attach each file to the multipart request
         for cid in files:
+            operation = self._operations[cid]
             mtom_part.attach(self.create_attachment(cid))
 
         # Finally, create the final multipart request string
@@ -235,7 +260,7 @@ class MultipartTransport(Transport):
         # Decode the XML and return the request
         message = mtom_part.as_string().split("\n\n", 1)[1]
         message = message.replace("\n", "\r\n", 5)
-        return message
+        return message.encode("UTF-8"), operation
 
     def create_attachment(self, cid):
         """Create an attachment for the multipart request.
