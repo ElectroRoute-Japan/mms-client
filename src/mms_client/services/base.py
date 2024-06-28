@@ -365,7 +365,10 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             f"{config.name}: Starting request. Envelope: {type(envelope).__name__}, Data: {type(payload).__name__}",
         )
         request = self._to_mms_request(
-            wrapper, config.request_type, config.service.serializer.serialize(envelope, payload, config.for_report)
+            wrapper,
+            config.name,
+            config.request_type,
+            config.service.serializer.serialize(envelope, payload, config.for_report),
         )
 
         # Next, submit the request to the MMS server and get and verify the response.
@@ -422,7 +425,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             if is_list
             else config.service.serializer.serialize(envelope, payload, config.for_report)  # type: ignore[type-var]
         )
-        request = self._to_mms_request(wrapper, config.request_type, serialized)
+        request = self._to_mms_request(wrapper, config.name, config.request_type, serialized)
 
         # Next, submit the request to the MMS server and get and verify the response.
         resp = wrapper.submit(request)
@@ -452,6 +455,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
     def _to_mms_request(
         self,
         client: ZWrapper,
+        operation: str,
         req_type: RequestType,
         data: bytes,
         return_req: bool = False,
@@ -461,6 +465,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         Arguments:
         client (ZWrapper):              The Zeep client to use for submitting the request.
+        operation (str):                The name of the MMS function being called.
         req_type (RequestType):         The type of request to submit to the MMS server.
         data (bytes):                   The data to submit to the MMS server.
         return_req (bool):              Whether to return the request data in the response. This is False by default.
@@ -470,11 +475,13 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         """
         # First, convert the attachments to the correct the MMS format
         attachment_data = (
-            [self._to_mms_attachment(client, name, data) for name, data in attachments.items()] if attachments else []
+            [self._to_mms_attachment(client, operation, name, data) for name, data in attachments.items()]
+            if attachments
+            else []
         )
 
         # Next, convert the payload to a base-64 string
-        tag, signature = self._register_and_sign(client, "payload", data)
+        tag, signature = self._register_and_sign(client, operation, "payload", data)
 
         # Embed the data and the attachments in the MMS request and return it
         logger.debug(
@@ -491,24 +498,38 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
             attachmentData=attachment_data,
         )
 
-    def _to_mms_attachment(self, client: ZWrapper, name: str, data: bytes) -> Attachment:  # pragma: no cover
+    def _to_mms_attachment(
+        self, client: ZWrapper, operation: str, name: str, data: bytes
+    ) -> Attachment:  # pragma: no cover
         """Convert the given data to an MMS attachment.
 
         Arguments:
         client (ZWrapper):  The Zeep client to use for submitting the request.
+        operation (str):    The name of the operation.
         name (str):         The name of the attachment.
         data (bytes):       The data to be attached.
 
         Returns:    The MMS attachment.
         """
         # Convert the data to a base-64 string
-        tag, signature = self._register_and_sign(client, name, data)
+        tag, signature = self._register_and_sign(client, operation, name, data)
 
         # Create the MMS attachment and return it
         return Attachment(signature=signature, name=name, binaryData=tag)
 
-    def _register_and_sign(self, client: ZWrapper, name: str, data: bytes) -> Tuple[str, str]:
-        tag = client.register_attachment(name, data)
+    def _register_and_sign(self, client: ZWrapper, operation: str, name: str, data: bytes) -> Tuple[str, str]:
+        """Register an attachment and sign the data.
+
+        Arguments:
+        client (ZWrapper):  The Zeep client to use for submitting the request.
+        operation (str):    The name of the operation.
+        name (str):         The name of the attachment.
+        data (bytes):       The data to be attached.
+
+        Returns:    The content ID of the attachment, which should be used in place of the attachment data.
+        """
+        # First, register the attachment
+        tag = client.register_attachment(operation, name, data)
 
         # Next, sign the data
         signature = self._signer.sign(data)

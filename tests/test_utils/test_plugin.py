@@ -1,7 +1,6 @@
 """Tests the functionality of the mms_client.utils.auditing module."""
 
 from base64 import b64encode
-from logging import getLogger
 
 import responses
 
@@ -10,7 +9,7 @@ from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
-from mms_client.utils.auditing import AuditPlugin
+from mms_client.utils.plugin import Plugin
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
 from mms_client.utils.web import ZWrapper
@@ -18,8 +17,8 @@ from tests.testutils import register_mms_request
 from tests.testutils import verify_mms_response
 
 
-class FakeAuditPlugin(AuditPlugin):
-    """Test AuditPlugin that we'll use to verify the functionality of the AuditPlugin class."""
+class FakeAuditPlugin(Plugin):
+    """Test Plugin that we'll use to verify the functionality of the Plugin class."""
 
     def __init__(self):
         """Initialize the TestAuditPlugin class."""
@@ -63,7 +62,7 @@ def test_auditer_works(mock_certificate: Certificate):
     verify_mms_response(resp, True, ResponseDataType.XML, b"derp")
     data = b64encode(b"derp").decode("UTF-8")
     assert auditor.request == (
-        """<?xml version='1.0' encoding='UTF-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/"""
+        """<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/"""
         """soap/envelope/"><soap-env:Body><ns0:RequestAttInfo xmlns:ns0="urn:abb.com:project/mms/types">"""
         """<requestType>mp.info</requestType><adminRole>false</adminRole><requestDataCompressed>false"""
         """</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
@@ -72,10 +71,10 @@ def test_auditer_works(mock_certificate: Certificate):
         """</soap-env:Body></soap-env:Envelope>"""
     ).encode("UTF-8")
     assert auditor.response == (
-        """<?xml version='1.0' encoding='UTF-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/"""
+        """<?xml version='1.0' encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/"""
         """soap/envelope/"><soap-env:Body><ns0:ResponseAttInfo xmlns:ns0="urn:abb.com:project/mms/types"><success>"""
         """true</success><warnings>false</warnings><responseBinary>false</responseBinary><responseCompressed>false"""
         f"""</responseCompressed><responseDataType>XML</responseDataType><responseData>{data}</responseData>"""
         """</ns0:ResponseAttInfo></soap-env:Body></soap-env:Envelope>"""
     ).encode("UTF-8")
-    assert auditor.name == "submitAttachment"
+    assert auditor.name == "https://www2.tdgc.jp/axis2/services/MiWebService"

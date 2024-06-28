@@ -3,44 +3,44 @@
 from abc import ABC
 from abc import abstractmethod
 from logging import getLogger
-
-from lxml.etree import _Element as Element
-from lxml.etree import tostring
-from zeep import Plugin
-from zeep.wsdl.definitions import Operation
+from typing import Tuple
 
 # Set the default logger for the MMS client
 logger = getLogger(__name__)
 
 
-class AuditPlugin(ABC, Plugin):
+class Plugin(ABC):
     """Base class for audit plugins."""
 
-    def egress(self, envelope: Element, http_headers: dict, operation: Operation, binding_options):
+    def egress(self, message: bytes, http_headers: dict, operation: str) -> Tuple[bytes, dict]:
         """Handle the MMS request before it is sent.
 
-        Arguments are the same as in the egress method of the Plugin class.
+        Arguments:
+        message (bytes):        The message to send.
+        http_headers (dict):    The HTTP headers to send.
+        operation (str):        The operation being called.
 
         Returns:
         lxml.etree.Element: The XML message to send.
         dict:               The HTTP headers to send.
         """
-        data = tostring(envelope, encoding="UTF-8", xml_declaration=True)
-        self.audit_request(operation.name, data)
-        return envelope, http_headers
+        self.audit_request(operation, message)
+        return message, http_headers
 
-    def ingress(self, envelope: Element, http_headers: dict, operation: Operation):
+    def ingress(self, message: bytes, http_headers: dict, operation: str) -> Tuple[bytes, dict]:
         """Handle the MMS response before it is processed.
 
-        Arguments are the same as in the ingress method of the Plugin class.
+        Arguments:
+        message (bytes):        The message to process.
+        http_headers (dict):    The HTTP headers to process.
+        operation (str):        The operation being called.
 
         Returns:
         lxml.etree.Element: The XML message to process.
         dict:               The HTTP headers to process.
         """
-        data = tostring(envelope, encoding="UTF-8", xml_declaration=True)
-        self.audit_response(operation.name, data)
-        return envelope, http_headers
+        self.audit_response(operation, message)
+        return message, http_headers
 
     @abstractmethod
     def audit_request(self, operation: str, mms_request: bytes) -> None:
