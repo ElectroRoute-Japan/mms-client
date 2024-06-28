@@ -245,7 +245,7 @@ class MultipartTransport(Transport):
 
         # Attach each file to the multipart request
         for cid in files:
-            operation = self._operations[cid]
+            operation = self._operations.pop(cid)
             mtom_part.attach(self.create_attachment(cid))
 
         # Finally, create the final multipart request string
@@ -271,7 +271,7 @@ class MultipartTransport(Transport):
         Returns:    The attachment.
         """
         # First, get the attachment from the cache
-        attach = self._attachments[cid]
+        attach = self._attachments.pop(cid)
 
         # Next, create the attachment
         part = MIMEBase("application", "octet-stream")
