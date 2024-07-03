@@ -124,7 +124,7 @@ class OfferData(Payload):
         return value.replace(tzinfo=None).isoformat() if value else ""
 
     @field_validator("start", "end", "submission_time")
-    def decode_datetime(self, value: DateTime) -> DateTime:
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
         """Decode the datetime from an MMS-compliant ISO 8601 string."""
         return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 
@@ -151,7 +151,7 @@ class OfferCancel(Payload):
         return value.replace(tzinfo=None).isoformat()
 
     @field_validator("start", "end")
-    def decode_datetime(self, value: DateTime) -> DateTime:
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
         """Decode the datetime from an MMS-compliant ISO 8601 string."""
         return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 

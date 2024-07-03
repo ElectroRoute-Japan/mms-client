@@ -340,7 +340,7 @@ class OutboundData(Envelope):
         return value.replace(tzinfo=None).isoformat() if value else ""
 
     @field_validator("publish_time")
-    def decode_datetime(self, value: DateTime) -> DateTime:
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
         """Decode the datetime from an MMS-compliant ISO 8601 string."""
         return value.replace(tzinfo=TZ("Asia/Tokyo"))
 
