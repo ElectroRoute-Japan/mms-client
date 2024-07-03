@@ -1,9 +1,10 @@
 """Contains the client layer for making registration requests to the MMS server."""
 
-from datetime import date as Date
 from logging import getLogger
 from typing import List
 from typing import Optional
+
+from pydantic_extra_types.pendulum_dt import Date
 
 from mms_client.services.base import ClientProto
 from mms_client.services.base import ServiceConfiguration

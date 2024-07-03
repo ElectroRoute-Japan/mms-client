@@ -4,6 +4,9 @@ from decimal import Decimal
 from typing import List
 from typing import Optional
 
+from pendulum import Timezone
+from pydantic import field_serializer
+from pydantic import field_validator
 from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import attr
 from pydantic_xml import element
@@ -115,6 +118,16 @@ class OfferData(Payload):
     # The date and time when the offer was submitted
     submission_time: Optional[DateTime] = attr(default=None, name="SubmissionTime")
 
+    @field_serializer("start", "end", "submission_time")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat() if value else ""
+
+    @field_validator("start", "end", "submission_time")
+    def decode_datetime(self, value: DateTime) -> DateTime:
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
+
 
 class OfferCancel(Payload):
     """Describes the data necessary to cancel an offer in the MMS."""
@@ -131,6 +144,16 @@ class OfferCancel(Payload):
 
     # The type of market for the offer was submitted on
     market_type: MarketType = attr(name="MarketType")
+
+    @field_serializer("start", "end")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat()
+
+    @field_validator("start", "end")
+    def decode_datetime(self, value: DateTime) -> DateTime:
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 
 
 class OfferQuery(Payload):

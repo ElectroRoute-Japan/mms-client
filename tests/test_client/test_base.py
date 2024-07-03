@@ -1,9 +1,8 @@
 """Tests the functionality of the mms_client.services.base module."""
 
-from datetime import date as Date
-
 import pytest
 import responses
+from pendulum import Date
 from pendulum import DateTime
 
 from mms_client.services.base import BaseClient

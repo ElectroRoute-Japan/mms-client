@@ -2,7 +2,6 @@
 
 # pylint: disable=too-many-lines
 
-from datetime import date as Date
 from decimal import Decimal
 from enum import Enum
 from typing import Annotated
@@ -10,6 +9,7 @@ from typing import List
 from typing import Optional
 
 from pydantic_core import PydanticUndefined
+from pydantic_extra_types.pendulum_dt import Date
 from pydantic_xml import attr
 from pydantic_xml import element
 from pydantic_xml import wrapped

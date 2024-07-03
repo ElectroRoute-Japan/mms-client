@@ -1,8 +1,7 @@
 """Tests the functionality in the mms_client.utils.serialization module."""
 
-from datetime import date as Date
-
 import pytest
+from pendulum import Date
 from pendulum import DateTime
 from pendulum import Timezone
 
@@ -216,8 +215,8 @@ def test_deserialize_works():
         resp.data,
         [offer_stack_verifier(1, 100, 100, 150, 200, 250, 300, 350, "FAKE_ID")],
         "FAKE_RESO",
-        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("UTC")),
-        DateTime(2019, 8, 30, 11, 24, 15, tzinfo=Timezone("UTC")),
+        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2019, 8, 30, 11, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
         12,
         "F100",
@@ -226,7 +225,7 @@ def test_deserialize_works():
         AreaCode.CHUBU,
         "偽電力",
         "FSYS0",
-        DateTime(2019, 8, 29, 3, 24, 15, tzinfo=Timezone("UTC")),
+        DateTime(2019, 8, 29, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
     )
     verify_response_common(resp.payload.data_validation, True, ValidationStatus.PASSED)
     verify_market_submit(resp.envelope, Date(2019, 8, 29), "F100", "FAKEUSER", MarketType.DAY_AHEAD, 1)
@@ -389,8 +388,8 @@ def test_deserialize_multi_works():
         resp.data[0],
         [offer_stack_verifier(1, 100, 100, 150, 200, 250, 300, 350, "FAKE_ID")],
         "FAKE_RESO",
-        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("UTC")),
-        DateTime(2019, 8, 30, 11, 24, 15, tzinfo=Timezone("UTC")),
+        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2019, 8, 30, 11, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
         12,
         "F100",
@@ -399,7 +398,7 @@ def test_deserialize_multi_works():
         AreaCode.CHUBU,
         "偽電力",
         "FSYS0",
-        DateTime(2019, 8, 29, 3, 24, 15, tzinfo=Timezone("UTC")),
+        DateTime(2019, 8, 29, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
     )
     verify_response_common(resp.payload[0].data_validation, True, ValidationStatus.PASSED)
     verify_market_submit(resp.envelope, Date(2019, 8, 29), "F100", "FAKEUSER", MarketType.DAY_AHEAD, 1)

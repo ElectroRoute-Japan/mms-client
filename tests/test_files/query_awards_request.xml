@@ -1,5 +1,5 @@
 <MarketData>
     <MarketQuery Date="2024-04-12" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER">
-        <AwardResultsQuery AfterGC="1" Area="03" EndTime="2024-04-12T18:00:00+09:00" LinkedArea="02" MarketType="DAM" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00+09:00"></AwardResultsQuery>
+        <AwardResultsQuery AfterGC="1" Area="03" EndTime="2024-04-12T18:00:00" LinkedArea="02" MarketType="DAM" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00"></AwardResultsQuery>
     </MarketQuery>
 </MarketData>

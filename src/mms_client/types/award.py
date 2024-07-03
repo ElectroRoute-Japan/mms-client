@@ -5,6 +5,9 @@ from enum import Enum
 from typing import List
 from typing import Optional
 
+from pendulum import Timezone
+from pydantic import field_serializer
+from pydantic import field_validator
 from pydantic_core import PydanticUndefined
 from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import attr
@@ -108,6 +111,16 @@ class AwardQuery(Payload, tag="AwardResultsQuery"):
     # Whether we are before gate close or after gate close. If this isn't provided, then all results will be retrieved
     # regardless of gate closure.
     gate_closed: Optional[BooleanFlag] = attr(default=None, name="AfterGC")
+
+    @field_serializer("start", "end")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat()
+
+    @field_validator("start", "end")
+    def decode_datetime(self, value: DateTime) -> DateTime:
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 
 
 class Award(Payload):
@@ -286,6 +299,16 @@ class Award(Payload):
     # Whether we are before gate close or after gate close
     gate_closed: BooleanFlag = attr(name="AfterGC")
 
+    @field_serializer("submission_time")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat() if value else ""
+
+    @field_validator("submission_time")
+    def decode_datetime(self, value: DateTime) -> DateTime:
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
+
 
 class AwardResult(Payload, tag="AwardResults"):
     """Contains a number of bid rewards associated with a block of time and trade direction."""
@@ -301,6 +324,16 @@ class AwardResult(Payload, tag="AwardResults"):
 
     # The bid awards associated with these parameters
     data: List[Award] = element(tag="AwardResultsData", min_length=1)
+
+    @field_serializer("start", "end")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat()
+
+    @field_validator("start", "end")
+    def decode_datetime(self, value: DateTime) -> DateTime:
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 
 
 class AwardResponse(AwardQuery, tag="AwardResultsQuery"):
