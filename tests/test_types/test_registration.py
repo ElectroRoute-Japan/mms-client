@@ -1,6 +1,6 @@
 """Tests the functionality in the mms_client.types.registration module."""
 
-from datetime import date as Date
+from pendulum import Date
 
 from mms_client.types.registration import QueryAction
 from mms_client.types.registration import QueryType

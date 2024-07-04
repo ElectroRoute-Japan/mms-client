@@ -1,6 +1,6 @@
 """Tests the functionality in the mms_client.types.market module."""
 
-from datetime import date as Date
+from pendulum import Date
 
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery

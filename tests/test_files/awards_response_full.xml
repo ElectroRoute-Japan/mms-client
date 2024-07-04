@@ -1,6 +1,6 @@
-<AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00+09:00" EndTime="2024-04-12T18:00:00+09:00" AfterGC="1">
+<AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" AfterGC="1">
     <AwardResultsQueryResponse>
-        <AwardResults StartTime="2024-04-12T15:00:00+09:00" EndTime="2024-04-12T18:00:00+09:00" Direction="1">
+        <AwardResults StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" Direction="1">
             <AwardResultsData
                  ContractId="156098uqt3qawldefjT"
                  JbmsId="4235230998"
@@ -48,7 +48,7 @@
                  Tertiary1InvalidQuantityInKw="4004"
                  BaselineLoadFileNameNeg="W9_3010_20240411_15_AS490_FAKE_NEG.xml"
                  BaselineLoadFileNamePos="W9_3010_20240411_15_AS490_FAKE_POS.xml"
-                 SubmissionTime="2024-04-10T22:34:44+09:00"
+                 SubmissionTime="2024-04-10T22:34:44"
                  OfferAwardedLevel="2"
                  OfferId="FAKE_ID"
                  ContractSource="2"

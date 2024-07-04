@@ -1,13 +1,16 @@
 """Contains objects for report data."""
 
-from datetime import date as Date
 from decimal import Decimal
 from enum import StrEnum
 from typing import Annotated
 from typing import List
 from typing import Optional
 
+from pendulum import Timezone as TZ
+from pydantic import field_serializer
+from pydantic import field_validator
 from pydantic_core import PydanticUndefined
+from pydantic_extra_types.pendulum_dt import Date
 from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import BaseXmlModel
 from pydantic_xml import attr
@@ -330,6 +333,16 @@ class OutboundData(Envelope):
 
     # The time the report was published
     publish_time: Optional[DateTime] = attr(default=None, name="PublishTime")
+
+    @field_serializer("publish_time")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat() if value else ""
+
+    @field_validator("publish_time")
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=TZ("Asia/Tokyo"))
 
 
 class ReportLineBase(Payload):

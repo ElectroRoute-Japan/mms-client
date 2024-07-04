@@ -1,10 +1,10 @@
 """Tests the functionality in the mms_client.services.report module."""
 
-from datetime import date as Date
 from decimal import Decimal
 
 import pytest
 import responses
+from pendulum import Date
 
 from mms_client.client import MmsClient
 from mms_client.types.enums import AreaCode

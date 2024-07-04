@@ -1,11 +1,9 @@
 """Contains objects for market information."""
 
-# Have to use this becasue pydantic doesn't like pendulum.Date. I've submitted a PR to address this but it hasn't been
-# merged or released yet.
-from datetime import date as Date
 from enum import Enum
 from typing import Optional
 
+from pydantic_extra_types.pendulum_dt import Date
 from pydantic_xml import attr
 
 from mms_client.types.base import Envelope

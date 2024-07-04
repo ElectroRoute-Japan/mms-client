@@ -39,8 +39,7 @@ def test_award_results_query_defaults():
 
     # Finally, verify that the request was created with the correct parameters
     assert data == (
-        b"""<AwardResultsQuery MarketType="DAM" StartTime="2024-04-12T15:00:00+09:00" """
-        b"""EndTime="2024-04-12T18:00:00+09:00"/>"""
+        b"""<AwardResultsQuery MarketType="DAM" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00"/>"""
     )
     verify_award_query(
         request,
@@ -69,7 +68,7 @@ def test_award_results_query_full():
     # Finally, verify that the request was created with the correct parameters
     assert data == (
         b"""<AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" """
-        b"""StartTime="2024-04-12T15:00:00+09:00" EndTime="2024-04-12T18:00:00+09:00" AfterGC="1"/>"""
+        b"""StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" AfterGC="1"/>"""
     )
     verify_award_query(
         request,
@@ -97,8 +96,7 @@ def test_award_results_response_defaults():
 
     # Finally, verify that the response was created with the correct parameters
     assert data == (
-        b"""<AwardResultsQuery MarketType="DAM" StartTime="2024-04-12T15:00:00+09:00" """
-        b"""EndTime="2024-04-12T18:00:00+09:00"/>"""
+        b"""<AwardResultsQuery MarketType="DAM" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00"/>"""
     )
     verify_award_response(
         response,

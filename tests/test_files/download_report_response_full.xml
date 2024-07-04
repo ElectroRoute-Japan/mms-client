@@ -1,4 +1,4 @@
-<OutboundData DatasetName="BSP_ResourceList" DatasetType="ON_DEMAND" Date="2024-04-12" DateType="TRADE" DateTimeIndicator="JST" PublishTime="2024-04-12T15:00:00+09:00">
+<OutboundData DatasetName="BSP_ResourceList" DatasetType="ON_DEMAND" Date="2024-04-12" DateType="TRADE" DateTimeIndicator="JST" PublishTime="2024-04-12T15:00:00">
     <BSP_ResourceList
          ROW="1"
          ParticipantName="F100"

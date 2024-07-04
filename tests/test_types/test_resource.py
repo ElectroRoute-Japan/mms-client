@@ -1,7 +1,8 @@
 """Tests the functionality in the mms_client.types.resource module."""
 
-from datetime import date as Date
 from decimal import Decimal
+
+from pendulum import Date
 
 from mms_client.types.enums import AreaCode
 from mms_client.types.resource import AfcMinimumOutput

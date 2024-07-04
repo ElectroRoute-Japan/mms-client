@@ -1,6 +1,7 @@
 """Tests the functionality in the mms_client.types.offer module."""
 
 from pendulum import DateTime
+from pendulum import Timezone
 
 from mms_client.types.enums import AreaCode
 from mms_client.types.market import MarketType
@@ -34,8 +35,8 @@ def test_offer_submit_defaults():
         request,
         [offer_stack_verifier(1, 100, 100)],
         "FAKE_RESO",
-        DateTime(2019, 8, 30, 3, 24, 15),
-        DateTime(2019, 9, 30, 3, 24, 15),
+        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2019, 9, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
     )
     assert (
@@ -83,8 +84,8 @@ def test_offer_submit_full():
         request,
         [offer_stack_verifier(1, 100, 100, 150, 200, 250, 300, 350, "FAKE_ID")],
         "FAKE_RESO",
-        DateTime(2019, 8, 30, 3, 24, 15),
-        DateTime(2019, 9, 30, 3, 24, 15),
+        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2019, 9, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
         12,
         "F100",
@@ -93,7 +94,7 @@ def test_offer_submit_full():
         AreaCode.CHUBU,
         "偽電力",
         "FSYS0",
-        DateTime(2019, 8, 30, 3, 24, 15),
+        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
     )
     assert data == (
         """<OfferData ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" """
@@ -120,7 +121,11 @@ def test_offer_cancel():
 
     # Finally, verify that the request was created with the correct parameters
     verify_offer_cancel(
-        request, "FAKE_RESO", DateTime(2019, 8, 30, 3, 24, 15), DateTime(2019, 9, 30, 3, 24, 15), MarketType.WEEK_AHEAD
+        request,
+        "FAKE_RESO",
+        DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2019, 9, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
+        MarketType.WEEK_AHEAD,
     )
     assert data == (
         b"""<OfferCancel ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" """

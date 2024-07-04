@@ -1,10 +1,10 @@
 """Tests the functionality in the mms_client.services.market module."""
 
-from datetime import date as Date
 from decimal import Decimal
 
 import pytest
 import responses
+from pendulum import Date
 from pendulum import DateTime
 from pendulum import Timezone
 
@@ -80,8 +80,8 @@ def test_query_reserve_requirements_works(mock_certificate):
         AreaCode.TOKYO,
         [
             requirement_verifier(
-                DateTime(2024, 4, 12, 15, tzinfo=Timezone("UTC")),
-                DateTime(2024, 4, 12, 18, tzinfo=Timezone("UTC")),
+                DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
+                DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
                 100,
                 200,
                 300,
@@ -158,8 +158,8 @@ def test_put_offer_works(mock_certificate):
         offer,
         [offer_stack_verifier(1, 100, 100, id="FAKE_ID")],
         "FAKE_RESO",
-        DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),
-        DateTime(2024, 3, 15, 21, tzinfo=Timezone("UTC")),
+        DateTime(2024, 3, 15, 12, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2024, 3, 15, 21, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
         pattern=1,
         bsp_participant="F100",
@@ -168,7 +168,7 @@ def test_put_offer_works(mock_certificate):
         area=AreaCode.CHUBU,
         resource_short_name="偽電力",
         system_code="FSYS0",
-        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("UTC")),
+        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("Asia/Tokyo")),
     )
 
 
@@ -236,8 +236,8 @@ def test_put_offers_works(mock_certificate):
         offers[0],
         [offer_stack_verifier(1, 100, 100, id="FAKE_ID")],
         "FAKE_RESO",
-        DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),
-        DateTime(2024, 3, 15, 21, tzinfo=Timezone("UTC")),
+        DateTime(2024, 3, 15, 12, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2024, 3, 15, 21, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
         pattern=1,
         bsp_participant="F100",
@@ -246,7 +246,7 @@ def test_put_offers_works(mock_certificate):
         area=AreaCode.CHUBU,
         resource_short_name="偽電力",
         system_code="FSYS0",
-        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("UTC")),
+        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("Asia/Tokyo")),
     )
 
 
@@ -286,8 +286,8 @@ def test_query_offers_works(mock_certificate):
         offers[0],
         [offer_stack_verifier(1, 100, 100, id="FAKE_ID")],
         "FAKE_RESO",
-        DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),
-        DateTime(2024, 3, 15, 21, tzinfo=Timezone("UTC")),
+        DateTime(2024, 3, 15, 12, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2024, 3, 15, 21, tzinfo=Timezone("Asia/Tokyo")),
         Direction.SELL,
         pattern=1,
         bsp_participant="F100",
@@ -296,7 +296,7 @@ def test_query_offers_works(mock_certificate):
         area=AreaCode.CHUBU,
         resource_short_name="偽電力",
         system_code="FSYS0",
-        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("UTC")),
+        submission_time=DateTime(2024, 3, 15, 11, 44, 15, tzinfo=Timezone("Asia/Tokyo")),
     )
 
 
@@ -362,8 +362,8 @@ def test_cancel_offer_works(mock_certificate):
     verify_offer_cancel(
         resp,
         "FAKE_RESO",
-        DateTime(2024, 3, 15, 12, tzinfo=Timezone("UTC")),
-        DateTime(2024, 3, 15, 21, tzinfo=Timezone("UTC")),
+        DateTime(2024, 3, 15, 12, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2024, 3, 15, 21, tzinfo=Timezone("Asia/Tokyo")),
         MarketType.DAY_AHEAD,
     )
 
@@ -389,13 +389,7 @@ def test_query_awards_works(mock_certificate):
     register_mms_request(
         RequestType.MARKET,
         (
-            "BiEsp0K4TkHJv0NbYf82KOyn8bhkEQxX3QlOq5lLYQxzPOdonKDuy/E8huI6PgzX+Md5MckH2WRf14+eKpvJLtc8o9bDbcF+YkSxWr147"
-            "jj7x28ScDJT4dMdOgMNzvCY2N66a9JD2TSZYEfgmFEy+Aez9KIXMHyiBva+wrQ13WLLyXambGZ3oZsOYK6U5qhgO842HPQu+LlCfory7w"
-            "iTIOklUop5BxVnT9SDlwRuXv3hUEO3TqnjT8d2nvtuBeAcKMyHD4F83VOF8t0PRZz6haacOOqOBf5nzij5oA5JUdQaCPN2KLx0i0hqbe5"
-            "L7q8+15D267UY2L5Pd2pfgNoT/8KUE4Rhgdzdsp7m7uQTWpt2xxNjvx/cdV27zRtIk6g57udT034QTtGct8s0+cX+2wMolh7hegPIoh4d"
-            "oyUJFdSXdMtia3sRnD5HGREafaT3pFqH66NJp9/iu65stSIBSPMRdElCIlm/LBy3aA6fj1mhbUTWcPLOWvF4bDNbLEZuzPltnpZOhJo9I"
-            "uhP3q+o2ZJceJmyyXO4ikuO6Rf/QSXLWl2DocvstfGfWjWmYWP9pgOhvxLWQw9XRksygEgXs0OmgeQW4NyB6NcpgVTdNX3Yj+qh9nUYVh"
-            "/T43icqzkZTBcIPkpchMNe5Ms4l0r16WHhHdNKOYmfDGsP/KRk3js="
+            "8JZ4ecLOMVtm30sjaxVsk6WL/A08yhDsidfgX4tYenxZeLyN0TDC8RTQVUNBlOc6zXP4eE6rYXu4SJ2OBTMdbVud8CrC0Yy9uD+R40gZ+HSfLf5bDPjdHXMrFbXBhA8pY5J5HFs3zhMZNuhGyUtvTqPbs6q6nWkuXdPqyftO/MX4ZjCqq3R3ZFpldM5lS5dLYRFX/CEQ9mnxISM9cQUbqeVawQZNo+PsFOylG91jGNlw4ZL7CDEC+BFqJk7BL8l5b3cCvTwGknFg4IM55MzYQgtfnisn73cN69a1LJbabAOr2NFuj98n8PaLhpxledwyVM3gN4oCFlA8SnzviMY/iPAzN81pxHg69aUJAJbLyqwmUqPb7/E/qiC6dY9ty/8eFdvoN+APFYAnY8sWQyQUENFBas8Osij9i50J2n/x3muQ8zzcmWIXW+mmp0KnxzyO/HKPqxoadfqAPQgzhh/4KyGZxa6jhYYV6rfs7BwiJH47pSQ+AXPasOJOdwMK4K9a8yQoEQloaxr/dLcwPWFccsShXFtMSZxCRVl2tJA0KtK7B1n6LXf3YkmqHS0tfUb7dh2dpXbQCfSGRaZgzAd5DZrYh5XTX99Up38m+qeESsxMmHzBnA5UED6n77yP7ufN4j5P2mCOwrVf0mxJJUa/b2gtJT5xKTRN30kzfrYrSFc="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),

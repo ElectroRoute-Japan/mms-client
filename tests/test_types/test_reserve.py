@@ -1,6 +1,7 @@
 """Tests the functionality in the mms_client.types.reserve module."""
 
-from pydantic_extra_types.pendulum_dt import DateTime
+from pendulum import DateTime
+from pendulum import Timezone
 
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import Direction
@@ -68,7 +69,14 @@ def test_reserve_requirement_defaults():
         b"""Direction="1"/></ReserveRequirement>"""
     )
     verify_reserve_requirement(
-        request, AreaCode.TOKYO, [requirement_verifier(DateTime(2024, 4, 12, 15), DateTime(2024, 4, 12, 18))]
+        request,
+        AreaCode.TOKYO,
+        [
+            requirement_verifier(
+                DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
+                DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
+            )
+        ],
     )
 
 
@@ -104,7 +112,16 @@ def test_reserve_requirement_full():
         AreaCode.TOKYO,
         [
             requirement_verifier(
-                DateTime(2024, 4, 12, 15), DateTime(2024, 4, 12, 18), 100, 200, 300, 400, 500, 600, 700, 800
+                DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
+                DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
+                100,
+                200,
+                300,
+                400,
+                500,
+                600,
+                700,
+                800,
             )
         ],
     )

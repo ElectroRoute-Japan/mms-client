@@ -3,6 +3,7 @@
 from decimal import Decimal
 
 from pendulum import DateTime
+from pendulum import Timezone as TZ
 
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BaseLineSettingMethod
@@ -280,7 +281,7 @@ def test_outbound_data():
         ReportName.BSP_RESOURCE_LIST,
         Periodicity.ON_DEMAND,
         Date(2024, 4, 12),
-        DateTime(2024, 4, 12, 15),
+        DateTime(2024, 4, 12, 15, tzinfo=TZ("Asia/Tokyo")),
     )
 
 
