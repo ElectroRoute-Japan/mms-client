@@ -1,2 +1,10 @@
-# Default code owners
+# Ensure that code changes are reviewed by the developers
 * @ElectroRoute-Japan/Developers
+
+# Ensure that changes to workflows or the codeowners file are reviewed by the Admins
+.gitignore @ElectroRoute-Japan/Admins
+CODEOWNERS @ElectroRoute-Japan/Admins
+LICENSE @ElectroRoute-Japan/Admins
+*.yaml @ElectroRoute-Japan/Admins
+*.yml @ElectroRoute-Japan/Admins
+*.sh @ElectroRoute-Japan/Admins
