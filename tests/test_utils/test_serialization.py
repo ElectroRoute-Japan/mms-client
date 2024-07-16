@@ -5,7 +5,6 @@ from pendulum import Date
 from pendulum import DateTime
 from pendulum import Timezone
 
-from mms_client.types.base import ResponseCommon
 from mms_client.types.base import ValidationStatus
 from mms_client.types.enums import AreaCode
 from mms_client.types.market import MarketQuery
@@ -25,7 +24,9 @@ from mms_client.types.report import ReportBase
 from mms_client.types.report import ReportName
 from mms_client.types.report import ReportSubType
 from mms_client.types.report import ReportType
-from mms_client.types.reserve import ReserveRequirementQuery
+from mms_client.utils.errors import DataNodeNotFoundError
+from mms_client.utils.errors import EnvelopeNodeNotFoundError
+from mms_client.utils.errors import InvalidContainerError
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
 from tests.testutils import message_verifier
@@ -34,12 +35,12 @@ from tests.testutils import offer_stack_verifier
 from tests.testutils import parameter_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
-from tests.testutils import verify_market_query
 from tests.testutils import verify_market_submit
 from tests.testutils import verify_messages
 from tests.testutils import verify_offer_data
 from tests.testutils import verify_report_base
 from tests.testutils import verify_report_create_request
+from tests.testutils import verify_response_common
 
 
 def test_serialize_data():
@@ -172,11 +173,18 @@ def test_deserialize_payload_key_invalid():
     serialzier = Serializer(SchemaType.MARKET, "ReportData")
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
-    with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(read_request_file("serialization_1.xml").encode("UTF-8"), MarketSubmit, OfferData)
+    with pytest.raises(InvalidContainerError) as ex_info:
+        _ = serialzier.deserialize(
+            "Test_Method", read_request_file("serialization_1.xml").encode("UTF-8"), MarketSubmit, OfferData
+        )
 
     # Finally, verify that the error message is as we expect
-    assert str(ex_info.value) == "Expected payload key 'ReportData' not found in response"
+    assert ex_info.value.method == "Test_Method"
+    assert ex_info.value.expected == "ReportData"
+    assert ex_info.value.actual == "MarketData"
+    assert (
+        ex_info.value.message == "Test_Method: Expected payload key 'ReportData' in response, but found 'MarketData'."
+    )
 
 
 def test_deserialize_envelope_type_invalid():
@@ -185,11 +193,13 @@ def test_deserialize_envelope_type_invalid():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
-    with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(read_file("serialization_1.xml"), MarketQuery, OfferData)
+    with pytest.raises(EnvelopeNodeNotFoundError) as ex_info:
+        _ = serialzier.deserialize("Test_Method", read_file("serialization_1.xml"), MarketQuery, OfferData)
 
     # Finally, verify that the error message is as we expect
-    assert str(ex_info.value) == "Expected envelope type 'MarketQuery' not found in response"
+    assert ex_info.value.method == "Test_Method"
+    assert ex_info.value.expected == "MarketQuery"
+    assert ex_info.value.message == "Test_Method: Expected envelope node 'MarketQuery' not found in response."
 
 
 def test_deserialize_data_type_invalid():
@@ -198,11 +208,15 @@ def test_deserialize_data_type_invalid():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
-    with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize(read_request_file("serialization_1.xml").encode("UTF-8"), MarketSubmit, OfferCancel)
+    with pytest.raises(DataNodeNotFoundError) as ex_info:
+        _ = serialzier.deserialize(
+            "Test_Method", read_request_file("serialization_1.xml").encode("UTF-8"), MarketSubmit, OfferCancel
+        )
 
     # Finally, verify that the error message is as we expect
-    assert str(ex_info.value) == "Expected data type 'OfferCancel' not found in response"
+    assert ex_info.value.method == "Test_Method"
+    assert ex_info.value.expected == OfferCancel
+    assert ex_info.value.message == "Test_Method: Expected data node 'OfferCancel' not found in response."
 
 
 def test_deserialize_works():
@@ -211,7 +225,7 @@ def test_deserialize_works():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize(read_file("serialization_1.xml"), MarketSubmit, OfferData)
+    resp = serialzier.deserialize("Test_Method", read_file("serialization_1.xml"), MarketSubmit, OfferData)
 
     # Finally, verify that the response is as we expect
     verify_offer_data(
@@ -296,36 +310,6 @@ def test_deserialize_works():
     )
 
 
-def test_deserialize_empty_response_works():
-    """Test that the deserialize method works when there is no data to return."""
-    # First, create our serializer
-    serialzier = Serializer(SchemaType.MARKET, "MarketData")
-
-    # Create our test XML payload
-    encoded_data = read_file("serialization_empty.xml")
-
-    # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize(encoded_data, MarketSubmit, ReserveRequirementQuery)
-
-    # Finally, verify that the response is as we expect
-    assert not resp.data
-    verify_market_query(resp.envelope, Date(2024, 7, 18), "F100", "FAKEUSER", 1)
-    verify_response_common(resp.envelope_validation, True, ValidationStatus.PASSED)
-    verify_messages(
-        resp.messages,
-        {
-            "MarketData.MarketQuery": messages_verifier(
-                [],
-                [],
-                [
-                    message_verifier("MMSMKT_I_QUERY-EMPTY", "No Data found for specified query parameters"),
-                    message_verifier("MMSMKT_I_SUB-PASS", "Successfully processed the ReserveRequirement query"),
-                ],
-            ),
-        },
-    )
-
-
 def test_deserialize_no_data_works():
     """Test that the deserialize method works when there is no data to return."""
     # First, create our serializer
@@ -335,7 +319,7 @@ def test_deserialize_no_data_works():
     encoded_data = read_file("serialization_3.xml")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize(encoded_data, MarketSubmit, OfferData)
+    resp = serialzier.deserialize("Test_Method", encoded_data, MarketSubmit, OfferData)
 
     # Finally, verify that the response is as we expect
     assert not resp.data
@@ -382,7 +366,9 @@ def test_deserialize_report_works():
     raw = read_file("create_report_response_full.xml")
 
     # Next, attempt to deserialize the payload as a report create request
-    resp = Serializer(SchemaType.REPORT, "MarketReport").deserialize(raw, ReportBase, NewReportResponse, True)
+    resp = Serializer(SchemaType.REPORT, "MarketReport").deserialize(
+        "Test_Method", raw, ReportBase, NewReportResponse, True
+    )
 
     # Finally, verify that the response is as we expect
     verify_report_base(resp.envelope, ApplicationType.MARKET_REPORT, "F100")
@@ -441,11 +427,16 @@ def test_deserialize_multi_payload_key_invalid():
     serialzier = Serializer(SchemaType.MARKET, "ReportData")
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
-    with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketSubmit, OfferData)
+    with pytest.raises(InvalidContainerError) as ex_info:
+        _ = serialzier.deserialize_multi("Test_Method", read_file("serialization_1.xml"), MarketSubmit, OfferData)
 
     # Finally, verify that the error message is as we expect
-    assert str(ex_info.value) == "Expected payload key 'ReportData' not found in response"
+    assert ex_info.value.method == "Test_Method"
+    assert ex_info.value.expected == "ReportData"
+    assert ex_info.value.actual == "MarketData"
+    assert (
+        ex_info.value.message == "Test_Method: Expected payload key 'ReportData' in response, but found 'MarketData'."
+    )
 
 
 def test_deserialize_multi_envelope_type_invalid():
@@ -454,11 +445,13 @@ def test_deserialize_multi_envelope_type_invalid():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
-    with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketQuery, OfferData)
+    with pytest.raises(EnvelopeNodeNotFoundError) as ex_info:
+        _ = serialzier.deserialize_multi("Test_Method", read_file("serialization_1.xml"), MarketQuery, OfferData)
 
     # Finally, verify that the error message is as we expect
-    assert str(ex_info.value) == "Expected envelope type 'MarketQuery' not found in response"
+    assert ex_info.value.method == "Test_Method"
+    assert ex_info.value.expected == "MarketQuery"
+    assert ex_info.value.message == "Test_Method: Expected envelope node 'MarketQuery' not found in response."
 
 
 def test_deserialize_multi_data_type_invalid():
@@ -467,11 +460,13 @@ def test_deserialize_multi_data_type_invalid():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market query; this should raise an error
-    with pytest.raises(ValueError) as ex_info:
-        _ = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketSubmit, OfferCancel)
+    with pytest.raises(DataNodeNotFoundError) as ex_info:
+        _ = serialzier.deserialize_multi("Test_Method", read_file("serialization_1.xml"), MarketSubmit, OfferCancel)
 
     # Finally, verify that the error message is as we expect
-    assert str(ex_info.value) == "Expected data type 'OfferCancel' not found in response"
+    assert ex_info.value.method == "Test_Method"
+    assert ex_info.value.expected == OfferCancel
+    assert ex_info.value.message == "Test_Method: Expected data node 'OfferCancel' not found in response."
 
 
 def test_deserialize_multi_works():
@@ -480,7 +475,7 @@ def test_deserialize_multi_works():
     serialzier = Serializer(SchemaType.MARKET, "MarketData")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize_multi(read_file("serialization_1.xml"), MarketSubmit, OfferData)
+    resp = serialzier.deserialize_multi("Test_Method", read_file("serialization_1.xml"), MarketSubmit, OfferData)
 
     # Finally, verify that the response is as we expect
     assert len(resp.data) == 1
@@ -575,7 +570,7 @@ def test_deserialize_multi_no_data_works():
     encoded_data = read_file("serialization_3.xml")
 
     # Next, attempt to deserialize the payload as a market submit request and offer data
-    resp = serialzier.deserialize_multi(encoded_data, MarketSubmit, OfferData)
+    resp = serialzier.deserialize_multi("Test_Method", encoded_data, MarketSubmit, OfferData)
 
     # Finally, verify that the response is as we expect
     assert len(resp.data) == 0
@@ -614,9 +609,3 @@ def test_deserialize_multi_no_data_works():
             ),
         },
     )
-
-
-def verify_response_common(data: ResponseCommon, success: bool, validation: ValidationStatus):
-    """Verify that the response common fields are as we expect."""
-    assert data.success == success
-    assert data.validation == validation

@@ -4,6 +4,7 @@ from logging import getLogger
 from typing import Dict
 from typing import List
 from typing import Optional
+from typing import Type
 from typing import Union
 
 from mms_client.types.base import E
@@ -87,4 +88,54 @@ class MMSValidationError(RuntimeError):
         )
         self.method = method
         self.messages = messages
+        super().__init__(self.message)
+
+
+class InvalidContainerError(ValueError):
+    """Error raised when the outer XML tag is not the expected one."""
+
+    def __init__(self, method: str, expected: str, actual: str):
+        """Initialize the error.
+
+        Arguments:
+        method (str):   The method that caused the error.
+        expected (str): The expected outer XML tag.
+        actual (str):   The actual outer XML tag.
+        """
+        self.message = f"{method}: Expected payload key '{expected}' in response, but found '{actual}'."
+        self.method = method
+        self.expected = expected
+        self.actual = actual
+        super().__init__(self.message)
+
+
+class EnvelopeNodeNotFoundError(ValueError):
+    """Error raised when the envelope node is not found."""
+
+    def __init__(self, method: str, expected: str):
+        """Initialize the error.
+
+        Arguments:
+        method (str):   The method that caused the error.
+        expected (str): The expected envelope XML tag.
+        """
+        self.message = f"{method}: Expected envelope node '{expected}' not found in response."
+        self.method = method
+        self.expected = expected
+        super().__init__(self.message)
+
+
+class DataNodeNotFoundError(ValueError):
+    """Error raised when the data node is not found."""
+
+    def __init__(self, method: str, expected: Type):
+        """Initialize the error.
+
+        Arguments:
+        method (str):       The method that caused the error.
+        expected (Type):    The expected data node.
+        """
+        self.message = f"{method}: Expected data node '{expected.__name__}' not found in response."
+        self.method = method
+        self.expected = expected
         super().__init__(self.message)

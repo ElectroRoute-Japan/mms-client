@@ -25,6 +25,8 @@ from mms_client.types.award import ContractResult
 from mms_client.types.award import ContractSource
 from mms_client.types.base import Message
 from mms_client.types.base import Messages
+from mms_client.types.base import ResponseCommon
+from mms_client.types.base import ValidationStatus
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BooleanFlag
 from mms_client.types.enums import ResourceType
@@ -179,6 +181,12 @@ def verify_messages(messages: Dict[str, Messages], verifiers: dict):
     # print(messages)
     for key, verifier in verifiers.items():
         verifier(messages[key])
+
+
+def verify_response_common(data: ResponseCommon, success: bool, validation: ValidationStatus):
+    """Verify that the response common fields are as we expect."""
+    assert data.success == success
+    assert data.validation == validation
 
 
 def verify_market_query(req: MarketQuery, date: Date, participant: str, user: str, days: int = 1):

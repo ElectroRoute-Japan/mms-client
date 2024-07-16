@@ -28,6 +28,7 @@ from mms_client.types.transport import RequestDataType
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
 from mms_client.utils.errors import AudienceError
+from mms_client.utils.errors import EnvelopeNodeNotFoundError
 from mms_client.utils.errors import MMSClientError
 from mms_client.utils.errors import MMSServerError
 from mms_client.utils.errors import MMSValidationError
@@ -131,7 +132,7 @@ class ClientProto(Protocol):
         envelope: E,
         data: Union[P, List[P]],
         config: EndpointConfiguration,
-    ) -> Tuple[MultiResponse[E, P], Dict[str, bytes]]:
+    ) -> Tuple[MultiResponse[E, P], Dict[str, bytes], bool]:
         """Submit a request to the MMS server and return the multi-response.
 
         Arguments:
@@ -139,7 +140,10 @@ class ClientProto(Protocol):
         data (Payload):                 The data to submit to the MMS server.
         config (EndpointConfiguration): The configuration for the endpoint.
 
-        Returns:    The multi-response from the MMS server.
+        Returns:
+        MultiResponse[E, P]:    The multi-response from the MMS server.
+        Dict[str, bytes]:       The attachments returned with the response.
+        bool:                   Whether or not the response was found.
         """
 
 
@@ -244,15 +248,15 @@ def mms_multi_endpoint(**kwargs):
                 envelope, callback = result, None
 
             # Now, submit the request to the MMS server and get the response
-            resp, attachments = self.request_many(envelope, args[0], config)
+            resp, attachments, found = self.request_many(envelope, args[0], config)
 
             # Call the callback function if it was provided
             if callback:
-                callback(resp, attachments)  # pragma: no cover
+                callback(resp, attachments, found)  # pragma: no cover
 
             # Finally, extract the data from the response and return it
             logger.info(f"{config.name}: Returning {len(resp.data)} item(s).")
-            return resp.data
+            return resp.data if found else []
 
         return wrapper
 
@@ -382,7 +386,9 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         envelope_type = config.response_envelope_type or type(envelope)
         data_type = config.response_data_type or type(payload)
         deserializer = config.serializer or config.service.serializer
-        data: Response[E, P] = deserializer.deserialize(resp.payload, envelope_type, data_type, config.for_report)
+        data: Response[E, P] = deserializer.deserialize(
+            config.name, resp.payload, envelope_type, data_type, config.for_report
+        )
         self._verify_response(data, config)
 
         # Return the response data and any attachments
@@ -391,12 +397,12 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         )
         return data, attachments
 
-    def request_many(
+    def request_many(  # pylint: disable=too-many-locals
         self,
         envelope: E,
         payload: Union[P, List[P]],
         config: EndpointConfiguration[E, P],
-    ) -> Tuple[MultiResponse[E, P], Dict[str, bytes]]:
+    ) -> Tuple[MultiResponse[E, P], Dict[str, bytes], bool]:
         """Submit a request to the MMS server and return the multi-response.
 
         Arguments:
@@ -404,7 +410,10 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         payload (Payload):              The data to submit to the MMS server.
         config (EndpointConfiguration): The configuration for the endpoint.
 
-        Returns:    The multi-response from the MMS server.
+        Returns:
+        MultiResponse[E, P]:    The multi-response from the MMS server.
+        Dict[str, bytes]:       The attachments returned with the response.
+        bool:                   Whether or not the response was found.
         """
         # Create a new ZWrapper for the given service
         wrapper = self._get_wrapper(config.service)
@@ -434,23 +443,38 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
         # Now, extract the attachments from the response
         attachments = {a.name: b64decode(a.data) for a in resp.attachments}
 
-        # Finally, deserialize and verify the response
-        envelope_type = config.response_envelope_type or type(envelope)
-        data_type = config.response_data_type or data_type
+        # Finally, deserialize the response and verify it
         deserializer = config.serializer or config.service.serializer
-        data: MultiResponse[E, P] = deserializer.deserialize_multi(
-            resp.payload,
-            envelope_type,
-            data_type,  # type: ignore[arg-type]
-            config.for_report,
-        )
+        try:
+            found = True
+            envelope_type = config.response_envelope_type or type(envelope)
+            resp_data_type = config.response_data_type or data_type
+            data: MultiResponse[E, P] = deserializer.deserialize_multi(
+                config.name,
+                resp.payload,
+                envelope_type,
+                resp_data_type,  # type: ignore[arg-type]
+                config.for_report,
+            )
+        except EnvelopeNodeNotFoundError:
+            found = False
+            envelope_type = type(envelope)
+            resp_data_type = data_type
+            data = deserializer.deserialize_multi(
+                config.name,
+                resp.payload,
+                envelope_type,
+                data_type,  # type: ignore[arg-type]
+                config.for_report,
+            )
         self._verify_multi_response(data, config)
 
         # Return the response data and any attachments
         logger.debug(
-            f"{config.name}: Returning multi-response. Envelope: {envelope_type.__name__}, Data: {data_type.__name__}",
+            f"{config.name}: Returning multi-response. Envelope: {envelope_type.__name__}, Data: "
+            f"{resp_data_type.__name__}"
         )
-        return data, attachments
+        return data, attachments, found
 
     def _to_mms_request(
         self,
