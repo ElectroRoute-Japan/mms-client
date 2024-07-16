@@ -2,38 +2,38 @@
 <MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
     <Messages>
-        <Warning Code="Warning1" />
-        <Warning Code="Warning2" />
-        <Information Code="Info1" />
-        <Information Code="Info2" />
+        <Warning Code="Warning1">Warning1</Warning>
+        <Warning Code="Warning2">Warning2</Warning>
+        <Information Code="Info1">Info1</Information>
+        <Information Code="Info2">Info2</Information>
     </Messages>
     <MarketQuery Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1" Validation="PASSED" Success="true">
         <Messages>
-            <Warning Code="Warning1" />
-            <Warning Code="Warning2" />
-            <Information Code="Info1" />
-            <Information Code="Info2" />
+            <Warning Code="Warning1">Warning1</Warning>
+            <Warning Code="Warning2">Warning2</Warning>
+            <Information Code="Info1">Info1</Information>
+            <Information Code="Info2">Info2</Information>
         </Messages>
         <AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" AfterGC="1" Validation="PASSED" Success="true">
             <Messages>
-                <Warning Code="Warning1" />
-                <Warning Code="Warning2" />
-                <Information Code="Info1" />
-                <Information Code="Info2" />
+                <Warning Code="Warning1">Warning1</Warning>
+                <Warning Code="Warning2">Warning2</Warning>
+                <Information Code="Info1">Info1</Information>
+                <Information Code="Info2">Info2</Information>
             </Messages>
             <AwardResultsQueryResponse>
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
                 <AwardResults StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" Direction="1">
                     <Messages>
-                        <Warning Code="Warning1" />
-                        <Warning Code="Warning2" />
-                        <Information Code="Info1" />
-                        <Information Code="Info2" />
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
                     </Messages>
                     <AwardResultsData
                         ContractId="156098uqt3qawldefjT"
@@ -88,10 +88,10 @@
                         ContractSource="2"
                         AfterGC="1">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </AwardResultsData>
                 </AwardResults>

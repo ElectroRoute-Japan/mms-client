@@ -22,6 +22,7 @@ from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
+from tests.testutils import message_verifier
 from tests.testutils import messages_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
@@ -193,24 +194,52 @@ def test_request_one_response_invalid(mock_certificate):
         exc_info.value.messages,
         {
             "MarketData": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData.OfferStack[0]": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
         },
     )
@@ -268,24 +297,52 @@ def test_request_many_response_invalid(mock_certificate):
         exc_info.value.messages,
         {
             "MarketData": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData[0]": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData[0].OfferStack[0]": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
         },
     )

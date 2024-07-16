@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="mi-market.xsd">
+    <ProcessingStatistics Received="1" Valid="1" Invalid="0"
+        Successful="0" Unsuccessful="0" ProcessingTimeMs="19"
+        TransactionId="derpderp"
+        TimeStamp="Tue Jul 16 17:26:46 JST 2024" XmlTimeStamp="2024-07-16T17:26:46.596+09:00"/>
+    <MarketQuery Date="2024-07-18" ParticipantName="F100"
+        UserName="FAKEUSER" NumOfDays="1" Validation="PASSED" Success="true">
+        <Messages>
+            <Information Code="MMSMKT_I_QUERY-EMPTY">No Data found for specified query parameters</Information>
+            <Information Code="MMSMKT_I_SUB-PASS">Successfully processed the ReserveRequirement query</Information>
+        </Messages>
+        <ReserveRequirementQuery MarketType="DAM" Area="03" Validation="PASSED"/>
+    </MarketQuery>
+</MarketData>
