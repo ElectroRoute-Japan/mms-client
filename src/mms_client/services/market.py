@@ -40,7 +40,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     @mms_multi_endpoint(
         name="MarketQuery_ReserveRequirementQuery",
         service=config,
-        request_type=RequestType.INFO,
+        request_type=RequestType.MARKET,
         response_envelope_type=MarketSubmit,
         response_data_type=ReserveRequirement,
     )
