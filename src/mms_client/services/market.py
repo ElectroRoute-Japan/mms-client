@@ -37,7 +37,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     # The configuration for the market service
     config = ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData"))
 
-    @mms_endpoint(
+    @mms_multi_endpoint(
         name="MarketQuery_ReserveRequirementQuery",
         service=config,
         request_type=RequestType.INFO,

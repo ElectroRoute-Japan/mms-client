@@ -75,8 +75,9 @@ def test_query_reserve_requirements_works(mock_certificate):
     resp = client.query_reserve_requirements(request, 1, Date(2024, 4, 12))
 
     # Finally, verify the response
+    assert len(resp) == 1
     verify_reserve_requirement(
-        resp,
+        resp[0],
         AreaCode.TOKYO,
         [
             requirement_verifier(
