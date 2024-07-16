@@ -55,7 +55,7 @@ def test_query_reserve_requirements_works(mock_certificate):
 
     # Register our test response with the responses library
     register_mms_request(
-        RequestType.INFO,
+        RequestType.MARKET,
         (
             "j/QJWIqedO/PWDHdHSa9MHDyHvqx0UIkcFc1CAzWRku+8mXL0UFLtI01zP0xZsvD3SUjktFf5VauyM5u+Ypc9vAip9PF17Msv/0bREeTD"
             "bWEWGgcFic7Mue5783DaWFvcgwLopH2DkqGCNTEknrnF9y0YIj0FNezMbC7LCZ7CV4akjXzJtTAcV71OcsyyG1uFmgz3Z8oumxctkYYfu"

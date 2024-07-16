@@ -115,7 +115,7 @@ def power_positive(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the power value.
     """
-    return attr(default=None if optional else PydanticUndefined, name=alias, gt=0, le=10000000)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=0, le=10000000)
 
 
 def price(alias: str, limit: float, optional: bool = False):

@@ -457,6 +457,9 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
                 config.for_report,
             )
         except EnvelopeNodeNotFoundError:
+            logger.warning(
+                f"{config.name}: Failed to deserialize multi-response. Attempting to deserialize as the request object."
+            )
             found = False
             envelope_type = type(envelope)
             resp_data_type = data_type
