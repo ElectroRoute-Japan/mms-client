@@ -269,7 +269,7 @@ class NewReportRequest(ReportMetadata, tag="ReportCreateRequest"):
     bsp_name: Optional[str] = participant("BSPName", True)
 
     # Parameters to be use when configuring the report
-    parameters: List[Parameter] = element(tag="Param", max_length=5)
+    parameters: Annotated[List[Parameter], element(tag="Param", max_length=5)]
 
 
 class NewReportResponse(NewReportRequest, tag="ReportCreateRequest"):
@@ -287,7 +287,7 @@ class ListReportResponse(ListReportRequest, tag="ReportListRequest"):
     """Represents the base fields for a list report response."""
 
     # The list of reports that match the query
-    reports: List[ReportItem] = wrapped(path="ReportListResponse", entity=element(tag="ReportItem"))
+    reports: Annotated[List[ReportItem], wrapped(path="ReportListResponse", entity=element(tag="ReportItem"))]
 
 
 class ReportDownloadRequest(ReportData):

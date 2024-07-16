@@ -2,6 +2,7 @@
 
 from decimal import Decimal
 from enum import Enum
+from typing import Annotated
 from typing import List
 from typing import Optional
 
@@ -323,7 +324,7 @@ class AwardResult(Payload, tag="AwardResults"):
     direction: Direction = attr(name="Direction")
 
     # The bid awards associated with these parameters
-    data: List[Award] = element(tag="AwardResultsData", min_length=1)
+    data: Annotated[List[Award], element(tag="AwardResultsData", min_length=1)]
 
     @field_serializer("start", "end")
     def encode_datetime(self, value: DateTime) -> str:
@@ -340,4 +341,4 @@ class AwardResponse(AwardQuery, tag="AwardResultsQuery"):
     """Contains the results of a bid award query."""
 
     # The bid awards associated with the query
-    results: Optional[List[AwardResult]] = wrapped(default=None, path="AwardResultsQueryResponse")
+    results: Annotated[Optional[List[AwardResult]], wrapped(default=None, path="AwardResultsQueryResponse")]
