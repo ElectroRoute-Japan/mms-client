@@ -46,6 +46,8 @@ This object represents the top-level XML element contained within the `MmsRespon
 ### Response & MultiResponse
 These objects contain the actual payload data and inherit from `BaseResponse`. These are what will actually be returned from the deserialization process. They also contain validation data for the top-level paylaod item(s). The difference between `Response` and `MultiResponse` is that the former contains a single item and the latter contains a list.
 
+Note that the `MultiResponse` object covers a special case where queries made to the MMS may return no items, in which case the response will be the request object itself. This is handled internally by the client, and the user will receive an empty list in such cases.
+
 ## Envelopes
 Not to be confused with the SOAP envelope, this envelope contains the method parameters used to send requests to the MMS server. For example, if you wanted to send a market-related request, this would take on the form of a `MarketQuery`, `MarketSubmit` or `MarketCancel` object. This is combined with the payload during the serialization process to produce the final XML payload before injecting it into the `MmsRequest`. During the deserialization process, this is extracted from the XML paylod on the `MmsResponse` object. Each of these should inherit from `mms_client.types.base.Envelope`.
 
