@@ -88,7 +88,7 @@ class MmsRequest(BaseModel):
 
     # Any attached files to be sent with the request. Only 20 of these are allowed for OMI requests. For MI requests,
     # the limit is 40.
-    attachments: Annotated[List[Attachment], Field(default=[], alias="attachmentData")]
+    attachments: Annotated[List[Attachment], Field(alias="attachmentData")] = []
 
     def to_arguments(self) -> dict:
         """Convert the request to a dictionary of arguments for use in the MMS client."""
@@ -128,4 +128,4 @@ class MmsResponse(BaseModel):
     payload: bytes = Field(alias="responseData")
 
     # Any attached files to be sent with the response
-    attachments: Annotated[List[Attachment], Field(default=[], alias="attachmentData")]
+    attachments: Annotated[List[Attachment], Field(alias="attachmentData")] = []
