@@ -1,5 +1,6 @@
 """Contains objects for MMS reserve requirements."""
 
+from typing import Annotated
 from typing import List
 from typing import Optional
 
@@ -71,7 +72,7 @@ class ReserveRequirement(Payload):
     area: AreaCode = attr(name="Area")
 
     # The requirements associated with the area
-    requirements: List[Requirement] = element(tag="Requirement", min_length=1)
+    requirements: Annotated[List[Requirement], element(tag="Requirement", min_length=1)]
 
 
 class ReserveRequirementQuery(Payload):

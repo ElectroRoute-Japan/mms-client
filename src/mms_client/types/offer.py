@@ -1,6 +1,7 @@
 """Contains objects for MMS offers."""
 
 from decimal import Decimal
+from typing import Annotated
 from typing import List
 from typing import Optional
 
@@ -79,7 +80,7 @@ class OfferData(Payload):
     """Describes the data common to both offer requests and responses."""
 
     # The separate offers that make up the offer stack
-    stack: List[OfferStack] = element(tag="OfferStack", min_length=1, max_length=20)
+    stack: Annotated[List[OfferStack], element(tag="OfferStack", min_length=1, max_length=20)]
 
     # The identifier for the power resource being traded
     resource: str = resource_name("ResourceName")

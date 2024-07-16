@@ -328,7 +328,7 @@ class StartupPattern(Payload, tag="StartupPatternInfo"):
     pattern_name: str = pattern_name("PatternName")
 
     # The events associated with this startup pattern
-    events: List[StartupEvent] = element(tag="StartupPatternEvent", min_length=6, max_length=25)
+    events: Annotated[List[StartupEvent], element(tag="StartupPatternEvent", min_length=6, max_length=25)]
 
 
 class ShutdownEvent(Payload):
@@ -366,34 +366,36 @@ class ShutdownPattern(Payload, tag="StopPatternInfo"):
     pattern_name: str = pattern_name("PatternName")
 
     # The events associated with this stop pattern
-    events: List[ShutdownEvent] = element(tag="StopPatternEvent", min_length=2, max_length=21)
+    events: Annotated[List[ShutdownEvent], element(tag="StopPatternEvent", min_length=2, max_length=21)]
 
 
 class ResourceData(Payload, tag="Resource"):
     """Contains the data common to both resource requests and responses."""
 
     # The output bands associated with this resource
-    output_bands: Optional[List[OutputBand]] = wrapped(default=None, path="OutputBand", min_length=1, max_length=20)
+    output_bands: Annotated[
+        Optional[List[OutputBand]], wrapped(default=None, path="OutputBand", min_length=1, max_length=20)
+    ]
 
     # The switching outputs associated with this resource
-    switch_outputs: Optional[List[SwitchOutput]] = wrapped(
-        default=None, path="SwitchOutput", min_length=1, max_length=20
-    )
+    switch_outputs: Annotated[
+        Optional[List[SwitchOutput]], wrapped(default=None, path="SwitchOutput", min_length=1, max_length=20)
+    ]
 
     # The minimum EDC/LFC outputs associated with this resource
-    afc_minimum_outputs: Optional[List[AfcMinimumOutput]] = wrapped(
-        default=None, path="OutputRangeBelowAfc", min_length=1, max_length=20
-    )
+    afc_minimum_outputs: Annotated[
+        Optional[List[AfcMinimumOutput]], wrapped(default=None, path="OutputRangeBelowAfc", min_length=1, max_length=20)
+    ]
 
     # The startup patterns associated with this resource
-    startup_patterns: Optional[List[StartupPattern]] = wrapped(
-        default=None, path="StartupPattern", min_length=1, max_length=20
-    )
+    startup_patterns: Annotated[
+        Optional[List[StartupPattern]], wrapped(default=None, path="StartupPattern", min_length=1, max_length=20)
+    ]
 
     # The stop patterns associated with this resource
-    shutdown_patterns: Optional[List[ShutdownPattern]] = wrapped(
-        default=None, path="StopPattern", min_length=1, max_length=20
-    )
+    shutdown_patterns: Annotated[
+        Optional[List[ShutdownPattern]], wrapped(default=None, path="StopPattern", min_length=1, max_length=20)
+    ]
 
     # Any comments attached to the resource
     comments: Optional[str] = element(
