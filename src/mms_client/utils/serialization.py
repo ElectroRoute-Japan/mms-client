@@ -29,6 +29,9 @@ from mms_client.types.base import Response
 from mms_client.types.base import ResponseCommon
 from mms_client.types.base import ResponseData
 from mms_client.types.base import SchemaType
+from mms_client.utils.errors import DataNodeNotFoundError
+from mms_client.utils.errors import EnvelopeNodeNotFoundError
+from mms_client.utils.errors import InvalidContainerError
 
 # Directory containing all our XML schemas
 XSD_DIR = Path(__file__).parent.parent / "schemas" / "xsd"
@@ -115,11 +118,12 @@ class Serializer:
         return self._to_canoncialized_xml(payload)
 
     def deserialize(
-        self, data: bytes, envelope_type: Type[E], data_type: Type[P], for_report: bool = False
+        self, method: str, data: bytes, envelope_type: Type[E], data_type: Type[P], for_report: bool = False
     ) -> Response[E, P]:
         """Deserialize the data to a response object.
 
         Arguments:
+        method (str):                   The method for which the data was received.
         data (bytes):                   The raw data to be deserialized.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
         data_type (Type[Payload]):      The type of data to be constructed.
@@ -128,14 +132,15 @@ class Serializer:
         Returns:    A response object containing the envelope and data extracted from the raw data.
         """
         tree = self._from_xml(data)
-        return self._from_tree(tree, envelope_type, data_type, for_report)
+        return self._from_tree(method, tree, envelope_type, data_type, for_report)
 
     def deserialize_multi(
-        self, data: bytes, envelope_type: Type[E], data_type: Type[P], for_report: bool = False
+        self, method: str, data: bytes, envelope_type: Type[E], data_type: Type[P], for_report: bool = False
     ) -> MultiResponse[E, P]:
         """Deserialize the data to a multi-response object.
 
         Arguments:
+        method (str):                   The method for which the data was received.
         data (bytes):                   The raw data to be deserialized.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
         data_type (Type[Payload]):      The type of data to be constructed.
@@ -144,7 +149,7 @@ class Serializer:
         Returns:    A multi-response object containing the envelope and data extracted from the raw data.
         """
         tree = self._from_xml(data)
-        return self._from_tree_multi(tree, envelope_type, data_type, for_report)
+        return self._from_tree_multi(method, tree, envelope_type, data_type, for_report)
 
     def _to_canoncialized_xml(self, payload: PayloadBase) -> bytes:
         """Convert the payload to a canonicalized XML string.
@@ -170,10 +175,13 @@ class Serializer:
         buffer.seek(0)
         return buffer.read()
 
-    def _from_tree(self, raw: Element, envelope_type: Type[E], data_type: Type[P], for_report: bool) -> Response[E, P]:
+    def _from_tree(
+        self, method: str, raw: Element, envelope_type: Type[E], data_type: Type[P], for_report: bool
+    ) -> Response[E, P]:
         """Convert the raw data to a response object.
 
         Arguments:
+        method (str):                   The method for which the data was received.
         raw (Element):                  The raw data to be converted.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
         data_type (Type[Payload]):      The type of data to be constructed.
@@ -184,7 +192,7 @@ class Serializer:
         # First, attempt to extract the response from the raw data; if the key isn't found then we'll raise an error.
         # Otherwise, we'll attempt to construct the response from the raw data.
         if self._payload_key != raw.tag:
-            raise ValueError(f"Expected payload key '{self._payload_key}' not found in response")
+            raise InvalidContainerError(method, self._payload_key, raw.tag)
         cls: Response[E, P] = _create_response_payload_type(  # type: ignore[assignment]
             self._payload_key,
             envelope_type,  # type: ignore[arg-type]
@@ -195,12 +203,12 @@ class Serializer:
 
         # Next, attempt to extract the envelope and data from within the response
         resp.envelope, resp.envelope_validation, envelope_node = self._from_tree_envelope(
-            raw, envelope_type, for_report
+            method, raw, envelope_type, for_report
         )
 
         # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
         # from within the envelope
-        self._verify_tree_data_tag(envelope_node, data_type)
+        self._verify_tree_data_tag(method, envelope_node, data_type)
         resp.payload = self._from_tree_data(envelope_node.find(get_tag(data_type)), data_type)
 
         # Finally, attempt to extract the messages from within the payload
@@ -212,11 +220,12 @@ class Serializer:
         return resp
 
     def _from_tree_multi(
-        self, raw: Element, envelope_type: Type[E], data_type: Type[P], for_report: bool
+        self, method: str, raw: Element, envelope_type: Type[E], data_type: Type[P], for_report: bool
     ) -> MultiResponse[E, P]:
         """Convert the raw data to a multi-response object.
 
         Arguments:
+        method (str):                   The method for which the data was received.
         raw (Element):                  The raw data to be converted.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
         data_type (Type[Payload]):      The type of data to be constructed.
@@ -227,7 +236,7 @@ class Serializer:
         # First, attempt to extract the response from the raw data; if the key isn't found then we'll raise an error.
         # Otherwise, we'll attempt to construct the response from the raw data.
         if self._payload_key != raw.tag:
-            raise ValueError(f"Expected payload key '{self._payload_key}' not found in response")
+            raise InvalidContainerError(method, self._payload_key, raw.tag)
         cls: MultiResponse[E, P] = _create_response_payload_type(  # type: ignore[assignment]
             self._payload_key,
             envelope_type,  # type: ignore[arg-type]
@@ -237,12 +246,14 @@ class Serializer:
         resp = cls.from_xml_tree(raw)  # type: ignore[arg-type]
 
         # Next, attempt to extract the envelope from the response
-        resp.envelope, resp.envelope_validation, env_node = self._from_tree_envelope(raw, envelope_type, for_report)
+        resp.envelope, resp.envelope_validation, env_node = self._from_tree_envelope(
+            method, raw, envelope_type, for_report
+        )
 
         # Now, verify that the response doesn't contain an unexpected data type and then retrieve the payload data
         # from within the envelope
         # NOTE: apparently, mypy doesn't know about setter-getter properties either...
-        self._verify_tree_data_tag(env_node, data_type)
+        self._verify_tree_data_tag(method, env_node, data_type)
         resp.payload = [
             self._from_tree_data(item, data_type) for item in env_node.findall(get_tag(data_type))  # type: ignore[misc]
         ]
@@ -256,11 +267,12 @@ class Serializer:
         return resp
 
     def _from_tree_envelope(
-        self, raw: Element, envelope_type: Type[E], for_report: bool
+        self, method: str, raw: Element, envelope_type: Type[E], for_report: bool
     ) -> Tuple[E, ResponseCommon, Element]:
         """Attempt to extract the envelope from within the response.
 
         Arguments:
+        method (str):                   The method for which the data was received.
         raw (Element):                  The raw data to be converted.
         envelope_type (Type[Envelope]): The type of envelope to be constructed.
         for_report (bool):              If True, the data will be serialized for a report request.
@@ -274,7 +286,7 @@ class Serializer:
         envelope_tag = get_tag(envelope_type)
         envelope_node = raw if for_report else raw.find(envelope_tag)
         if envelope_node is None or envelope_node.tag != envelope_tag:
-            raise ValueError(f"Expected envelope type '{envelope_tag}' not found in response")
+            raise EnvelopeNodeNotFoundError(method, envelope_tag)
 
         # Next, create a new envelope type that contains the envelope type with the appropriate XML tag. We have to do
         # this because the envelope type doesn't include the ResponseCommon fields, and the tag doesn't match
@@ -288,10 +300,11 @@ class Serializer:
             envelope_node,
         )
 
-    def _verify_tree_data_tag(self, raw: Element, data_type: Type[P]) -> None:
+    def _verify_tree_data_tag(self, method: str, raw: Element, data_type: Type[P]) -> None:
         """Verify that no types other than the expected data type are present in the response.
 
         Arguments:
+        method (str):               The method for which the data was received.
         raw (Element):              The raw data to be converted.
         data_type (Type[Payload]):  The type of data to be constructed.
 
@@ -300,7 +313,7 @@ class Serializer:
         """
         data_tags = set(node.tag for node in raw)
         if not data_tags.issubset([data_type.__name__, data_type.__xml_tag__, "ProcessingStatistics", "Messages"]):
-            raise ValueError(f"Expected data type '{data_type.__name__}' not found in response")
+            raise DataNodeNotFoundError(method, data_type)
 
     def _from_tree_data(self, raw: Optional[Element], data_type: Type[P]) -> Optional[ResponseData[P]]:
         """Attempt to extract the data from within the payload.

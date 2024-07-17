@@ -8,10 +8,14 @@ from pendulum import DateTime
 from mms_client.services.base import BaseClient
 from mms_client.services.base import EndpointConfiguration
 from mms_client.services.base import ServiceConfiguration
+from mms_client.types.base import ValidationStatus
+from mms_client.types.enums import AreaCode
+from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
 from mms_client.types.market import MarketType
 from mms_client.types.offer import Direction
 from mms_client.types.offer import OfferData
+from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
 from mms_client.types.transport import RequestType
 from mms_client.types.transport import ResponseDataType
@@ -22,11 +26,15 @@ from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
 from mms_client.utils.web import ClientType
 from mms_client.utils.web import Interface
+from tests.testutils import message_verifier
 from tests.testutils import messages_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
 from tests.testutils import register_mms_request
+from tests.testutils import verify_market_query
 from tests.testutils import verify_messages
+from tests.testutils import verify_offer_query
+from tests.testutils import verify_response_common
 
 
 @responses.activate
@@ -193,24 +201,52 @@ def test_request_one_response_invalid(mock_certificate):
         exc_info.value.messages,
         {
             "MarketData": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData.OfferStack[0]": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
         },
     )
@@ -268,24 +304,93 @@ def test_request_many_response_invalid(mock_certificate):
         exc_info.value.messages,
         {
             "MarketData": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit": messages_verifier(
-                ["Error1"],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Error1", "Error1"),
+                ],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData[0]": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
             "MarketData.MarketSubmit.OfferData[0].OfferStack[0]": messages_verifier(
                 [],
-                ["Warning1", "Warning2"],
-                ["Info1", "Info2"],
+                [
+                    message_verifier("Warning1", "Warning1"),
+                    message_verifier("Warning2", "Warning2"),
+                ],
+                [
+                    message_verifier("Info1", "Info1"),
+                    message_verifier("Info2", "Info2"),
+                ],
             ),
         },
     )
+
+
+@responses.activate
+def test_request_many_no_data(mock_certificate):
+    """Test that an exception is raised if the response is invalid."""
+    # First, create our base client and endpoint configuration
+    client = BaseClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+    config = EndpointConfiguration(
+        name="Test",
+        allowed_clients=[ClientType.BSP],
+        service=ServiceConfiguration(Interface.MI, Serializer(SchemaType.MARKET, "MarketData")),
+        request_type=RequestType.INFO,
+        response_envelope_type=MarketSubmit,
+        response_data_type=OfferData,
+    )
+
+    # Next, register our test response with the responses library
+    register_mms_request(
+        RequestType.INFO,
+        (
+            "eBki+iSH6OaDGQSRkB6unDPyDxqMnpmZravPSYLztpaYqc1L8Zxx4ZcPFVbM2BJZ3CbKCw4urcRDsCA+4p5Lnx0BwCtCWCknFfrPyJfkg/VHixX2GJygyCzfY39Ysm3Lor8a5m5VjVukhiYG8roTE55wqivEzYX6mBDxSWSKx697c0Kmfy6lsIZaALxdLWMEnZwSgf4i/nSWdqaqFc/6oAmpHYkdp2woeXs4UTgG0BxPsoaDwhHH1HTqSzJqFexgilmOLMKo/9wg/zyEOiwOdp+chaaI4DEYhi7q+d6coFQiN0+pWh4+KA6PeHkQsaAVTurw60MVtw3CQ4EL5Od3lDutndkdVdwsW8/fbY0xsH1/uusqoZjhZine4oRTdOudP2y8pPhE65N//XP9Tgti7DU8I7CaQ9418FgZ/9u9N7Ut3W/CgwWVTuiTG3JJN8UvrO3833ANl0QlhY78az9rEa58MfpZ0mmaxNIH8Y55XqX2BDytsN6YUNlZHYFw0fe2qt+jRursDlbcbAvNn+AGUTEwAdLxzUiHbuEvX/i4Rc7R9mGm3F0XFA6OXb8EOrXCyPuerfpqbVEAW7WRSsEOB4tzq53VnJPbdsNHPD/5z2JdOkHwB2ZtfnqvAZ8yXx0B5FFyS6oiTZbD/tjdU1bGLPgc782d9zqFr4B1Gn7UDro="
+        ),
+        read_request_file("query_offers_request.xml"),
+        read_file("query_offers_request.xml"),
+        multipart=True,
+    )
+
+    # Now, create our request envelope and payload
+    envelope = MarketQuery(date=Date(2024, 3, 15), participant="F100", user="FAKEUSER")
+    payload = OfferQuery(market_type=MarketType.DAY_AHEAD, area=AreaCode.CHUBU, resource="FAKE_RESO")
+
+    # Finally, attempt to submit the request; this should not fail
+    resp, _, found = client.request_many(envelope, payload, config)
+
+    # Verify that the response is as we expect
+    assert not found
+    assert len(resp.data) == 1
+    assert not resp.messages
+    verify_market_query(resp.envelope, Date(2024, 3, 15), "F100", "FAKEUSER", 1)
+    verify_offer_query(resp.data[0], MarketType.DAY_AHEAD, AreaCode.CHUBU, "FAKE_RESO")
+    verify_response_common(resp.envelope_validation, True, ValidationStatus.NOT_DONE)

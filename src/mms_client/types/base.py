@@ -35,6 +35,9 @@ class Message(BaseXmlModel):
     # The message text. Not sure why this is called code in the XML.
     code: str = attr(default="", name="Code", min_length=2, max_length=50, pattern=r"^[a-zA-Z_0-9\-]*$")
 
+    # A human-readable description of the message
+    description: str
+
 
 class Messages(BaseXmlModel, search_mode="unordered", arbitrary_types_allowed=True):
     """Represents a collection of messages returned with a payload."""
@@ -49,21 +52,21 @@ class Messages(BaseXmlModel, search_mode="unordered", arbitrary_types_allowed=Tr
     errors_raw: List[Element] = element(default=[], tag="Error", nillable=True, exclude=True)
 
     @computed_element
-    def information(self) -> List[str]:
+    def information(self) -> List[Message]:
         """Return the information messages."""
         return self._parse_messages(self.information_raw)
 
     @computed_element
-    def warnings(self) -> List[str]:
+    def warnings(self) -> List[Message]:
         """Return the warning messages."""
         return self._parse_messages(self.warnings_raw)
 
     @computed_element
-    def errors(self) -> List[str]:
+    def errors(self) -> List[Message]:
         """Return the error messages."""
         return self._parse_messages(self.errors_raw)
 
-    def _parse_messages(self, raw: List[Element]) -> List[str]:
+    def _parse_messages(self, raw: List[Element]) -> List[Message]:
         """Parse the messages from the XML tree.
 
         Arguments:
@@ -73,10 +76,11 @@ class Messages(BaseXmlModel, search_mode="unordered", arbitrary_types_allowed=Tr
         """
         messages = []
         for item in raw:
+            text = item.text or ""
             if message := item.attrib.get("Code"):
-                messages.append(message)
+                messages.append(Message(description=text, code=message))
             else:
-                messages.append(item.text or "")
+                messages.append(Message(description=text))
         return messages
 
 

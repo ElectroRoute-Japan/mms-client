@@ -2,33 +2,33 @@
 <MarketData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
     <Messages>
-        <Error Code="Error1" />
-        <Warning Code="Warning1" />
-        <Warning Code="Warning2" />
-        <Information Code="Info1" />
-        <Information Code="Info2" />
+        <Error Code="Error1">Error1</Error>
+        <Warning Code="Warning1">Warning1</Warning>
+        <Warning Code="Warning2">Warning2</Warning>
+        <Information Code="Info1">Info1</Information>
+        <Information Code="Info2">Info2</Information>
     </Messages>
     <MarketSubmit Date="2024-03-15" ParticipantName="F100" UserName="FAKEUSER" MarketType="DAM" NumOfDays="1" Validation="FAILED" Success="false">
         <Messages>
-            <Error Code="Error1" />
-            <Warning Code="Warning1" />
-            <Warning Code="Warning2" />
-            <Information Code="Info1" />
-            <Information Code="Info2" />
+            <Error Code="Error1">Error1</Error>
+            <Warning Code="Warning1">Warning1</Warning>
+            <Warning Code="Warning2">Warning2</Warning>
+            <Information Code="Info1">Info1</Information>
+            <Information Code="Info2">Info2</Information>
         </Messages>
         <OfferData ResourceName="FAKE_RESO" StartTime="2024-03-15T12:00:00" EndTime="2024-03-15T21:00:00" Direction="1" DrPatternNumber="1" BspParticipantName="F100" CompanyShortName="偽会社" OperatorCode="FAKE" Area="04" ResourceShortName="偽電力" SystemCode="FSYS0" SubmissionTime="2024-03-15T11:44:15" Validation="PASSED" Success="true">
             <Messages>
-                <Warning Code="Warning1" />
-                <Warning Code="Warning2" />
-                <Information Code="Info1" />
-                <Information Code="Info2" />
+                <Warning Code="Warning1">Warning1</Warning>
+                <Warning Code="Warning2">Warning2</Warning>
+                <Information Code="Info1">Info1</Information>
+                <Information Code="Info2">Info2</Information>
             </Messages>
             <OfferStack StackNumber="1" MinimumQuantityInKw="100" OfferUnitPrice="100" OfferId="FAKE_ID">
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
             </OfferStack>
         </OfferData>

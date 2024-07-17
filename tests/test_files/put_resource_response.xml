@@ -2,17 +2,17 @@
 <RegistrationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Validation="PASSED" Success="true">
     <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
     <Messages>
-        <Warning Code="Warning1" />
-        <Warning Code="Warning2" />
-        <Information Code="Info1" />
-        <Information Code="Info2" />
+        <Warning Code="Warning1">Warning1</Warning>
+        <Warning Code="Warning2">Warning2</Warning>
+        <Information Code="Info1">Info1</Information>
+        <Information Code="Info2">Info2</Information>
     </Messages>
     <RegistrationSubmit Validation="PASSED" Success="true">
         <Messages>
-            <Warning Code="Warning1" />
-            <Warning Code="Warning2" />
-            <Information Code="Info1" />
-            <Information Code="Info2" />
+            <Warning Code="Warning1">Warning1</Warning>
+            <Warning Code="Warning2">Warning2</Warning>
+            <Information Code="Info1">Info1</Information>
+            <Information Code="Info2">Info2</Information>
         </Messages>
         <Resource
             ParticipantName="F100"
@@ -121,151 +121,151 @@
             Success="true"
         >
             <Messages>
-                <Warning Code="Warning1" />
-                <Warning Code="Warning2" />
-                <Information Code="Info1" />
-                <Information Code="Info2" />
+                <Warning Code="Warning1">Warning1</Warning>
+                <Warning Code="Warning2">Warning2</Warning>
+                <Information Code="Info1">Info1</Information>
+                <Information Code="Info2">Info2</Information>
             </Messages>
             <OutputBand>
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
                 <OutputBandInfo Output="100" GfWidth="1000" AfcWidth="2000" AfcVariationSpeed="100" OtmVariationSpeed="200" AfcOtmVariationSpeed="300">
                     <Messages>
-                        <Warning Code="Warning1" />
-                        <Warning Code="Warning2" />
-                        <Information Code="Info1" />
-                        <Information Code="Info2" />
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
                     </Messages>
                 </OutputBandInfo>
             </OutputBand>
             <SwitchOutput>
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
                 <SwitchOutputInfo Output="3000" SwitchTime="40">
                     <Messages>
-                        <Warning Code="Warning1" />
-                        <Warning Code="Warning2" />
-                        <Information Code="Info1" />
-                        <Information Code="Info2" />
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
                     </Messages>
                 </SwitchOutputInfo>
             </SwitchOutput>
             <OutputRangeBelowAfc>
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
                 <OutputRangeBelowAfcInfo Output="4000" OperationTime="50.1" OutputVariationSpeed="400">
                     <Messages>
-                        <Warning Code="Warning1" />
-                        <Warning Code="Warning2" />
-                        <Information Code="Info1" />
-                        <Information Code="Info2" />
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
                     </Messages>
                 </OutputRangeBelowAfcInfo>
             </OutputRangeBelowAfc>
             <StartupPattern>
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
                 <StartupPatternInfo PatternName="偽パターン１">
                     <Messages>
-                        <Warning Code="Warning1" />
-                        <Warning Code="Warning2" />
-                        <Information Code="Info1" />
-                        <Information Code="Info2" />
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
                     </Messages>
                     <StartupPatternEvent EventName="1" ChangeTime="00:10" Output="5000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StartupPatternEvent>
                     <StartupPatternEvent EventName="2" ChangeTime="01:20" Output="6000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2"/>
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StartupPatternEvent>
                     <StartupPatternEvent EventName="3" ChangeTime="10:03" Output="7000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StartupPatternEvent>
                     <StartupPatternEvent EventName="4" ChangeTime="-01:01" Output="8000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StartupPatternEvent>
                     <StartupPatternEvent EventName="25" ChangeTime="-00:50" Output="9000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StartupPatternEvent>
                     <StartupPatternEvent EventName="17" ChangeTime="-10:05" Output="10000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StartupPatternEvent>
                 </StartupPatternInfo>
             </StartupPattern>
             <StopPattern>
                 <Messages>
-                    <Warning Code="Warning1" />
-                    <Warning Code="Warning2" />
-                    <Information Code="Info1" />
-                    <Information Code="Info2" />
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
                 </Messages>
                 <StopPatternInfo PatternName="偽パターン２">
                     <Messages>
-                        <Warning Code="Warning1" />
-                        <Warning Code="Warning2" />
-                        <Information Code="Info1" />
-                        <Information Code="Info2" />
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
                     </Messages>
                     <StopPatternEvent EventName="1" ChangeTime="-45:33" Output="5000">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StopPatternEvent>
                     <StopPatternEvent EventName="21" ChangeTime="-00:32" Output="10">
                         <Messages>
-                            <Warning Code="Warning1" />
-                            <Warning Code="Warning2" />
-                            <Information Code="Info1" />
-                            <Information Code="Info2" />
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
                         </Messages>
                     </StopPatternEvent>
                 </StopPatternInfo>

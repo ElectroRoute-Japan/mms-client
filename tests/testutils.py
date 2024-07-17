@@ -23,7 +23,10 @@ from mms_client.types.award import AwardResponse
 from mms_client.types.award import AwardResult
 from mms_client.types.award import ContractResult
 from mms_client.types.award import ContractSource
+from mms_client.types.base import Message
 from mms_client.types.base import Messages
+from mms_client.types.base import ResponseCommon
+from mms_client.types.base import ValidationStatus
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BooleanFlag
 from mms_client.types.enums import ResourceType
@@ -151,13 +154,23 @@ def attachment_verifier(name: str, data: str, signature: str):
     return inner
 
 
+def message_verifier(code: str, description: str):
+    """Return a function that verifies that a message has the expected code and description."""
+
+    def inner(message: Message):
+        assert message.code == code
+        assert message.description == description
+
+    return inner
+
+
 def messages_verifier(errors: list, warnings: list, infos: list):
     """Return a function that verifies that a message has the expected errors, warnings, and information."""
 
     def inner(messages: Messages):
-        assert sorted(messages.errors) == errors
-        assert sorted(messages.warnings) == warnings
-        assert sorted(messages.information) == infos
+        verify_list(sorted(messages.errors, key=lambda x: x.description), errors)
+        verify_list(sorted(messages.warnings, key=lambda x: x.description), warnings)
+        verify_list(sorted(messages.information, key=lambda x: x.description), infos)
 
     return inner
 
@@ -168,6 +181,12 @@ def verify_messages(messages: Dict[str, Messages], verifiers: dict):
     # print(messages)
     for key, verifier in verifiers.items():
         verifier(messages[key])
+
+
+def verify_response_common(data: ResponseCommon, success: bool, validation: ValidationStatus):
+    """Verify that the response common fields are as we expect."""
+    assert data.success == success
+    assert data.validation == validation
 
 
 def verify_market_query(req: MarketQuery, date: Date, participant: str, user: str, days: int = 1):
@@ -690,7 +709,7 @@ def event_verifier(name, charge_time: str, output: int):
     return inner
 
 
-def verify_list(items: list = None, verifiers: list = None):
+def verify_list(items: Optional[list] = None, verifiers: Optional[list] = None):
     """Verify that the given list of items was created with the correct parameters."""
     print(items)
     if items is None or verifiers is None:
