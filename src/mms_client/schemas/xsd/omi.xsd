@@ -22,11 +22,11 @@
       History:
 
       001  2021-03-29 Initial version.
-
-
+      
+      
       </xs:documentation>
     </xs:annotation>
-
+    
     <!-- BEGIN: Common Simple Type Definitions -->
 
     <xs:simpleType name="ValidationStatusType">
@@ -55,7 +55,7 @@
     </xs:simpleType>
 
     <!-- END: Common Simple Type Definitions -->
-
+    
     <!-- BEGIN: Registration Simple Type Definitions -->
 
     <xs:simpleType name="ParticipantNameType">
@@ -190,32 +190,20 @@
 
     <xs:simpleType name="StartTimeCodeType">
       <xs:restriction base="xs:string">
-        <xs:enumeration value="01"/>
-        <xs:enumeration value="07"/>
-        <xs:enumeration value="13"/>
-        <xs:enumeration value="19"/>
-        <xs:enumeration value="25"/>
-        <xs:enumeration value="31"/>
-        <xs:enumeration value="37"/>
-        <xs:enumeration value="43"/>
+        <xs:length value="2"/>
+        <xs:pattern value="([0][1-9]|[1-3][0-9]|[4][0-8])"/>
       </xs:restriction>
     </xs:simpleType>
 
     <xs:simpleType name="EndTimeCodeType">
       <xs:restriction base="xs:string">
-        <xs:enumeration value="06"/>
-        <xs:enumeration value="12"/>
-        <xs:enumeration value="18"/>
-        <xs:enumeration value="24"/>
-        <xs:enumeration value="30"/>
-        <xs:enumeration value="36"/>
-        <xs:enumeration value="42"/>
-        <xs:enumeration value="48"/>
+        <xs:length value="2"/>
+        <xs:pattern value="([0][1-9]|[1-3][0-9]|[4][0-8])"/>
       </xs:restriction>
     </xs:simpleType>
 
     <!-- END: General Simple Type Definitions -->
-
+    
     <!-- BEGIN: Precision Types -->
 
     <xs:simpleType name="KwPosValue7.0Type">
@@ -413,6 +401,54 @@
         <xs:enumeration value="PRI-SEC2-TER1"/>
         <xs:enumeration value="SEC1-SEC2-TER1"/>
         <xs:enumeration value="PRI-SEC1-SEC2-TER1"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="CommodityCategoryType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1000"/>
+        <xs:enumeration value="2100"/>
+        <xs:enumeration value="2200"/>
+        <xs:enumeration value="3100"/>
+        <xs:enumeration value="3200"/>
+        <xs:enumeration value="4000"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ProcurementTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="1"/>
+        <xs:enumeration value="2"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="RampDownRefundTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="0"/>
+        <xs:enumeration value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="StartUpRefundTypeType">
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="0"/>
+        <xs:enumeration value="1"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="ContractIdType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="19"/>
+        <xs:maxLength value="19"/>
+        <xs:pattern value="[a-zA-Z0-9]*"/>
+      </xs:restriction>
+    </xs:simpleType>
+
+    <xs:simpleType name="JbmsIdRefundType">
+      <xs:restriction base="xs:string">
+        <xs:minLength value="1"/>
+        <xs:maxLength value="18"/>
+        <xs:pattern value="[A-Z0-9]*"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -683,6 +719,8 @@
       <xs:attribute name="CompoundContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="Tertiary2ContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="ContractPrice" type="PriceValue7.2RoundedType" use="required"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2RoundedType" use="optional"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2RoundedType" use="optional"/>
       <xs:attribute name="DrPatternNumber" type="DrPatternNumberType" use="optional"/>
       <xs:attribute name="PriSec1CommandOperationMethod" type="PriSec1CommandOperationMethodType" use="optional"/>
       <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
@@ -714,10 +752,86 @@
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
 
+    <xs:complexType name="RefundDataQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          RefundData: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="ProcurementType" type="ProcurementTypeType" use="optional"/>
+      <xs:attribute name="JbmsId" type="JbmsIdRefundType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="ContractId" type="ContractIdType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional" />
+      <xs:attribute name="Area" type="AreaType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="RefundTargetContractResultQueryType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          RefundTargetContractResult: Query type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="ProcurementType" type="ProcurementTypeType" use="required"/>
+      <xs:attribute name="JbmsId" type="JbmsIdRefundType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="ContractId" type="ContractIdType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
+    <xs:complexType name="RefundDataType">
+      <xs:annotation>
+        <xs:documentation xml:lang="en">
+
+          RefundData: Submit type
+
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="Messages" type="MessagesType"
+          minOccurs="0" maxOccurs="1"/>
+      </xs:sequence>
+      <xs:attribute name="ProcurementType" type="ProcurementTypeType" use="required"/>
+      <xs:attribute name="JbmsId" type="JbmsIdRefundType" use="required"/>
+      <xs:attribute name="ContractId" type="ContractIdType" use="optional"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="ParticipantName" type="ParticipantNameType" use="optional"/>
+      <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
+      <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="optional"/>
+      <xs:attribute name="ContractPrice" type="PriceValue7.2RoundedType" use="optional"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2RoundedType" use="optional"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2RoundedType" use="optional"/>
+      <xs:attribute name="RampDownRefundType" type="RampDownRefundTypeType" use="required"/>
+      <xs:attribute name="StartUpRefundType" type="StartUpRefundTypeType" use="required"/>
+      <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
+      <xs:attributeGroup ref="CommonAttributes"/>
+    </xs:complexType>
+
     <!-- END: OMI Data Definitions -->
 
     <!-- BEGIN: Interface DEFINITIONS -->
-
+    
     <!-- Submit Types -->
     <xs:complexType name="MarketSubmitType">
       <xs:annotation>
@@ -736,6 +850,8 @@
           <xs:element name="RemainingReserveData" type="RemainingReserveDataSubmitType"
             minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="OffMarketContract" type="OffMarketContractSubmitType"
+            minOccurs="0" maxOccurs="unbounded"/>
+          <xs:element name="RefundData" type="RefundDataType"
             minOccurs="0" maxOccurs="unbounded"/>
 
         </xs:choice>
@@ -764,6 +880,10 @@
           <xs:element name="RemainingReserveDataQuery" type="RemainingReserveDataQueryType"
             minOccurs="0" maxOccurs="1"/>
           <xs:element name="OffMarketContractQuery" type="OffMarketContractQueryType"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="RefundDataQuery" type="RefundDataQueryType"
+            minOccurs="0" maxOccurs="1"/>
+          <xs:element name="RefundTargetContractResultQuery" type="RefundTargetContractResultQueryType"
             minOccurs="0" maxOccurs="1"/>
 
         </xs:choice>

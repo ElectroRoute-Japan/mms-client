@@ -12,13 +12,15 @@ from mms_client.services.base import mms_endpoint
 from mms_client.services.base import mms_multi_endpoint
 from mms_client.types.award import AwardQuery
 from mms_client.types.award import AwardResponse
-from mms_client.types.market import MarketCancel
+from mms_client.types.market import MarketCancel, Defaults
 from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
 from mms_client.types.market import MarketType
 from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
+from mms_client.types.bup import BupSubmit, BupQuery
 from mms_client.types.offer import OfferQuery
+from mms_client.types.settlement import SettlementResults, SettlementResultsFileListQuery
 from mms_client.types.reserve import ReserveRequirement
 from mms_client.types.reserve import ReserveRequirementQuery
 from mms_client.types.transport import RequestType
@@ -205,6 +207,118 @@ class MarketClientMixin:  # pylint: disable=unused-argument
                                     current date.
 
         Returns:    The award results that match the query.
+        """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        return MarketQuery(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
+            days=days,
+        )
+
+    @mms_endpoint(
+        name="MarketQuery_SettlementResultsFileListQuery",
+        service=config,
+        request_type=RequestType.MARKET,
+        response_data_type=SettlementResults,
+        allowed_clients=[ClientType.BSP, ClientType.TSO],
+    )
+    def get_settlement_results(self: ClientProto, request: SettlementResultsFileListQuery, days: int, date: Optional[Date] = None) -> SettlementResults:
+        """Query the MMS server for settlement results.
+
+        This endpoint is only accessible to BSPs and TSOs.
+
+        Arguments:
+        request (SettlementResultsFileListQuery):   The query to submit to the MMS server.
+        days (int):                                 The number of days ahead for which the data is being queried.
+        date (Date):                                The date of the transaction in the format "YYYY-MM-DD". This value
+                                                    defaults to the current date.
+
+        Returns:    The settlement results that match the query.
+        """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        return MarketQuery(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
+            days=days,
+        )
+
+    @mms_multi_endpoint(
+        name="MarketSubmit_BupSubmit", service=config, request_type=RequestType.MARKET, allowed_clients=[ClientType.BSP]
+    )
+    def put_bups(self: ClientProto, requests: List[BupSubmit], market_type: MarketType, days: int, date: Optional[Date] = None, default: bool = False) -> List[BupSubmit]:
+        """Submit multiple bups to the MMS server.
+
+        This endpoint is only accessible to BSPs.
+
+        Arguments:
+        requests (List[BupSubmit]): The bups to submit to the MMS server.
+        market_type (MarketType):   The type of market for which the bups are being submitted.
+        days (int):                 The number of days ahead for which the bups are being submitted.
+        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                    current date.
+        default (bool):             Whether or not the bups are the default.
+
+        Returns:    A list of bups that have been registered with the MMS server.
+        """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        return MarketSubmit(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
+            market_type=market_type,
+            days=days,
+            defaults=Defaults(is_default=default),
+        )
+
+    @mms_endpoint(
+        name="MarketSubmit_BupSubmit", service=config, request_type=RequestType.MARKET, allowed_clients=[ClientType.BSP]
+    )
+    def put_bup(self: ClientProto, request: BupSubmit, market_type: MarketType, days: int, date: Optional[Date] = None, default: bool = False) -> BupSubmit:
+        """Submit a bup to the MMS server.
+
+        This endpoint is only accessible to BSPs.
+
+        Arguments:
+        request (BupSubmit):        The bup to submit to the MMS server.
+        market_type (MarketType):   The type of market for which the bup is being submitted.
+        days (int):                 The number of days ahead for which the bup is being submitted.
+        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                    current date.
+        default (bool):             Whether or not the bup is the default.
+
+        Returns:    The bup that has been registered with the MMS server.
+        """
+        # NOTE: The return type does not match the method definition but the decorator will return the correct type
+        return MarketSubmit(  # type: ignore[return-value]
+            date=date or Date.today(),
+            participant=self.participant,
+            user=self.user,
+            market_type=market_type,
+            days=days,
+            defaults=Defaults(is_default=default),
+        )
+
+    @mms_multi_endpoint(
+        name="MarketQuery_BupQuery",
+        service=config,
+        request_type=RequestType.MARKET,
+        response_envelope_type=MarketSubmit,
+        response_data_type=BupSubmit,
+    )
+    def query_bups(self: ClientProto, request: BupQuery, days: int, date: Optional[Date] = None) -> List[BupSubmit]:
+        """Query the MMS server for bups.
+
+        This endpoint is accessible to all client types.
+
+        Arguments:
+        request (BupQuery):       The query to submit to the MMS server.
+        days (int):               The number of days ahead for which the data is being queried.
+        date (Date):              The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                  current date.
+
+        Returns:    A list of bups that match the query.
         """
         # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketQuery(  # type: ignore[return-value]

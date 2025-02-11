@@ -4,7 +4,8 @@ from enum import Enum
 from typing import Optional
 
 from pydantic_extra_types.pendulum_dt import Date
-from pydantic_xml import attr
+from pydantic_xml import attr, element
+from pydantic_xml import BaseXmlModel
 
 from mms_client.types.base import Envelope
 from mms_client.types.fields import participant
@@ -32,6 +33,13 @@ class BaseMarketRequest(Envelope):
     user: str = attr(name="UserName", min_length=1, max_length=12, pattern=r"^[A-Z0-9]*$")
 
 
+class Defaults(BaseXmlModel):
+    """Represents the default settings to apply when submitting a market request."""
+
+    # Whether or not the submission represents the default
+    is_default: bool = attr(name="StandingFlag")
+
+
 class MarketQuery(BaseMarketRequest):
     """Represents the base fields for a market query."""
 
@@ -49,6 +57,10 @@ class MarketSubmit(BaseMarketRequest):
     # If the market type is specified as "DAM" (day-ahead market), the number of days should be specified as "1".
     # Otherwise, this field indicates the number of days ahead for which the data is being submitted.
     days: int = attr(default=1, name="NumOfDays", ge=1, le=31)
+
+    # Default values to include with the submission. The request will be rejected if this is included in a request
+    # where it is not allowed.
+    defaults: Optional[Defaults] = element(default=None, name="StandingData")
 
 
 class MarketCancel(BaseMarketRequest):

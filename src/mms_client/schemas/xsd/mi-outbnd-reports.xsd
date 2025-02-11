@@ -30,6 +30,7 @@
 	  008  14-Dec-2021  HAPG  SF5691151; matching XSD with Interface
       009  13-May-2022  HENG  Ph2.5; Updated FromCapacity in BUP to accommodate negative values
       010  28-Nov-2022  HENG  Changes for Ph3;
+      011  25-Mar-2024  HENG  Changes for Ph4;
 
     </xs:documentation>
   </xs:annotation>
@@ -344,11 +345,13 @@
 <!-- Codes for Baseline Setting Method Type
 	1: PREDICTION_BASE
 	2: MEASUREMENT_BASE
+	3: SEQUENTIAL_MEASUREMENT_BASE
 -->
   <xs:simpleType name="BaselineSettingsMethodType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="1"/>
       <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -595,6 +598,7 @@
     <xs:restriction base="xs:decimal">
       <xs:maxInclusive value="10000.00"/>
       <xs:minInclusive value="0.00"/>
+      <xs:fractionDigits value="2" />
     </xs:restriction>
   </xs:simpleType>
 
@@ -626,7 +630,7 @@
         <xs:maxInclusive value="9999999999999"/>
       </xs:restriction>
     </xs:simpleType>
-
+	
 
   <xs:simpleType name="PriceValue6.2Type">
       <xs:restriction base="xs:decimal">
@@ -642,12 +646,45 @@
       <xs:minInclusive value="40.0"/>
     </xs:restriction>
   </xs:simpleType>
+  
+  <xs:simpleType name="hZPosValue1.4Type0Min">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0000"/>
+      <xs:maxInclusive value="9.9999"/>
+      <xs:fractionDigits value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TimeSecInterval1.2Type">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.00"/>
+      <xs:maxInclusive value="9.99"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="hZPosValue1.3Type0Min">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.000"/>
+      <xs:maxInclusive value="9.999"/>
+      <xs:fractionDigits value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="TimeSecInterval1.1Type">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="9.9"/>
+      <xs:fractionDigits value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
 
 <!-- Codes for Contract Type
 	1: MARKET
 	2: MARKET_AND_POWER_SUPPLY_II
 	3: POWER_SUPPLY_II
-	4: ONLY_POWER_SUPPLY_I’
+	4: ONLY_POWER_SUPPLY_I’							 
 	5: MARKET_AND_REMAINING_RESERVE_UTILIZATION
 	6: REMAINING_RESERVE_UTILIZATION
 -->
@@ -656,7 +693,7 @@
       <xs:enumeration value="1"/>
       <xs:enumeration value="2"/>
       <xs:enumeration value="3"/>
-      <xs:enumeration value="4"/>
+      <xs:enumeration value="4"/>	 
       <xs:enumeration value="5"/>
 	  <xs:enumeration value="6"/>
     </xs:restriction>
@@ -726,6 +763,11 @@
     </xs:sequence>
   </xs:complexType>
 
+  <xs:simpleType name="CreatorType">
+    <xs:restriction base="xs:string">
+    </xs:restriction>
+  </xs:simpleType>
+
 <!-- 3.2.1.1.1	OND_0023a Resource List for TSO -->
   <xs:complexType name="ResourceListType">
     <xs:attribute name="ROW" type="RowType" use="optional"/>
@@ -742,9 +784,9 @@
     <xs:attribute name="Sec2" type="CommodityCategoryOfferType" use="optional"/>
     <xs:attribute name="Ter1" type="CommodityCategoryOfferType" use="optional"/>
 	<xs:attribute name="Ter2" type="CommodityCategoryOfferType" use="optional"/>
-    <xs:attribute name="ContractType" type="ContractTypeType" use="required"/>
+    <xs:attribute name="ContractType" type="ContractTypeType" use="required"/>	
     <xs:attribute name="PriSec1CommandOperationMethod" type="PriSec1CommandOperationMethodType" use="optional"/>
-    <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
+    <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>	
     <xs:attribute name="CoefficientTR2" type="PercentageType2" use="optional"/>
     <xs:attribute name="BaselineSettingsMethod" type="BaselineSettingsMethodType" use="optional"/>
     <xs:attribute name="SignalType" type="SignalTypeType" use="required"/>
@@ -781,7 +823,7 @@
     <xs:attribute name="Sec1RemResvUtilization" type="RemResvUtilizationType" use="required"/>
     <xs:attribute name="Sec2RemResvUtilization" type="RemResvUtilizationType" use="required"/>
     <xs:attribute name="Ter1RemResvUtilization" type="RemResvUtilizationType" use="required"/>
-    <xs:attribute name="Ter2RemResvUtilization" type="RemResvUtilizationType" use="required"/>
+    <xs:attribute name="Ter2RemResvUtilization" type="RemResvUtilizationType" use="required"/>	
   </xs:complexType>
 
 <!-- 3.2.1.2	OND_0033: Resources master for settlement -->
@@ -881,6 +923,11 @@
     <xs:attribute name="MarketContext" type="MarketContextType" use="optional"/>
     <xs:attribute name="ContractExstOfPowerSupplyiP" type="AvailNotAvailType" use="optional"/>
     <xs:attribute name="PowerSourceiPDecMaxUnitPrice" type="PriceValue6.2Type" use="optional"/>
+    <xs:attribute name="GfVariationRate" type="PercentageType1" use="optional"/>
+    <xs:attribute name="DeadBand" type="hZPosValue1.4Type0Min" use="optional"/>
+    <xs:attribute name="FrequencyMeasurementInterval" type="TimeSecInterval1.2Type" use="optional"/>
+    <xs:attribute name="FrequencyMeasurementError" type="hZPosValue1.3Type0Min" use="optional"/>
+    <xs:attribute name="DelayTime" type="TimeSecInterval1.1Type" use="optional"/>
   </xs:complexType>
 
 <!-- 3.2.1.3	OND_0033a: Resources master OTM for settlement -->
@@ -930,6 +977,8 @@
     <xs:attribute name="Tertiary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Tertiary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="OfferUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
     <xs:attribute name="CompletionDate" type="TimeStampType" use="required"/>
   </xs:complexType>
@@ -957,6 +1006,8 @@
     <xs:attribute name="Tertiary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Tertiary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="OfferUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
     <xs:attribute name="CompletionDate" type="TimeStampType" use="required"/>
   </xs:complexType>
@@ -1098,6 +1149,8 @@
     <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
     <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2Type" use="required"/>
     <xs:attribute name="CoefficientTR2" type="PercentageType2" use="optional"/>
     <xs:attribute name="UpdateTime" type="TimeStampType" use="required"/>
@@ -1113,12 +1166,13 @@
     <xs:attribute name="CompoundSufficientQty" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaseLineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdType" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
     <xs:attribute name="ContractResult" type="ContractResultValueType" use="required"/>
     <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
+    <xs:attribute name="Creator" type="CreatorType" use="optional"/>
   </xs:complexType>
 
 <!-- 3.2.3.2.2	OND_0016: Power Source Contract Results for BSP -->
@@ -1139,6 +1193,8 @@
     <xs:attribute name="Area" type="AreaType" use="required"/>
     <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="PrimaryOfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
@@ -1154,7 +1210,7 @@
     <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaseLineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdOnd16Type" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1186,6 +1242,8 @@
     <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
     <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2Type" use="required"/>
     <xs:attribute name="CoefficientTR2" type="PercentageType2" use="optional"/>
     <xs:attribute name="UpdateTime" type="TimeStampType" use="required"/>
@@ -1201,7 +1259,7 @@
 	<xs:attribute name="CompoundSufficientQty" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaseLineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdType" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1228,6 +1286,8 @@
     <xs:attribute name="Area" type="AreaType" use="required"/>
     <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="PrimaryOfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
@@ -1243,7 +1303,7 @@
     <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaseLineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdOnd16Type" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1275,6 +1335,8 @@
     <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
     <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2Type" use="required"/>
     <xs:attribute name="CoefficientTR2" type="PercentageType2" use="optional"/>
     <xs:attribute name="UpdateTime" type="TimeStampType" use="required"/>
@@ -1290,7 +1352,7 @@
     <xs:attribute name="CompoundSufficientQty" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaseLineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdType" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1317,6 +1379,8 @@
     <xs:attribute name="Area" type="AreaType" use="required"/>
     <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="PrimaryOfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
@@ -1332,7 +1396,7 @@
     <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaseLineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdOnd16Type" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1369,6 +1433,8 @@
     <xs:attribute name="SourceTertiary1ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="SourceCompoundSufficientQty" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="SourcePrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
+    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
     <xs:attribute name="PrimaryRequestedQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary1RequestedQuantity" type="kWPosValue7Type0Min" use="optional"/>
     <xs:attribute name="Secondary2RequestedQuantity" type="kWPosValue7Type0Min" use="optional"/>
