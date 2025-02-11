@@ -1,16 +1,27 @@
 """Contains objects for BUPs."""
 
-from enum import Enum
-from typing import List, Optional, Annotated
 from decimal import Decimal
+from enum import Enum
+from typing import Annotated
+from typing import List
+from typing import Optional
 
 from pydantic_core import PydanticUndefined
 from pydantic_extra_types.pendulum_dt import DateTime
-from pydantic_xml import attr, element, wrapped
+from pydantic_xml import attr
+from pydantic_xml import element
+from pydantic_xml import wrapped
 
-from mms_client.types.enums import AreaCode
 from mms_client.types.base import Payload
-from mms_client.types.fields import resource_name, price, capacity, power_positive, participant, company_short_name, resource_short_name, system_code
+from mms_client.types.enums import AreaCode
+from mms_client.types.fields import capacity
+from mms_client.types.fields import company_short_name
+from mms_client.types.fields import participant
+from mms_client.types.fields import power_positive
+from mms_client.types.fields import price
+from mms_client.types.fields import resource_name
+from mms_client.types.fields import resource_short_name
+from mms_client.types.fields import system_code
 
 
 def abc_price(alias: str, optional: bool = False):
@@ -24,7 +35,9 @@ def abc_price(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the abc price.
     """
-    return attr(default=None if optional else PydanticUndefined, name=alias, gt=-100000.0, lt=100000.0, decimal_places=1)
+    return attr(
+        default=None if optional else PydanticUndefined, name=alias, gt=-100000.0, lt=100000.0, decimal_places=1
+    )
 
 
 class Status(Enum):
@@ -93,7 +106,7 @@ class Bup(Payload):
 
     # The V4 unit price charged for this pattern. This value is only valid when the contract_type on the associated
     # resource is set to anything other than ONLY_POWER_SUPPLY_1.
-    v4_unit_price: Annotated[Decimal,price("V4", 10000.00, True)]
+    v4_unit_price: Annotated[Decimal, price("V4", 10000.00, True)]
 
     # The bands associated with this BUP.
     bands: List[BupBand] = element(name="BandBup", min_length=1, max_length=20)
@@ -118,7 +131,9 @@ class Pattern(Payload):
     abc: Annotated[Optional[List[AbcBand]], wrapped(default=None, path="Abc", min_length=1, max_length=5)]
 
     # The startup cost bands associated with this pattern
-    startup_costs: Annotated[Optional[List[StartupCostBand]], wrapped(default=None, path="StartupCost", min_length=1, max_length=10)]
+    startup_costs: Annotated[
+        Optional[List[StartupCostBand]], wrapped(default=None, path="StartupCost", min_length=1, max_length=10)
+    ]
 
 
 class BupSubmit(Payload):
@@ -163,7 +178,7 @@ class BupQuery(BupSubmit):
     resource_code: str = resource_name("ResourceName")
 
     # The start date and time for the validity period of the BUP
-    start: Optional[DateTime] = attr(default=None, name="StartTime")
+    start: Annotated[DateTime, attr(default=None, name="StartTime")]
 
     # The end date and time for the validity period of the BUP
-    end: Optional[DateTime] = attr(default=None, name="EndTime")
+    end: Annotated[DateTime, attr(default=None, name="EndTime")]

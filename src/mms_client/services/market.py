@@ -12,17 +12,20 @@ from mms_client.services.base import mms_endpoint
 from mms_client.services.base import mms_multi_endpoint
 from mms_client.types.award import AwardQuery
 from mms_client.types.award import AwardResponse
-from mms_client.types.market import MarketCancel, Defaults
+from mms_client.types.bup import BupQuery
+from mms_client.types.bup import BupSubmit
+from mms_client.types.market import Defaults
+from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
 from mms_client.types.market import MarketType
 from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
-from mms_client.types.bup import BupSubmit, BupQuery
 from mms_client.types.offer import OfferQuery
-from mms_client.types.settlement import SettlementResults, SettlementResultsFileListQuery
 from mms_client.types.reserve import ReserveRequirement
 from mms_client.types.reserve import ReserveRequirementQuery
+from mms_client.types.settlement import SettlementResults
+from mms_client.types.settlement import SettlementResultsFileListQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
@@ -223,7 +226,9 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         response_data_type=SettlementResults,
         allowed_clients=[ClientType.BSP, ClientType.TSO],
     )
-    def get_settlement_results(self: ClientProto, request: SettlementResultsFileListQuery, days: int, date: Optional[Date] = None) -> SettlementResults:
+    def get_settlement_results(
+        self: ClientProto, request: SettlementResultsFileListQuery, days: int, date: Optional[Date] = None
+    ) -> SettlementResults:
         """Query the MMS server for settlement results.
 
         This endpoint is only accessible to BSPs and TSOs.
@@ -247,7 +252,14 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     @mms_multi_endpoint(
         name="MarketSubmit_BupSubmit", service=config, request_type=RequestType.MARKET, allowed_clients=[ClientType.BSP]
     )
-    def put_bups(self: ClientProto, requests: List[BupSubmit], market_type: MarketType, days: int, date: Optional[Date] = None, default: bool = False) -> List[BupSubmit]:
+    def put_bups(
+        self: ClientProto,
+        requests: List[BupSubmit],
+        market_type: MarketType,
+        days: int,
+        date: Optional[Date] = None,
+        default: bool = False,
+    ) -> List[BupSubmit]:
         """Submit multiple bups to the MMS server.
 
         This endpoint is only accessible to BSPs.
@@ -275,7 +287,14 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     @mms_endpoint(
         name="MarketSubmit_BupSubmit", service=config, request_type=RequestType.MARKET, allowed_clients=[ClientType.BSP]
     )
-    def put_bup(self: ClientProto, request: BupSubmit, market_type: MarketType, days: int, date: Optional[Date] = None, default: bool = False) -> BupSubmit:
+    def put_bup(
+        self: ClientProto,
+        request: BupSubmit,
+        market_type: MarketType,
+        days: int,
+        date: Optional[Date] = None,
+        default: bool = False,
+    ) -> BupSubmit:
         """Submit a bup to the MMS server.
 
         This endpoint is only accessible to BSPs.

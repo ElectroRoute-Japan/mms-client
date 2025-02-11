@@ -630,7 +630,7 @@
         <xs:maxInclusive value="9999999999999"/>
       </xs:restriction>
     </xs:simpleType>
-	
+
 
   <xs:simpleType name="PriceValue6.2Type">
       <xs:restriction base="xs:decimal">
@@ -646,7 +646,7 @@
       <xs:minInclusive value="40.0"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:simpleType name="hZPosValue1.4Type0Min">
     <xs:restriction base="xs:decimal">
       <xs:minInclusive value="0.0000"/>
@@ -684,7 +684,7 @@
 	1: MARKET
 	2: MARKET_AND_POWER_SUPPLY_II
 	3: POWER_SUPPLY_II
-	4: ONLY_POWER_SUPPLY_I’							 
+	4: ONLY_POWER_SUPPLY_I’
 	5: MARKET_AND_REMAINING_RESERVE_UTILIZATION
 	6: REMAINING_RESERVE_UTILIZATION
 -->
@@ -693,7 +693,7 @@
       <xs:enumeration value="1"/>
       <xs:enumeration value="2"/>
       <xs:enumeration value="3"/>
-      <xs:enumeration value="4"/>	 
+      <xs:enumeration value="4"/>
       <xs:enumeration value="5"/>
 	  <xs:enumeration value="6"/>
     </xs:restriction>
@@ -784,9 +784,9 @@
     <xs:attribute name="Sec2" type="CommodityCategoryOfferType" use="optional"/>
     <xs:attribute name="Ter1" type="CommodityCategoryOfferType" use="optional"/>
 	<xs:attribute name="Ter2" type="CommodityCategoryOfferType" use="optional"/>
-    <xs:attribute name="ContractType" type="ContractTypeType" use="required"/>	
+    <xs:attribute name="ContractType" type="ContractTypeType" use="required"/>
     <xs:attribute name="PriSec1CommandOperationMethod" type="PriSec1CommandOperationMethodType" use="optional"/>
-    <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>	
+    <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
     <xs:attribute name="CoefficientTR2" type="PercentageType2" use="optional"/>
     <xs:attribute name="BaselineSettingsMethod" type="BaselineSettingsMethodType" use="optional"/>
     <xs:attribute name="SignalType" type="SignalTypeType" use="required"/>
@@ -823,7 +823,7 @@
     <xs:attribute name="Sec1RemResvUtilization" type="RemResvUtilizationType" use="required"/>
     <xs:attribute name="Sec2RemResvUtilization" type="RemResvUtilizationType" use="required"/>
     <xs:attribute name="Ter1RemResvUtilization" type="RemResvUtilizationType" use="required"/>
-    <xs:attribute name="Ter2RemResvUtilization" type="RemResvUtilizationType" use="required"/>	
+    <xs:attribute name="Ter2RemResvUtilization" type="RemResvUtilizationType" use="required"/>
   </xs:complexType>
 
 <!-- 3.2.1.2	OND_0033: Resources master for settlement -->

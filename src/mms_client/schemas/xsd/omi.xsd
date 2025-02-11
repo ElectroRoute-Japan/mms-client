@@ -22,11 +22,11 @@
       History:
 
       001  2021-03-29 Initial version.
-      
-      
+
+
       </xs:documentation>
     </xs:annotation>
-    
+
     <!-- BEGIN: Common Simple Type Definitions -->
 
     <xs:simpleType name="ValidationStatusType">
@@ -55,7 +55,7 @@
     </xs:simpleType>
 
     <!-- END: Common Simple Type Definitions -->
-    
+
     <!-- BEGIN: Registration Simple Type Definitions -->
 
     <xs:simpleType name="ParticipantNameType">
@@ -203,7 +203,7 @@
     </xs:simpleType>
 
     <!-- END: General Simple Type Definitions -->
-    
+
     <!-- BEGIN: Precision Types -->
 
     <xs:simpleType name="KwPosValue7.0Type">
@@ -831,7 +831,7 @@
     <!-- END: OMI Data Definitions -->
 
     <!-- BEGIN: Interface DEFINITIONS -->
-    
+
     <!-- Submit Types -->
     <xs:complexType name="MarketSubmitType">
       <xs:annotation>
