@@ -430,6 +430,8 @@ def test_query_awards_works(mock_certificate):
                         operator="FAKE",
                         offer_price=Decimal("42.15"),
                         contract_price=Decimal("69.44"),
+                        start_up_unit_price=Decimal("99.99"),
+                        ramp_down_unit_price=Decimal("99.99"),
                         eval_coeff=Decimal("35.79"),
                         corrected_price=Decimal("199.99"),
                         result=ContractResult.PARTIAL,
