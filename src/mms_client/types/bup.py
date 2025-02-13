@@ -6,6 +6,9 @@ from typing import Annotated
 from typing import List
 from typing import Optional
 
+from pendulum import Timezone
+from pydantic import field_serializer
+from pydantic import field_validator
 from pydantic_core import PydanticUndefined
 from pydantic_extra_types.pendulum_dt import DateTime
 from pydantic_xml import attr
@@ -109,7 +112,7 @@ class Bup(Payload):
     v4_unit_price: Annotated[Decimal, price("V4", 10000.00, True)]
 
     # The bands associated with this BUP.
-    bands: List[BupBand] = element(name="BandBup", min_length=1, max_length=20)
+    bands: Annotated[List[BupBand], element(tag="BandBup", min_length=1, max_length=20)]
 
 
 class Pattern(Payload):
@@ -125,7 +128,7 @@ class Pattern(Payload):
     remarks: Optional[str] = attr(default=None, name="PatternRemark", min_length=1, max_length=50)
 
     # The balancing unit profile associated with this pattern
-    balancing_unit_profile: Optional[Bup] = element(defualt=None, name="Bup")
+    balancing_unit_profile: Optional[Bup] = element(default=None, tag="Bup")
 
     # The quadratic pricing bands associated with this pattern
     abc: Annotated[Optional[List[AbcBand]], wrapped(default=None, path="Abc", min_length=1, max_length=5)]
@@ -149,7 +152,7 @@ class BupSubmit(Payload):
     end: DateTime = attr(name="EndTime")
 
     # The patterns associated with this BUP
-    patterns: List[Pattern] = element(name="PatternData", max_length=10)
+    patterns: Annotated[List[Pattern], element(tag="PatternData", max_length=10)]
 
     # The name of the BSP participant submitting the BUP. This will only be populated when the object is returned.
     participant_name: Optional[str] = participant("BspParticipantName", True)
@@ -167,6 +170,16 @@ class BupSubmit(Payload):
     # object is returned.
     system_code: Optional[str] = system_code("SystemCode", True)
 
+    @field_serializer("start", "end")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat() if value else ""
+
+    @field_validator("start", "end")
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
+
 
 class BupQuery(BupSubmit):
     """Represents the data included with a BUP query."""
@@ -182,3 +195,13 @@ class BupQuery(BupSubmit):
 
     # The end date and time for the validity period of the BUP
     end: Annotated[DateTime, attr(default=None, name="EndTime")]
+
+    @field_serializer("start", "end")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat() if value else ""
+
+    @field_validator("start", "end")
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))

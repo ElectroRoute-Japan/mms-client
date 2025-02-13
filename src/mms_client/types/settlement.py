@@ -1,8 +1,12 @@
 """Contains objects for MMS settlement."""
 
+from typing import Annotated
 from typing import List
 from typing import Optional
 
+from pendulum import Timezone
+from pydantic import field_serializer
+from pydantic import field_validator
 from pydantic_core import PydanticUndefined
 from pydantic_extra_types.pendulum_dt import Date
 from pydantic_extra_types.pendulum_dt import DateTime
@@ -55,12 +59,22 @@ class SettlementFile(Payload):
     # The size of the file in bytes, if it has been uploaded
     size: Optional[int] = attr(name="FileSize", default=None, ge=0, lt=1000000000)
 
+    @field_serializer("submission_time")
+    def encode_datetime(self, value: DateTime) -> str:
+        """Encode the datetime to an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=None).isoformat() if value else ""
+
+    @field_validator("submission_time")
+    def decode_datetime(cls, value: DateTime) -> DateTime:  # pylint: disable=no-self-argument
+        """Decode the datetime from an MMS-compliant ISO 8601 string."""
+        return value.replace(tzinfo=Timezone("Asia/Tokyo"))
+
 
 class SettlementResults(Payload):
     """Contains a list of settlement files that can be requested separately later."""
 
     # The file results that were retrieved by the query
-    files: List[SettlementFile] = element(tag="File", min_length=1)
+    files: Annotated[List[SettlementFile], element(tag="File", min_length=1)]
 
 
 class SettlementResultsFileListQuery(Payload):

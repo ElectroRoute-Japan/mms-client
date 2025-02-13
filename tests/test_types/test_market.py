@@ -2,6 +2,7 @@
 
 from pendulum import Date
 
+from mms_client.types.market import Defaults
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
 from mms_client.types.market import MarketSubmit
@@ -72,6 +73,7 @@ def test_market_submit_full():
         user="FAKEUSER",
         market_type=MarketType.WEEK_AHEAD,
         days=4,
+        defaults=Defaults(is_default=True),
     )
 
     # Next, convert the request to a dictionary
@@ -81,7 +83,7 @@ def test_market_submit_full():
     verify_market_submit(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.WEEK_AHEAD, 4)
     assert (
         data
-        == b"""<MarketSubmit Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"/>"""
+        == b"""<MarketSubmit Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"><StandingData StandingFlag="true"/></MarketSubmit>"""
     )
 
 

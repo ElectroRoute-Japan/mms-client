@@ -1,0 +1,21 @@
+<BupSubmit
+     ResourceName="FAKE_RESO"
+     StartTime="2024-08-15T09:00:00"
+     EndTime="2024-08-15T12:00:00"
+     BspParticipantName="F100"
+     CompanyShortName="偽会社"
+     Area="03"
+     ResourceShortName="偽電力"
+     SystemCode="FSYS0">
+    <PatternData PatternNo="1" PatternStatus="1" PatternRemark="Some remarks">
+        <Bup V4="95.95">
+            <BandBup Band="2" FromCap="100" V1="200" V2="300"/>
+        </Bup>
+        <Abc>
+            <BandAbc Band="3" FromCap="400" a="400.50" b="400.60" c="400.70"/>
+        </Abc>
+        <StartupCost>
+            <BandStartup CaseNo="4" StopTime="90" V3="500" Remark="Some more remarks"/>
+        </StartupCost>
+    </PatternData>
+</BupSubmit>

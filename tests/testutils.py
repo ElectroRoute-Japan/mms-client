@@ -27,6 +27,14 @@ from mms_client.types.base import Message
 from mms_client.types.base import Messages
 from mms_client.types.base import ResponseCommon
 from mms_client.types.base import ValidationStatus
+from mms_client.types.bup import AbcBand
+from mms_client.types.bup import Bup
+from mms_client.types.bup import BupBand
+from mms_client.types.bup import BupQuery
+from mms_client.types.bup import BupSubmit
+from mms_client.types.bup import Pattern
+from mms_client.types.bup import StartupCostBand
+from mms_client.types.bup import Status as BupStatus
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BooleanFlag
 from mms_client.types.enums import ResourceType
@@ -633,6 +641,100 @@ def verify_resource_data(
                 assert getattr(req, field) == kwargs[field]
             else:
                 assert getattr(req, field) is None
+
+
+def verify_bup_submit(
+    req: BupSubmit, resource_code: str, start: DateTime, end: DateTime, pattern_verifiers: list, **kwargs
+):
+    """Verify that the given BupSubmit was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.start == start
+    assert req.end == end
+    verify_list(req.patterns, pattern_verifiers)
+    for field in req.model_fields.keys():
+        if field not in [
+            "resource_code",
+            "start",
+            "end",
+            "patterns",
+        ]:
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def pattern_data_verifier(
+    number: int,
+    status: BupStatus,
+    remarks: Optional[str] = None,
+    bup_verifier=None,
+    abc_verifiers: list = None,
+    startup_verifiers: list = None,
+):
+    """Verify that the Pattern was created with the correct parameters."""
+
+    def inner(pattern: Pattern):
+        assert pattern.number == number
+        assert pattern.status == status
+        assert pattern.remarks == remarks
+        if bup_verifier:
+            bup_verifier(pattern.balancing_unit_profile)
+        else:
+            assert pattern.balancing_unit_profile is None
+        verify_list(pattern.abc, abc_verifiers)
+        verify_list(pattern.startup_costs, startup_verifiers)
+
+    return inner
+
+
+def bup_verifier(v4_unit_price: Decimal, bands: list = None):
+    """Verify that the Bup was created with the correct parameters."""
+
+    def inner(bup: Bup):
+        assert bup.v4_unit_price == v4_unit_price
+        verify_list(bup.bands, bands)
+
+    return inner
+
+
+def bup_band_verifier(number: int, from_capacity: Decimal, v1_unit_price: Decimal, v2_unit_price: Decimal):
+    """Verify that the BupBand was created with the correct parameters."""
+
+    def inner(band: BupBand):
+        assert band.number == number
+        assert band.from_capacity == from_capacity
+        assert band.v1_unit_price == v1_unit_price
+        assert band.v2_unit_price == v2_unit_price
+
+    return inner
+
+
+def abc_band_verifier(number: int, from_capacity: Decimal, a: Decimal, b: Decimal, c: Decimal):
+    """Verify that the AbcBand was created with the correct parameters."""
+
+    def inner(band: AbcBand):
+        assert band.number == number
+        assert band.from_capacity == from_capacity
+        assert band.a == a
+        assert band.b == b
+        assert band.c == c
+
+    return inner
+
+
+def startup_cost_band_verifier(
+    number: int, stop_time_hours: int, v3_unit_price: Decimal, remarks: Optional[str] = None
+):
+    """Verify that the StartupCostBand was created with the correct parameters."""
+
+    def inner(band: StartupCostBand):
+        assert band.number == number
+        assert band.stop_time_hours == stop_time_hours
+        assert band.v3_unit_price == v3_unit_price
+        assert band.remarks == remarks
+
+    return inner
 
 
 def verify_resource_query(

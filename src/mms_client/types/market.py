@@ -61,7 +61,7 @@ class MarketSubmit(BaseMarketRequest):
 
     # Default values to include with the submission. The request will be rejected if this is included in a request
     # where it is not allowed.
-    defaults: Optional[Defaults] = element(default=None, name="StandingData")
+    defaults: Optional[Defaults] = element(default=None, tag="StandingData")
 
 
 class MarketCancel(BaseMarketRequest):
