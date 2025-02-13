@@ -181,7 +181,7 @@ class BupSubmit(Payload):
         return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 
 
-class BupQuery(BupSubmit):
+class BupQuery(Payload):
     """Represents the data included with a BUP query."""
 
     # Whether or not the BUP is the default

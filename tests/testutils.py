@@ -643,6 +643,16 @@ def verify_resource_data(
                 assert getattr(req, field) is None
 
 
+def verify_bup_query(
+    req: BupQuery, resource_code: str, start: DateTime, end: DateTime, is_default: Optional[bool] = None
+):
+    """Verify that the given BupQuery was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.start == start
+    assert req.end == end
+    assert req.is_default == is_default
+
+
 def verify_bup_submit(
     req: BupSubmit, resource_code: str, start: DateTime, end: DateTime, pattern_verifiers: list, **kwargs
 ):

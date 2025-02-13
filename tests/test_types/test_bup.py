@@ -20,6 +20,7 @@ from tests.testutils import bup_verifier
 from tests.testutils import pattern_data_verifier
 from tests.testutils import read_request_file
 from tests.testutils import startup_cost_band_verifier
+from tests.testutils import verify_bup_query
 from tests.testutils import verify_bup_submit
 
 
@@ -129,4 +130,56 @@ def test_bup_submit_full():
         area=AreaCode.TOKYO,
         resource_name="偽電力",
         system_code="FSYS0",
+    )
+
+
+def test_bup_query_defaults():
+    """Test that the BupQuery class serializes and converts to XML as we expect."""
+    # First, create a new BUP query
+    request = BupQuery(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 8, 15, 9),
+        end=DateTime(2024, 8, 15, 12),
+    )
+
+    # Now, serialize it to XML
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
+
+    # Finally, check that it matches what we expect
+    assert (
+        data
+        == b"""<BupQuery ResourceName="FAKE_RESO" StartTime="2024-08-15T09:00:00" EndTime="2024-08-15T12:00:00"/>"""
+    )
+    verify_bup_query(
+        request,
+        "FAKE_RESO",
+        DateTime(2024, 8, 15, 9, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2024, 8, 15, 12, tzinfo=Timezone("Asia/Tokyo")),
+    )
+
+
+def test_bup_query_full():
+    """Test that the BupQuery class serializes and converts to XML as we expect."""
+    # First, create a new BUP query
+    request = BupQuery(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 8, 15, 9),
+        end=DateTime(2024, 8, 15, 12),
+        is_default=False,
+    )
+
+    # Now, serialize it to XML
+    data = request.to_xml(skip_empty=True, encoding="utf-8")
+
+    # Finally, check that it matches what we expect
+    assert (
+        data
+        == b"""<BupQuery StandingFlag="false" ResourceName="FAKE_RESO" StartTime="2024-08-15T09:00:00" EndTime="2024-08-15T12:00:00"/>"""
+    )
+    verify_bup_query(
+        request,
+        "FAKE_RESO",
+        DateTime(2024, 8, 15, 9, tzinfo=Timezone("Asia/Tokyo")),
+        DateTime(2024, 8, 15, 12, tzinfo=Timezone("Asia/Tokyo")),
+        False,
     )
