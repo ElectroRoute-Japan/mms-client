@@ -87,6 +87,9 @@ from mms_client.types.resource import Status
 from mms_client.types.resource import SwitchOutput
 from mms_client.types.settlement import SettlementFile
 from mms_client.types.settlement import SettlementResults
+from mms_client.types.surplus_capcity import SurplusCapacityData
+from mms_client.types.surplus_capcity import SurplusCapacityQuery
+from mms_client.types.surplus_capcity import SurplusCapacitySubmit
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
@@ -874,6 +877,52 @@ def verify_list(items: Optional[list] = None, verifiers: Optional[list] = None):
     assert len(items) == len(verifiers)
     for item, verifier in zip(items, verifiers):
         verifier(item)
+
+
+def verify_surplus_capacity_submit(
+    req: SurplusCapacitySubmit, resource_code: str, pattern_number: int, start: DateTime, end: DateTime, **kwargs
+):
+    """Verify that the SurplusCapacitySubmit was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.pattern_number == pattern_number
+    assert req.start == start
+    assert req.end == end
+    for field, info in req.model_fields.items():
+        if not info.is_required():
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def verify_surplus_capacity_data(
+    req: SurplusCapacityData, resource_code: str, pattern_number: int, start: DateTime, end: DateTime, **kwargs
+):
+    """Verify that the SurplusCapacityData was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.pattern_number == pattern_number
+    assert req.start == start
+    assert req.end == end
+    for field, info in req.model_fields.items():
+        if not info.is_required():
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def verify_surplus_capacity_query(
+    req: SurplusCapacityQuery,
+    start: DateTime,
+    end: DateTime,
+    resource_code: Optional[str] = None,
+    pattern_number: Optional[int] = None,
+):
+    """Verify that the SurplusCapacityQuery was created with the correct parameters."""
+    assert req.start == start
+    assert req.end == end
+    assert req.resource_code == resource_code
+    assert req.pattern_number == pattern_number
 
 
 def register_mms_request(
