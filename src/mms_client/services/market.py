@@ -223,6 +223,7 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         name="MarketQuery_SettlementResultsFileListQuery",
         service=config,
         request_type=RequestType.MARKET,
+        response_envelope_type=MarketSubmit,
         response_data_type=SettlementResults,
         allowed_clients=[ClientType.BSP, ClientType.TSO],
     )

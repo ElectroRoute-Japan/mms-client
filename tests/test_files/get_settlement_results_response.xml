@@ -1,0 +1,8 @@
+<MarketData>
+    <MarketSubmit Date="2024-04-12" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER">
+        <SettlementResults>
+            <File Name="A000_B111_FAKE-FILE.xml" ParticipantName="F100" CompanyShortName="偽会社" SubmissionTime="2024-04-10T22:34:44" SttlDate="2024-04-11" FileSize="123456">
+            </File>
+        </SettlementResults>
+    </MarketSubmit>
+</MarketData>

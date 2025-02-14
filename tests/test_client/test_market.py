@@ -25,6 +25,7 @@ from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
 from mms_client.types.reserve import ReserveRequirementQuery
+from mms_client.types.settlement import SettlementQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.web import ClientType
@@ -35,10 +36,12 @@ from tests.testutils import read_file
 from tests.testutils import read_request_file
 from tests.testutils import register_mms_request
 from tests.testutils import requirement_verifier
+from tests.testutils import settlementfile_verifier
 from tests.testutils import verify_award_response
 from tests.testutils import verify_offer_cancel
 from tests.testutils import verify_offer_data
 from tests.testutils import verify_reserve_requirement
+from tests.testutils import verify_settlement_results
 
 
 @responses.activate
@@ -390,7 +393,13 @@ def test_query_awards_works(mock_certificate):
     register_mms_request(
         RequestType.MARKET,
         (
-            "8JZ4ecLOMVtm30sjaxVsk6WL/A08yhDsidfgX4tYenxZeLyN0TDC8RTQVUNBlOc6zXP4eE6rYXu4SJ2OBTMdbVud8CrC0Yy9uD+R40gZ+HSfLf5bDPjdHXMrFbXBhA8pY5J5HFs3zhMZNuhGyUtvTqPbs6q6nWkuXdPqyftO/MX4ZjCqq3R3ZFpldM5lS5dLYRFX/CEQ9mnxISM9cQUbqeVawQZNo+PsFOylG91jGNlw4ZL7CDEC+BFqJk7BL8l5b3cCvTwGknFg4IM55MzYQgtfnisn73cN69a1LJbabAOr2NFuj98n8PaLhpxledwyVM3gN4oCFlA8SnzviMY/iPAzN81pxHg69aUJAJbLyqwmUqPb7/E/qiC6dY9ty/8eFdvoN+APFYAnY8sWQyQUENFBas8Osij9i50J2n/x3muQ8zzcmWIXW+mmp0KnxzyO/HKPqxoadfqAPQgzhh/4KyGZxa6jhYYV6rfs7BwiJH47pSQ+AXPasOJOdwMK4K9a8yQoEQloaxr/dLcwPWFccsShXFtMSZxCRVl2tJA0KtK7B1n6LXf3YkmqHS0tfUb7dh2dpXbQCfSGRaZgzAd5DZrYh5XTX99Up38m+qeESsxMmHzBnA5UED6n77yP7ufN4j5P2mCOwrVf0mxJJUa/b2gtJT5xKTRN30kzfrYrSFc="
+            "8JZ4ecLOMVtm30sjaxVsk6WL/A08yhDsidfgX4tYenxZeLyN0TDC8RTQVUNBlOc6zXP4eE6rYXu4SJ2OBTMdbVud8CrC0Yy9uD+R40gZ+H"
+            "SfLf5bDPjdHXMrFbXBhA8pY5J5HFs3zhMZNuhGyUtvTqPbs6q6nWkuXdPqyftO/MX4ZjCqq3R3ZFpldM5lS5dLYRFX/CEQ9mnxISM9cQUb"
+            "qeVawQZNo+PsFOylG91jGNlw4ZL7CDEC+BFqJk7BL8l5b3cCvTwGknFg4IM55MzYQgtfnisn73cN69a1LJbabAOr2NFuj98n8PaLhpxled"
+            "wyVM3gN4oCFlA8SnzviMY/iPAzN81pxHg69aUJAJbLyqwmUqPb7/E/qiC6dY9ty/8eFdvoN+APFYAnY8sWQyQUENFBas8Osij9i50J2n/x"
+            "3muQ8zzcmWIXW+mmp0KnxzyO/HKPqxoadfqAPQgzhh/4KyGZxa6jhYYV6rfs7BwiJH47pSQ+AXPasOJOdwMK4K9a8yQoEQloaxr/dLcwPW"
+            "FccsShXFtMSZxCRVl2tJA0KtK7B1n6LXf3YkmqHS0tfUb7dh2dpXbQCfSGRaZgzAd5DZrYh5XTX99Up38m+qeESsxMmHzBnA5UED6n77yP"
+            "7ufN4j5P2mCOwrVf0mxJJUa/b2gtJT5xKTRN30kzfrYrSFc="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),
@@ -474,5 +483,71 @@ def test_query_awards_works(mock_certificate):
                     )
                 ],
             ),
+        ],
+    )
+
+
+def test_get_settlement_results_invalid_client(mock_certificate):
+    """Test that the get_settlement_results method raises a ValueError when called by an invalid client type."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
+
+    # Next, create our test settlement results query
+    request = SettlementQuery(
+        date=Date(2024, 4, 12),
+        participant="F100",
+        user="FAKEUSER",
+    )
+
+    # Now, attempt to get settlement results with the invalid client type; this should fail
+    with pytest.raises(AudienceError) as ex_info:
+        _ = client.get_settlement_results(request, 1)
+
+    # Finvally, verify the details of the raised exception
+    assert (
+        str(ex_info.value)
+        == "MarketQuery_SettlementResultsFileListQuery: Invalid client type, 'MO' provided. Only 'BSP' or 'TSO' are supported."
+    )
+
+
+@responses.activate
+def test_get_settlement_results_works(mock_certificate):
+    """Test that the get_settlement_results method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, register our test response with the responses library
+    register_mms_request(
+        RequestType.MARKET,
+        (
+            "jZmNScnlYiBOYwp94/5/dYGRcy6wW9Wq3EP/CQRWQ8GjHCY5b+6drlGKX2upAEEjnDIiRUbbzR9rFglTkb9G9jCxkL5bRQI3Hxu7EoBr+i"
+            "6A3CbnoahoIDYa2rO/F2RWFRYxYkgm1p7OUPDcJmSLGHD1vgbPyETr/nbLqHLs+YNtkm+YwLZzhyolQez4AIqOd8S/TjP012nMTg0wm3zp"
+            "0T1BylcO94mY4/zmTKC9Xs11rm+Hw0qztiu5h6LnMqh6cOeE84maFKg29kp6c/IRFFrkVWGhACCipQUdFvK5pLHzP5RsQxGhRJMWHVtO6m"
+            "nu891I1VEtkzn+3GxEpCE3nawv+sNXS88LHSrcy06k+7QEaFZfzqqjftoa0B50iY/FpjEDvaQTZ0lMn6sipZJELa/AZhU3phayO7WZ5Cut"
+            "+I0VLQ1dKqxBLamxmAtBnjyZp7bzsnYJqshGtKSlaGj4yMfsnjEwlxanTzn2elxiB3bFOIMlD8MLbbYlLqaFdKHrEEUybkh9W8Mdu5sN/z"
+            "0zPlNHF6Zb9uC+IvrIaypoA2JsE012wzNsJ06/z/K5YT4zH26+edrIHNB40bHLpYa53yaHdRpZHxhMEDfUlnc3cjkVxVAVZlIruPPya8lb"
+            "SM+UAx2byBLwvoqFNvuvY42Z2eKeK7Sb/bbS/kqHjqNWqHg="
+        ),
+        read_request_file("get_settlement_results_request.xml"),
+        read_file("get_settlement_results_response.xml"),
+        warnings=True,
+        multipart=True,
+    )
+
+    # Now, attempt to get settlement results with the valid client type; this should succeed
+    resp = client.get_settlement_results(SettlementQuery(), 1, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    verify_settlement_results(
+        resp,
+        [
+            settlementfile_verifier(
+                "A000_B111_FAKE-FILE.xml",
+                participant="F100",
+                company="偽会社",
+                submission_time=DateTime(2024, 4, 10, 22, 34, 44, tzinfo=Timezone("Asia/Tokyo")),
+                settlement_date=Date(2024, 4, 11),
+                size=123456,
+            )
         ],
     )

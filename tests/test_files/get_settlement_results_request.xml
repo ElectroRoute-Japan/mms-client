@@ -1,0 +1,5 @@
+<MarketData>
+    <MarketQuery Date="2024-04-12" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER">
+        <SettlementResultsFileListQuery></SettlementResultsFileListQuery>
+    </MarketQuery>
+</MarketData>

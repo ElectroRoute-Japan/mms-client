@@ -161,7 +161,8 @@ class Serializer:
         """
         # First, convert the payload to a raw XML string
         raw: bytes = payload.to_xml(
-            skip_empty=True,
+            exclude_none=True,
+            exclude_unset=True,
             encoding="utf-8",
             xml_declaration=False,
         )  # type: ignore[assignment]
