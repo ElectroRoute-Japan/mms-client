@@ -77,5 +77,5 @@ class SettlementResults(Payload):
     files: Annotated[List[SettlementFile], element(tag="File", min_length=1)]
 
 
-class SettlementResultsFileListQuery(Payload):
+class SettlementQuery(Payload, tag="SettlementResultsFileListQuery"):
     """Represents a request to query settlement results file list."""

@@ -83,6 +83,8 @@ from mms_client.types.resource import StartupEvent
 from mms_client.types.resource import StartupPattern
 from mms_client.types.resource import Status
 from mms_client.types.resource import SwitchOutput
+from mms_client.types.settlement import SettlementFile
+from mms_client.types.settlement import SettlementResults
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
@@ -610,39 +612,6 @@ def requirement_verifier(
     return inner
 
 
-def verify_resource_data(
-    req: ResourceData,
-    output_band_verifiers: list = None,
-    switch_verifiers: list = None,
-    afc_minimum_verifiers: list = None,
-    startup_verifiers: list = None,
-    shutdown_verifiers: list = None,
-    **kwargs,
-):
-    """Verify that the given resource data request has the expected parameters."""
-    # Verify the list sub-types
-    print(req)
-    verify_list(req.output_bands, output_band_verifiers)
-    verify_list(req.switch_outputs, switch_verifiers)
-    verify_list(req.afc_minimum_outputs, afc_minimum_verifiers)
-    verify_list(req.startup_patterns, startup_verifiers)
-    verify_list(req.shutdown_patterns, shutdown_verifiers)
-
-    # Verify the remaining fields
-    for field in req.model_fields.keys():
-        if field not in [
-            "output_bands",
-            "switch_outputs",
-            "afc_minimum_outputs",
-            "startup_patterns",
-            "shutdown_patterns",
-        ]:
-            if field in kwargs:
-                assert getattr(req, field) == kwargs[field]
-            else:
-                assert getattr(req, field) is None
-
-
 def verify_bup_query(
     req: BupQuery, resource_code: str, start: DateTime, end: DateTime, is_default: Optional[bool] = None
 ):
@@ -745,6 +714,65 @@ def startup_cost_band_verifier(
         assert band.remarks == remarks
 
     return inner
+
+
+def verify_settlement_results(req: SettlementResults, settlementfile_verifiers: list):
+    """Verify that the SettlementResults was created with the correct parameters."""
+    verify_list(req.files, settlementfile_verifiers)
+
+
+def settlementfile_verifier(
+    name: str,
+    participant: Optional[str] = None,
+    company: Optional[str] = None,
+    submission_time: Optional[DateTime] = None,
+    settlement_date: Optional[Date] = None,
+    size: Optional[int] = None,
+):
+    """Verify that the given settlement file was created with the correct parameters."""
+
+    def inner(file: SettlementFile):
+        assert file.name == name
+        assert file.participant == participant
+        assert file.company == company
+        assert file.submission_time == submission_time
+        assert file.settlement_date == settlement_date
+        assert file.size == size
+
+    return inner
+
+
+def verify_resource_data(
+    req: ResourceData,
+    output_band_verifiers: list = None,
+    switch_verifiers: list = None,
+    afc_minimum_verifiers: list = None,
+    startup_verifiers: list = None,
+    shutdown_verifiers: list = None,
+    **kwargs,
+):
+    """Verify that the given resource data request has the expected parameters."""
+    # Verify the list sub-types
+    print(req)
+    verify_list(req.output_bands, output_band_verifiers)
+    verify_list(req.switch_outputs, switch_verifiers)
+    verify_list(req.afc_minimum_outputs, afc_minimum_verifiers)
+    verify_list(req.startup_patterns, startup_verifiers)
+    verify_list(req.shutdown_patterns, shutdown_verifiers)
+
+    # Verify the remaining fields
+    for field in req.model_fields.keys():
+        if field not in [
+            "output_bands",
+            "switch_outputs",
+            "afc_minimum_outputs",
+            "startup_patterns",
+            "shutdown_patterns",
+        ]:
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
 
 
 def verify_resource_query(

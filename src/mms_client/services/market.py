@@ -24,8 +24,8 @@ from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.reserve import ReserveRequirement
 from mms_client.types.reserve import ReserveRequirementQuery
+from mms_client.types.settlement import SettlementQuery
 from mms_client.types.settlement import SettlementResults
-from mms_client.types.settlement import SettlementResultsFileListQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.serialization import SchemaType
 from mms_client.utils.serialization import Serializer
@@ -227,17 +227,17 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         allowed_clients=[ClientType.BSP, ClientType.TSO],
     )
     def get_settlement_results(
-        self: ClientProto, request: SettlementResultsFileListQuery, days: int, date: Optional[Date] = None
+        self: ClientProto, request: SettlementQuery, days: int, date: Optional[Date] = None
     ) -> SettlementResults:
         """Query the MMS server for settlement results.
 
         This endpoint is only accessible to BSPs and TSOs.
 
         Arguments:
-        request (SettlementResultsFileListQuery):   The query to submit to the MMS server.
-        days (int):                                 The number of days ahead for which the data is being queried.
-        date (Date):                                The date of the transaction in the format "YYYY-MM-DD". This value
-                                                    defaults to the current date.
+        request (SettlementQuery):  The query to submit to the MMS server.
+        days (int):                 The number of days ahead for which the data is being queried.
+        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                    current date.
 
         Returns:    The settlement results that match the query.
         """
