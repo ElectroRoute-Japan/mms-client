@@ -48,6 +48,8 @@ from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
+from mms_client.types.omi import MarketQuery as OmiMarketQuery
+from mms_client.types.omi import MarketSubmit as OmiMarketSubmit
 from mms_client.types.registration import QueryAction
 from mms_client.types.registration import QueryType
 from mms_client.types.registration import RegistrationQuery
@@ -221,6 +223,20 @@ def verify_market_cancel(
     verify_base_market_request(req, date, participant, user)
     assert req.days == days
     assert req.market_type == market_type
+
+
+def verify_omi_market_submit(req: OmiMarketSubmit, date: Date, participant: str, user: str):
+    """Verify that the OmiMarketSubmit was created with the correct parameters."""
+    assert req.date == date
+    assert req.participant == participant
+    assert req.user == user
+
+
+def verify_omi_market_query(req: OmiMarketQuery, date: Date, participant: str, user: str):
+    """Verify that the OmiMarketQuery was created with the correct parameters."""
+    assert req.date == date
+    assert req.participant == participant
+    assert req.user == user
 
 
 def verify_base_market_request(req: BaseMarketRequest, date: Date, participant: str, user: str):
