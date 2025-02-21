@@ -1,0 +1,28 @@
+<MarketData>
+    <MarketSubmit Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER">
+        <RemainingReserveData
+         BlackStartRejectFlag="1"
+         BlackStartRejectReason="Some reason"
+         DrPatternNumber="1"
+         EndTime="2024-04-12T18:00:00"
+         OverPowerRejectFlag="2"
+         OverPowerRejectReason="Some reason"
+         OverPowerRemainingReserveUp="300"
+         PeakModeRejectFlag="9"
+         PeakModeRejectReason="Some reason"
+         PeakModeRemainingReserveUp="400"
+         RemainingReserveDown="200"
+         RemainingReserveDownRejectFlag="2"
+         RemainingReserveDownRejectReason="Some reason"
+         RemainingReserveUp="100"
+         RemainingReserveUpRejectFlag="1"
+         RemainingReserveUpRejectReason="Some reason"
+         ResourceName="FAKE_RESO"
+         StartTime="2024-04-12T15:00:00"
+         SystemSecurityPumpRejectFlag="9"
+         SystemSecurityPumpRejectReason="Some reason"
+         VoltageAdjustmentRejectFlag="9"
+         VoltageAdjustmentRejectReason="Some reason">
+        </RemainingReserveData>
+    </MarketSubmit>
+</MarketData>

@@ -989,6 +989,7 @@ class MultipartPayloadMatcher:
         self.request_type = request_type
         self.signature = signature
         self.encoded = encoded
+        self.ns = "urn:types.ws.web.omi.co.jp" if request_type == RequestType.OMI else "urn:abb.com:project/mms/types"
         if self.encoded:
             b64 = b64encode(data.encode("UTF-8")).decode("UTF-8")
             self.data = "".join(b64[i : i + 76] + "\n" for i in range(0, len(b64), 76))
@@ -1022,14 +1023,14 @@ class MultipartPayloadMatcher:
             f"""--MIMEBoundary_{match.group('boundary')}\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: 7bit\r\n"""
             """Content-Type: application/xop+xml; charset="utf-8"; type="text/xml"\r\nContent-ID: """
             f"""<{match.group('mtom')}@fake.com>\r\nContent-Transfer-Encoding: binary\n\n<?xml version='1.0' """
-            f"""encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">"""
-            """<soap-env:Body><ns0:RequestAttInfo xmlns:ns0="urn:abb.com:project/mms/types"><requestType>"""
-            f"""{self.request_type.value}</requestType><adminRole>false</adminRole><requestDataCompressed>false"""
-            """</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
-            """</sendRequestDataOnSuccess><sendResponseDataCompressed>false</sendResponseDataCompressed>"""
-            f"""<requestSignature>{self.signature}</requestSignature><requestData><xop:Include xmlns:xop="http://"""
-            f"""www.w3.org/2004/08/xop/include" href="cid:{match.group('cid')}"/></requestData></ns0:RequestAttInfo>"""
-            f"""</soap-env:Body></soap-env:Envelope>\n--MIMEBoundary_{match.group('boundary')}\nContent-Transfer-"""
+            """encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">"""
+            f"""<soap-env:Body><ns0:RequestAttInfo xmlns:ns0="{self.ns}"><requestType>{self.request_type.value}"""
+            """</requestType><adminRole>false</adminRole><requestDataCompressed>false</requestDataCompressed>"""
+            """<requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false</sendRequestDataOnSuccess>"""
+            f"""<sendResponseDataCompressed>false</sendResponseDataCompressed><requestSignature>{self.signature}"""
+            """</requestSignature><requestData><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" """
+            f"""href="cid:{match.group('cid')}"/></requestData></ns0:RequestAttInfo></soap-env:Body>"""
+            f"""</soap-env:Envelope>\n--MIMEBoundary_{match.group('boundary')}\nContent-Transfer-"""
             f"""Encoding: {"base64" if self.encoded else "binary"}\nContent-ID: <{match.group('cid')}>\nContent-Type: """
             f"""application/octet-stream; charset="utf-8"\n\n{self.data}\n--MIMEBoundary_{match.group('boundary')}--\n"""
         )
