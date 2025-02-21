@@ -60,8 +60,8 @@ def test_market_submit_defaults():
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_market_submit(request, Date(2019, 8, 30), "F100", "FAKEUSER")
-    assert data == b"""<MarketSubmit Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" NumOfDays="1"/>"""
+    verify_market_submit(request, Date(2019, 8, 30), "F100", "FAKEUSER", days=None)
+    assert data == b"""<MarketSubmit Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER"/>"""
 
 
 def test_market_submit_full():

@@ -313,7 +313,9 @@ class Serializer:
         ValueError:    If the expected data type is not found in the response.
         """
         data_tags = set(node.tag for node in raw)
-        if not data_tags.issubset([data_type.__name__, data_type.__xml_tag__, "ProcessingStatistics", "Messages"]):
+        if not data_tags.issubset(
+            [data_type.__name__, data_type.__xml_tag__, "ProcessingStatistics", "Messages", "StandingData"]
+        ):
             raise DataNodeNotFoundError(method, data_type)
 
     def _from_tree_data(self, raw: Optional[Element], data_type: Type[P]) -> Optional[ResponseData[P]]:

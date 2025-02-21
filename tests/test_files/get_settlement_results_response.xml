@@ -1,7 +1,26 @@
 <MarketData>
-    <MarketSubmit Date="2024-04-12" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER">
-        <SettlementResults>
+    <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
+    <Messages>
+        <Warning Code="Warning1">Warning1</Warning>
+        <Warning Code="Warning2">Warning2</Warning>
+        <Information Code="Info1">Info1</Information>
+        <Information Code="Info2">Info2</Information>
+    </Messages>
+    <MarketSubmit Date="2024-04-12" NumOfDays="1" ParticipantName="F100" UserName="FAKEUSER" Validation="PASSED" Success="true">
+        <Messages>
+            <Warning Code="Warning1">Warning1</Warning>
+            <Warning Code="Warning2">Warning2</Warning>
+            <Information Code="Info1">Info1</Information>
+            <Information Code="Info2">Info2</Information>
+        </Messages>
+        <SettlementResults Validation="PASSED" Success="true">
             <File Name="A000_B111_FAKE-FILE.xml" ParticipantName="F100" CompanyShortName="偽会社" SubmissionTime="2024-04-10T22:34:44" SttlDate="2024-04-11" FileSize="123456">
+                <Messages>
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
+                </Messages>
             </File>
         </SettlementResults>
     </MarketSubmit>

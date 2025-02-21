@@ -256,8 +256,6 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     def put_bups(
         self: ClientProto,
         requests: List[BupSubmit],
-        market_type: MarketType,
-        days: int,
         date: Optional[Date] = None,
         default: bool = False,
     ) -> List[BupSubmit]:
@@ -267,8 +265,6 @@ class MarketClientMixin:  # pylint: disable=unused-argument
 
         Arguments:
         requests (List[BupSubmit]): The bups to submit to the MMS server.
-        market_type (MarketType):   The type of market for which the bups are being submitted.
-        days (int):                 The number of days ahead for which the bups are being submitted.
         date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                     current date.
         default (bool):             Whether or not the bups are the default.
@@ -280,8 +276,6 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
-            market_type=market_type,
-            days=days,
             defaults=Defaults(is_default=default),
         )
 
@@ -291,8 +285,6 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     def put_bup(
         self: ClientProto,
         request: BupSubmit,
-        market_type: MarketType,
-        days: int,
         date: Optional[Date] = None,
         default: bool = False,
     ) -> BupSubmit:
@@ -301,12 +293,10 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         This endpoint is only accessible to BSPs.
 
         Arguments:
-        request (BupSubmit):        The bup to submit to the MMS server.
-        market_type (MarketType):   The type of market for which the bup is being submitted.
-        days (int):                 The number of days ahead for which the bup is being submitted.
-        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
-                                    current date.
-        default (bool):             Whether or not the bup is the default.
+        request (BupSubmit):    The bup to submit to the MMS server.
+        date (Date):            The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
+                                current date.
+        default (bool):         Whether or not the bup is the default.
 
         Returns:    The bup that has been registered with the MMS server.
         """
@@ -315,8 +305,6 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
-            market_type=market_type,
-            days=days,
             defaults=Defaults(is_default=default),
         )
 

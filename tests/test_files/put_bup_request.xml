@@ -1,0 +1,22 @@
+<MarketData>
+    <MarketSubmit Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER">
+        <StandingData StandingFlag="false">
+        </StandingData>
+        <BupSubmit EndTime="2024-04-12T12:00:00" ResourceName="FAKE_RESO" StartTime="2024-04-12T09:00:00">
+            <PatternData PatternNo="1" PatternRemark="Some patterned remarks" PatternStatus="1">
+                <Bup V4="100.00">
+                    <BandBup Band="1" FromCap="9000" V1="200.00" V2="300.00">
+                    </BandBup>
+                </Bup>
+                <Abc>
+                    <BandAbc Band="1" FromCap="9001" a="400.1" b="400.2" c="400.3">
+                    </BandAbc>
+                </Abc>
+                <StartupCost>
+                    <BandStartup CaseNo="1" Remark="Some comment on startup" StopTime="42" V3="500">
+                    </BandStartup>
+                </StartupCost>
+            </PatternData>
+        </BupSubmit>
+    </MarketSubmit>
+</MarketData>
