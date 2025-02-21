@@ -1,0 +1,5 @@
+<MarketData>
+    <MarketQuery Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER">
+        <BupQuery EndTime="2024-04-12T18:00:00" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00"></BupQuery>
+    </MarketQuery>
+</MarketData>

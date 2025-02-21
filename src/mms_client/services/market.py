@@ -315,14 +315,13 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         response_envelope_type=MarketSubmit,
         response_data_type=BupSubmit,
     )
-    def query_bups(self: ClientProto, request: BupQuery, days: int, date: Optional[Date] = None) -> List[BupSubmit]:
+    def query_bups(self: ClientProto, request: BupQuery, date: Optional[Date] = None) -> List[BupSubmit]:
         """Query the MMS server for bups.
 
         This endpoint is accessible to all client types.
 
         Arguments:
         request (BupQuery):       The query to submit to the MMS server.
-        days (int):               The number of days ahead for which the data is being queried.
         date (Date):              The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
                                   current date.
 
@@ -333,5 +332,4 @@ class MarketClientMixin:  # pylint: disable=unused-argument
             date=date or Date.today(),
             participant=self.participant,
             user=self.user,
-            days=days,
         )

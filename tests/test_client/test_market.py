@@ -798,3 +798,62 @@ def test_put_bup_works(mock_certificate):
             )
         ],
     )
+
+
+@responses.activate
+def test_query_bups_works(mock_certificate):
+    """Test that the query_bups method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test bup query
+    request = BupQuery(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 15),
+        end=DateTime(2024, 4, 12, 18),
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.MARKET,
+        (
+            "LhwxZ4I1mJfd8ew0gERS5TP0ZPFxlzyN+RpLhe17AK/itZzDigPCMJRiUfpsNxv/kKx4EqNcN5jOpIzcWp1ZHWmAOaD31dbx2irlfiHQ4P"
+            "6o5xlCmQciRKycgEEgkFyXuHJon7hRVyACXh9Mq5kLzAxsLgvmWahQ7isF0knCBlhhUnmZtzZldWEw+huSUJnJ7rmYKEu9a0Vw36JJnSCf"
+            "C4Q0x0Am0uyvk7EMKBzwLiTz6h4GjA+nOAHYhKflu1vUECOxYhr6Mw48uyZsjZXJUBJqIfI3hnSfjEBV/VPMq6wuwZQu9T49uLIPIvq85i"
+            "Qv4xKnBjp5s/j0TdQZnt/Uznl5pICnDCtR17ImmlNbkyrnE407RMxa4UjCxOATyLZLPCNhj0kZFZpH9p130JVie8esh6U6+/UnH9yUWgOm"
+            "3k3byxom/al8A5XUK32tcKSBeaOeaOmg+Isqv1BAxcpkWXcrv4Kb3LSmq3QC7jxWAf4uIKMMgbAM24CRm9j7CS7XM44RZ49t7id3uk2BVn"
+            "9TCJJigk/esR4AWU6RVcccEv9DFOBmdbX0LX7bWxxvnhAm9af1/gKiojx31rgKk63/rtTSFidjdC6I2ahXRbxvdWyEY+J2c7IvA1QE0M8C"
+            "zg2epv3ajT+jfJsepU01rJpb5nN9ck+x5d3Q0QvDDKOlmTw="
+        ),
+        read_request_file("query_bups_request.xml"),
+        read_file("put_bup_response.xml"),
+        warnings=True,
+        multipart=True,
+    )
+
+    # Now, attempt to get BUPs with the valid client type; this should succeed
+    resp = client.query_bups(request, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    assert len(resp) == 1
+    verify_bup_submit(
+        resp[0],
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9, tzinfo=Timezone("Asia/Tokyo")),
+        end=DateTime(2024, 4, 12, 12, tzinfo=Timezone("Asia/Tokyo")),
+        participant_name="F100",
+        company="偽会社",
+        area=AreaCode.TOKYO,
+        resource_name="偽電力",
+        system_code="FSYS0",
+        pattern_verifiers=[
+            pattern_data_verifier(
+                1,
+                Status.ACTIVE,
+                "Some patterned remarks",
+                bup_verifier(Decimal("100.00"), [bup_band_verifier(1, 9000, Decimal("200.00"), Decimal("300.00"))]),
+                [abc_band_verifier(1, 9001, Decimal("400.1"), Decimal("400.2"), Decimal("400.3"))],
+                [startup_cost_band_verifier(1, 42, 500, "Some comment on startup")],
+            )
+        ],
+    )
