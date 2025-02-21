@@ -420,7 +420,7 @@ class BaseClient:  # pylint: disable=too-many-instance-attributes
 
         # First, create the MMS request from the payload and data.
         is_list = isinstance(payload, list)
-        data_type = type(payload[0]) if is_list else type(payload)  # type: ignore[index]
+        data_type: type = type(payload[0]) if is_list else type(payload)  # type: ignore[index]
         logger.debug(
             (
                 f"{config.name}: Starting multi-request. Envelope: {type(envelope).__name__}, "
