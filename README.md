@@ -187,12 +187,17 @@ This client is not complete. Currently, it supports the following endpoints:
 - MarketQuery_OfferQuery
 - MarketCancel_OfferCancel
 - MarketQuery_AwardResultsQuery
+- MarketQuery_SettlementResultsFileListQuery
+- MarketSubmit_BupSubmit
+- MarketQuery_BupQuery
 - RegistrationSubmit_Resource
 - RegistrationQuery_Resource
 - ReportCreateRequest
 - ReportListRequest
 - ReportDownloadRequestTrnID
 - BSP_ResourceList
+- MarketSubmit_RemainingReserveData
+- MarketQuery_RemainingReserveDataQuery
 
 We can add support for additional endpoints as time goes on, and independent contribution is, of course, welcome. However, support for attachments is currently limited because none of the endpoints we support currently require them. We have implemented attachment support up to the client level, but we haven't developed an architecture for submitting them through an endpoint yet.
 
