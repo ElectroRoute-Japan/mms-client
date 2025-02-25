@@ -192,6 +192,12 @@ class Award(Payload):
     # The contract price, in JPY/kW/segment
     contract_price: Decimal = price("ContractPrice", 10000.00)
 
+    # The unit price charged for the start up cost of the power, in JPY/kW/segment
+    start_up_unit_price: Decimal = price("StartUpUnitPrice", 10000.00, True)
+
+    # The unit price charged for the ramp down cost of the power, in JPY/kW/segment
+    ramp_down_unit_price: Decimal = price("RampDownUnitPrice", 10000.00, True)
+
     # The performance evaluation coefficient, alpha
     performance_evaluation_coefficient: Decimal = attr(name="PerfEvalCoeff", ge=0.00, le=100.0, decimal_places=2)
 

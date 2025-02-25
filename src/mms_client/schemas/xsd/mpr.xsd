@@ -182,6 +182,7 @@
       <xs:enumeration value="2200"/>
       <xs:enumeration value="3100"/>
       <xs:enumeration value="3200"/>
+      <xs:enumeration value="4000"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -225,6 +226,7 @@
     <xs:restriction base="xs:string">
       <xs:enumeration value="1"/>
       <xs:enumeration value="2"/>
+      <xs:enumeration value="3"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -735,6 +737,38 @@
     <xs:restriction base="xs:int">
       <xs:minInclusive value="0"/>
       <xs:maxInclusive value="9999"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DeadBandType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0000"/>
+      <xs:maxInclusive value="9.9999"/>
+      <xs:fractionDigits value="4"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FrequencyMeasurementIntervalType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.00"/>
+      <xs:maxInclusive value="9.99"/>
+      <xs:fractionDigits value="2"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="FrequencyMeasurementErrorType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.000"/>
+      <xs:maxInclusive value="9.999"/>
+      <xs:fractionDigits value="3"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="DelayTimeType">
+    <xs:restriction base="xs:decimal">
+      <xs:minInclusive value="0.0"/>
+      <xs:maxInclusive value="9.9"/>
+      <xs:fractionDigits value="1"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -1317,6 +1351,14 @@
     <xs:attribute name="AfcMinimumOutput" type="CapacityType"
                   use="optional"/>
     <xs:attribute name="GfVariationRate" type="PercentageType"
+                  use="optional"/>
+    <xs:attribute name="DeadBand" type="DeadBandType"
+                  use="optional"/>
+    <xs:attribute name="FrequencyMeasurementInterval" type="FrequencyMeasurementIntervalType"
+                  use="optional"/>
+    <xs:attribute name="FrequencyMeasurementError" type="FrequencyMeasurementErrorType"
+                  use="optional"/>
+    <xs:attribute name="DelayTime" type="DelayTimeType"
                   use="optional"/>
     <xs:attribute name="GfWidthOutOfRatedOutput" type="CapacityType"
                   use="optional"/>

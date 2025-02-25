@@ -9,7 +9,7 @@
 
               +-----------------------------------------------+
               |                                               |
-              |               COPYRIGHT (c) 2019              |
+              |               COPYRIGHT (c) 2024              |
               |                                               |
               |       ABB BUSINESS MANAGEMENT SYSTEMS         |
               |                                               |
@@ -49,7 +49,9 @@
       012  30-Jul-2021  RN        Updated ParticipantNameType to accommodate OMI and other such participants
       013  25-Apr-2022  RN        Updated FromCap Type in BUP to accommodate negative values
       014  22-Nov-2022  DM        Updated for Phase 3 requirements
-	  015  03-May-2023  DM        Updated for CR-0010
+      015  03-May-2023  DM        Updated for CR-0010
+      016  15-May-2024  DM        Updated for Phase 4 requirements
+      017  04-Sep-2024  DM        Change OfflineFrameSubmit element max occurances to unbounded
 
       </xs:documentation>
     </xs:annotation>
@@ -991,9 +993,8 @@
       <xs:sequence>
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="StartDate" type="xs:date" use="required"/>
-      <xs:attribute name="EndDate" type="xs:date" use="required"/>
-      <xs:attribute name="Area" type="AreaType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
       <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
       <xs:attribute name="OfflineFrameQuantityInKw" type="KwPosValue7.0Type" use="required"/>
     </xs:complexType>
@@ -1010,6 +1011,7 @@
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
         <xs:element name="OfflineFrame" type="OfflineFrameDataType" minOccurs="1" maxOccurs="unbounded"/>
       </xs:sequence>
+      <xs:attribute name="Area" type="AreaType" use="required"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
 
@@ -1024,8 +1026,6 @@
       <xs:sequence>
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="StartDate" type="xs:date" use="optional"/>
-      <xs:attribute name="EndDate" type="xs:date" use="optional"/>
       <xs:attribute name="Area" type="AreaType" use="optional"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
@@ -1181,6 +1181,8 @@
       <xs:attribute name="Tertiary1OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="Tertiary2OfferQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="OfferUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="optional"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="optional"/>
       <xs:attribute name="OfferId" type="OfferIdType" use="optional"/>
     </xs:complexType>
 
@@ -1598,6 +1600,8 @@
       <xs:attribute name="CommandOperationMethodSec2Ter1Ter2" type="CommandOperationMethodSec2Ter1Ter2Type" use="optional"/>
       <xs:attribute name="OfferPrice" type="PriceValue6.2RoundedType" use="required"/>
       <xs:attribute name="ContractPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
       <xs:attribute name="PerfEvalCoeff" type="PosValue4.2RoundedType" use="required"/>
       <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2RoundedType" use="required"/>
       <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>
@@ -2001,6 +2005,8 @@
       <xs:attribute name="Tertiary2Quantity" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="CompoundQuantity" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="Price" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
       <xs:attribute name="PerfEvalCoefficient" type="PosValue4.2RoundedType" use="optional"/>
       <xs:attribute name="LinkedArea" type="AreaType" use="optional"/>
       <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
@@ -2069,6 +2075,8 @@
       <xs:attribute name="Tertiary2RequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="CompoundRequestedQuantity" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="Price" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
       <xs:attribute name="TsoName" type="ParticipantNameType" use="required"/>
       <xs:attribute name="TsoShortName" type="CompanyShortNameType" use="required"/>
       <xs:attribute name="Area" type="AreaType" use="required"/>
@@ -2109,6 +2117,8 @@
       <xs:attribute name="Tertiary1QuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="Tertiary2QuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="Price" type="PriceValue6.2RoundedType" use="optional"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="optional"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="SourceType">
@@ -2284,7 +2294,7 @@
           <xs:element name="AllowableInterareaAward" type="AllowableInterareaAwardSubmitType" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="UpperLimitTieline" type="UpperLimitTielineSubmitType" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="SettlementResults" type="SettlementResultsSubmitType" minOccurs="0" maxOccurs="1"/>
-          <xs:element name="OfflineFrameSubmit" type="OfflineFrameSubmitType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="OfflineFrameSubmit" type="OfflineFrameSubmitType" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="FringeSubmit" type="FringeSubmitType" minOccurs="0" maxOccurs="1"/>
 
           <!-- Market Data Submit types -->

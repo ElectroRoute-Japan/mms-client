@@ -27,6 +27,14 @@ from mms_client.types.base import Message
 from mms_client.types.base import Messages
 from mms_client.types.base import ResponseCommon
 from mms_client.types.base import ValidationStatus
+from mms_client.types.bup import AbcBand
+from mms_client.types.bup import BalancingUnitPrice
+from mms_client.types.bup import BalancingUnitPriceBand
+from mms_client.types.bup import BalancingUnitPriceQuery
+from mms_client.types.bup import BalancingUnitPriceSubmit
+from mms_client.types.bup import Pattern
+from mms_client.types.bup import StartupCostBand
+from mms_client.types.bup import Status as BupStatus
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BooleanFlag
 from mms_client.types.enums import ResourceType
@@ -40,6 +48,8 @@ from mms_client.types.offer import OfferCancel
 from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
+from mms_client.types.omi import MarketQuery as OmiMarketQuery
+from mms_client.types.omi import MarketSubmit as OmiMarketSubmit
 from mms_client.types.registration import QueryAction
 from mms_client.types.registration import QueryType
 from mms_client.types.registration import RegistrationQuery
@@ -75,6 +85,11 @@ from mms_client.types.resource import StartupEvent
 from mms_client.types.resource import StartupPattern
 from mms_client.types.resource import Status
 from mms_client.types.resource import SwitchOutput
+from mms_client.types.settlement import SettlementFile
+from mms_client.types.settlement import SettlementResults
+from mms_client.types.surplus_capcity import SurplusCapacityData
+from mms_client.types.surplus_capcity import SurplusCapacityQuery
+from mms_client.types.surplus_capcity import SurplusCapacitySubmit
 from mms_client.types.transport import Attachment
 from mms_client.types.transport import MmsRequest
 from mms_client.types.transport import MmsResponse
@@ -211,6 +226,20 @@ def verify_market_cancel(
     verify_base_market_request(req, date, participant, user)
     assert req.days == days
     assert req.market_type == market_type
+
+
+def verify_omi_market_submit(req: OmiMarketSubmit, date: Date, participant: str, user: str):
+    """Verify that the OmiMarketSubmit was created with the correct parameters."""
+    assert req.date == date
+    assert req.participant == participant
+    assert req.user == user
+
+
+def verify_omi_market_query(req: OmiMarketQuery, date: Date, participant: str, user: str):
+    """Verify that the OmiMarketQuery was created with the correct parameters."""
+    assert req.date == date
+    assert req.participant == participant
+    assert req.user == user
 
 
 def verify_base_market_request(req: BaseMarketRequest, date: Date, participant: str, user: str):
@@ -602,6 +631,136 @@ def requirement_verifier(
     return inner
 
 
+def verify_bup_query(
+    req: BalancingUnitPriceQuery, resource_code: str, start: DateTime, end: DateTime, is_default: Optional[bool] = None
+):
+    """Verify that the given BalancingUnitPriceQuery was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.start == start
+    assert req.end == end
+    assert req.is_default == is_default
+
+
+def verify_bup_submit(
+    req: BalancingUnitPriceSubmit, resource_code: str, start: DateTime, end: DateTime, pattern_verifiers: list, **kwargs
+):
+    """Verify that the given BalancingUnitPriceSubmit was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.start == start
+    assert req.end == end
+    verify_list(req.patterns, pattern_verifiers)
+    for field in req.model_fields.keys():
+        if field not in [
+            "resource_code",
+            "start",
+            "end",
+            "patterns",
+        ]:
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def pattern_data_verifier(
+    number: int,
+    status: BupStatus,
+    remarks: Optional[str] = None,
+    bup_verifier=None,
+    abc_verifiers: list = None,
+    startup_verifiers: list = None,
+):
+    """Verify that the Pattern was created with the correct parameters."""
+
+    def inner(pattern: Pattern):
+        assert pattern.number == number
+        assert pattern.status == status
+        assert pattern.remarks == remarks
+        if bup_verifier:
+            bup_verifier(pattern.balancing_unit_profile)
+        else:
+            assert pattern.balancing_unit_profile is None
+        verify_list(pattern.abc, abc_verifiers)
+        verify_list(pattern.startup_costs, startup_verifiers)
+
+    return inner
+
+
+def bup_verifier(v4_unit_price: Decimal, bands: list = None):
+    """Verify that the BalancingUnitPrice was created with the correct parameters."""
+
+    def inner(bup: BalancingUnitPrice):
+        assert bup.v4_unit_price == v4_unit_price
+        verify_list(bup.bands, bands)
+
+    return inner
+
+
+def bup_band_verifier(number: int, from_capacity: Decimal, v1_unit_price: Decimal, v2_unit_price: Decimal):
+    """Verify that the BalancingUnitPriceBand was created with the correct parameters."""
+
+    def inner(band: BalancingUnitPriceBand):
+        assert band.number == number
+        assert band.from_capacity == from_capacity
+        assert band.v1_unit_price == v1_unit_price
+        assert band.v2_unit_price == v2_unit_price
+
+    return inner
+
+
+def abc_band_verifier(number: int, from_capacity: Decimal, a: Decimal, b: Decimal, c: Decimal):
+    """Verify that the AbcBand was created with the correct parameters."""
+
+    def inner(band: AbcBand):
+        assert band.number == number
+        assert band.from_capacity == from_capacity
+        assert band.a == a
+        assert band.b == b
+        assert band.c == c
+
+    return inner
+
+
+def startup_cost_band_verifier(
+    number: int, stop_time_hours: int, v3_unit_price: Decimal, remarks: Optional[str] = None
+):
+    """Verify that the StartupCostBand was created with the correct parameters."""
+
+    def inner(band: StartupCostBand):
+        assert band.number == number
+        assert band.stop_time_hours == stop_time_hours
+        assert band.v3_unit_price == v3_unit_price
+        assert band.remarks == remarks
+
+    return inner
+
+
+def verify_settlement_results(req: SettlementResults, settlementfile_verifiers: list):
+    """Verify that the SettlementResults was created with the correct parameters."""
+    verify_list(req.files, settlementfile_verifiers)
+
+
+def settlementfile_verifier(
+    name: str,
+    participant: Optional[str] = None,
+    company: Optional[str] = None,
+    submission_time: Optional[DateTime] = None,
+    settlement_date: Optional[Date] = None,
+    size: Optional[int] = None,
+):
+    """Verify that the given settlement file was created with the correct parameters."""
+
+    def inner(file: SettlementFile):
+        assert file.name == name
+        assert file.participant == participant
+        assert file.company == company
+        assert file.submission_time == submission_time
+        assert file.settlement_date == settlement_date
+        assert file.size == size
+
+    return inner
+
+
 def verify_resource_data(
     req: ResourceData,
     output_band_verifiers: list = None,
@@ -720,6 +879,52 @@ def verify_list(items: Optional[list] = None, verifiers: Optional[list] = None):
         verifier(item)
 
 
+def verify_surplus_capacity_submit(
+    req: SurplusCapacitySubmit, resource_code: str, pattern_number: int, start: DateTime, end: DateTime, **kwargs
+):
+    """Verify that the SurplusCapacitySubmit was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.pattern_number == pattern_number
+    assert req.start == start
+    assert req.end == end
+    for field, info in req.model_fields.items():
+        if not info.is_required():
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def verify_surplus_capacity_data(
+    req: SurplusCapacityData, resource_code: str, pattern_number: int, start: DateTime, end: DateTime, **kwargs
+):
+    """Verify that the SurplusCapacityData was created with the correct parameters."""
+    assert req.resource_code == resource_code
+    assert req.pattern_number == pattern_number
+    assert req.start == start
+    assert req.end == end
+    for field, info in req.model_fields.items():
+        if not info.is_required():
+            if field in kwargs:
+                assert getattr(req, field) == kwargs[field]
+            else:
+                assert getattr(req, field) is None
+
+
+def verify_surplus_capacity_query(
+    req: SurplusCapacityQuery,
+    start: DateTime,
+    end: DateTime,
+    resource_code: Optional[str] = None,
+    pattern_number: Optional[int] = None,
+):
+    """Verify that the SurplusCapacityQuery was created with the correct parameters."""
+    assert req.start == start
+    assert req.end == end
+    assert req.resource_code == resource_code
+    assert req.pattern_number == pattern_number
+
+
 def register_mms_request(
     request_type: RequestType,
     signature: str,
@@ -784,6 +989,7 @@ class MultipartPayloadMatcher:
         self.request_type = request_type
         self.signature = signature
         self.encoded = encoded
+        self.ns = "urn:types.ws.web.omi.co.jp" if request_type == RequestType.OMI else "urn:abb.com:project/mms/types"
         if self.encoded:
             b64 = b64encode(data.encode("UTF-8")).decode("UTF-8")
             self.data = "".join(b64[i : i + 76] + "\n" for i in range(0, len(b64), 76))
@@ -817,14 +1023,14 @@ class MultipartPayloadMatcher:
             f"""--MIMEBoundary_{match.group('boundary')}\r\nMIME-Version: 1.0\r\nContent-Transfer-Encoding: 7bit\r\n"""
             """Content-Type: application/xop+xml; charset="utf-8"; type="text/xml"\r\nContent-ID: """
             f"""<{match.group('mtom')}@fake.com>\r\nContent-Transfer-Encoding: binary\n\n<?xml version='1.0' """
-            f"""encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">"""
-            """<soap-env:Body><ns0:RequestAttInfo xmlns:ns0="urn:abb.com:project/mms/types"><requestType>"""
-            f"""{self.request_type.value}</requestType><adminRole>false</adminRole><requestDataCompressed>false"""
-            """</requestDataCompressed><requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false"""
-            """</sendRequestDataOnSuccess><sendResponseDataCompressed>false</sendResponseDataCompressed>"""
-            f"""<requestSignature>{self.signature}</requestSignature><requestData><xop:Include xmlns:xop="http://"""
-            f"""www.w3.org/2004/08/xop/include" href="cid:{match.group('cid')}"/></requestData></ns0:RequestAttInfo>"""
-            f"""</soap-env:Body></soap-env:Envelope>\n--MIMEBoundary_{match.group('boundary')}\nContent-Transfer-"""
+            """encoding='utf-8'?>\n<soap-env:Envelope xmlns:soap-env="http://schemas.xmlsoap.org/soap/envelope/">"""
+            f"""<soap-env:Body><ns0:RequestAttInfo xmlns:ns0="{self.ns}"><requestType>{self.request_type.value}"""
+            """</requestType><adminRole>false</adminRole><requestDataCompressed>false</requestDataCompressed>"""
+            """<requestDataType>XML</requestDataType><sendRequestDataOnSuccess>false</sendRequestDataOnSuccess>"""
+            f"""<sendResponseDataCompressed>false</sendResponseDataCompressed><requestSignature>{self.signature}"""
+            """</requestSignature><requestData><xop:Include xmlns:xop="http://www.w3.org/2004/08/xop/include" """
+            f"""href="cid:{match.group('cid')}"/></requestData></ns0:RequestAttInfo></soap-env:Body>"""
+            f"""</soap-env:Envelope>\n--MIMEBoundary_{match.group('boundary')}\nContent-Transfer-"""
             f"""Encoding: {"base64" if self.encoded else "binary"}\nContent-ID: <{match.group('cid')}>\nContent-Type: """
             f"""application/octet-stream; charset="utf-8"\n\n{self.data}\n--MIMEBoundary_{match.group('boundary')}--\n"""
         )

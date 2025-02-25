@@ -12,6 +12,14 @@ from mms_client.client import MmsClient
 from mms_client.types.award import AwardQuery
 from mms_client.types.award import ContractSource
 from mms_client.types.award import SubRequirement
+from mms_client.types.bup import AbcBand
+from mms_client.types.bup import BalancingUnitPrice
+from mms_client.types.bup import BalancingUnitPriceBand
+from mms_client.types.bup import BalancingUnitPriceQuery
+from mms_client.types.bup import BalancingUnitPriceSubmit
+from mms_client.types.bup import Pattern
+from mms_client.types.bup import StartupCostBand
+from mms_client.types.bup import Status
 from mms_client.types.enums import AreaCode
 from mms_client.types.enums import BooleanFlag
 from mms_client.types.enums import CommandMonitorMethod
@@ -25,20 +33,29 @@ from mms_client.types.offer import OfferData
 from mms_client.types.offer import OfferQuery
 from mms_client.types.offer import OfferStack
 from mms_client.types.reserve import ReserveRequirementQuery
+from mms_client.types.settlement import SettlementQuery
 from mms_client.types.transport import RequestType
 from mms_client.utils.errors import AudienceError
 from mms_client.utils.web import ClientType
+from tests.testutils import abc_band_verifier
 from tests.testutils import award_result_verifier
 from tests.testutils import award_verifier
+from tests.testutils import bup_band_verifier
+from tests.testutils import bup_verifier
 from tests.testutils import offer_stack_verifier
+from tests.testutils import pattern_data_verifier
 from tests.testutils import read_file
 from tests.testutils import read_request_file
 from tests.testutils import register_mms_request
 from tests.testutils import requirement_verifier
+from tests.testutils import settlementfile_verifier
+from tests.testutils import startup_cost_band_verifier
 from tests.testutils import verify_award_response
+from tests.testutils import verify_bup_submit
 from tests.testutils import verify_offer_cancel
 from tests.testutils import verify_offer_data
 from tests.testutils import verify_reserve_requirement
+from tests.testutils import verify_settlement_results
 
 
 @responses.activate
@@ -390,7 +407,13 @@ def test_query_awards_works(mock_certificate):
     register_mms_request(
         RequestType.MARKET,
         (
-            "8JZ4ecLOMVtm30sjaxVsk6WL/A08yhDsidfgX4tYenxZeLyN0TDC8RTQVUNBlOc6zXP4eE6rYXu4SJ2OBTMdbVud8CrC0Yy9uD+R40gZ+HSfLf5bDPjdHXMrFbXBhA8pY5J5HFs3zhMZNuhGyUtvTqPbs6q6nWkuXdPqyftO/MX4ZjCqq3R3ZFpldM5lS5dLYRFX/CEQ9mnxISM9cQUbqeVawQZNo+PsFOylG91jGNlw4ZL7CDEC+BFqJk7BL8l5b3cCvTwGknFg4IM55MzYQgtfnisn73cN69a1LJbabAOr2NFuj98n8PaLhpxledwyVM3gN4oCFlA8SnzviMY/iPAzN81pxHg69aUJAJbLyqwmUqPb7/E/qiC6dY9ty/8eFdvoN+APFYAnY8sWQyQUENFBas8Osij9i50J2n/x3muQ8zzcmWIXW+mmp0KnxzyO/HKPqxoadfqAPQgzhh/4KyGZxa6jhYYV6rfs7BwiJH47pSQ+AXPasOJOdwMK4K9a8yQoEQloaxr/dLcwPWFccsShXFtMSZxCRVl2tJA0KtK7B1n6LXf3YkmqHS0tfUb7dh2dpXbQCfSGRaZgzAd5DZrYh5XTX99Up38m+qeESsxMmHzBnA5UED6n77yP7ufN4j5P2mCOwrVf0mxJJUa/b2gtJT5xKTRN30kzfrYrSFc="
+            "8JZ4ecLOMVtm30sjaxVsk6WL/A08yhDsidfgX4tYenxZeLyN0TDC8RTQVUNBlOc6zXP4eE6rYXu4SJ2OBTMdbVud8CrC0Yy9uD+R40gZ+H"
+            "SfLf5bDPjdHXMrFbXBhA8pY5J5HFs3zhMZNuhGyUtvTqPbs6q6nWkuXdPqyftO/MX4ZjCqq3R3ZFpldM5lS5dLYRFX/CEQ9mnxISM9cQUb"
+            "qeVawQZNo+PsFOylG91jGNlw4ZL7CDEC+BFqJk7BL8l5b3cCvTwGknFg4IM55MzYQgtfnisn73cN69a1LJbabAOr2NFuj98n8PaLhpxled"
+            "wyVM3gN4oCFlA8SnzviMY/iPAzN81pxHg69aUJAJbLyqwmUqPb7/E/qiC6dY9ty/8eFdvoN+APFYAnY8sWQyQUENFBas8Osij9i50J2n/x"
+            "3muQ8zzcmWIXW+mmp0KnxzyO/HKPqxoadfqAPQgzhh/4KyGZxa6jhYYV6rfs7BwiJH47pSQ+AXPasOJOdwMK4K9a8yQoEQloaxr/dLcwPW"
+            "FccsShXFtMSZxCRVl2tJA0KtK7B1n6LXf3YkmqHS0tfUb7dh2dpXbQCfSGRaZgzAd5DZrYh5XTX99Up38m+qeESsxMmHzBnA5UED6n77yP"
+            "7ufN4j5P2mCOwrVf0mxJJUa/b2gtJT5xKTRN30kzfrYrSFc="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),
@@ -430,6 +453,8 @@ def test_query_awards_works(mock_certificate):
                         operator="FAKE",
                         offer_price=Decimal("42.15"),
                         contract_price=Decimal("69.44"),
+                        start_up_unit_price=Decimal("99.99"),
+                        ramp_down_unit_price=Decimal("99.99"),
                         eval_coeff=Decimal("35.79"),
                         corrected_price=Decimal("199.99"),
                         result=ContractResult.PARTIAL,
@@ -472,5 +497,363 @@ def test_query_awards_works(mock_certificate):
                     )
                 ],
             ),
+        ],
+    )
+
+
+def test_get_settlement_results_invalid_client(mock_certificate):
+    """Test that the get_settlement_results method raises a ValueError when called by an invalid client type."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
+
+    # Next, create our test settlement results query
+    request = SettlementQuery(
+        date=Date(2024, 4, 12),
+        participant="F100",
+        user="FAKEUSER",
+    )
+
+    # Now, attempt to get settlement results with the invalid client type; this should fail
+    with pytest.raises(AudienceError) as ex_info:
+        _ = client.get_settlement_results(request, 1)
+
+    # Finvally, verify the details of the raised exception
+    assert (
+        str(ex_info.value)
+        == "MarketQuery_SettlementResultsFileListQuery: Invalid client type, 'MO' provided. Only 'BSP' or 'TSO' are supported."
+    )
+
+
+@responses.activate
+def test_get_settlement_results_works(mock_certificate):
+    """Test that the get_settlement_results method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, register our test response with the responses library
+    register_mms_request(
+        RequestType.MARKET,
+        (
+            "jZmNScnlYiBOYwp94/5/dYGRcy6wW9Wq3EP/CQRWQ8GjHCY5b+6drlGKX2upAEEjnDIiRUbbzR9rFglTkb9G9jCxkL5bRQI3Hxu7EoBr+i"
+            "6A3CbnoahoIDYa2rO/F2RWFRYxYkgm1p7OUPDcJmSLGHD1vgbPyETr/nbLqHLs+YNtkm+YwLZzhyolQez4AIqOd8S/TjP012nMTg0wm3zp"
+            "0T1BylcO94mY4/zmTKC9Xs11rm+Hw0qztiu5h6LnMqh6cOeE84maFKg29kp6c/IRFFrkVWGhACCipQUdFvK5pLHzP5RsQxGhRJMWHVtO6m"
+            "nu891I1VEtkzn+3GxEpCE3nawv+sNXS88LHSrcy06k+7QEaFZfzqqjftoa0B50iY/FpjEDvaQTZ0lMn6sipZJELa/AZhU3phayO7WZ5Cut"
+            "+I0VLQ1dKqxBLamxmAtBnjyZp7bzsnYJqshGtKSlaGj4yMfsnjEwlxanTzn2elxiB3bFOIMlD8MLbbYlLqaFdKHrEEUybkh9W8Mdu5sN/z"
+            "0zPlNHF6Zb9uC+IvrIaypoA2JsE012wzNsJ06/z/K5YT4zH26+edrIHNB40bHLpYa53yaHdRpZHxhMEDfUlnc3cjkVxVAVZlIruPPya8lb"
+            "SM+UAx2byBLwvoqFNvuvY42Z2eKeK7Sb/bbS/kqHjqNWqHg="
+        ),
+        read_request_file("get_settlement_results_request.xml"),
+        read_file("get_settlement_results_response.xml"),
+        warnings=True,
+        multipart=True,
+    )
+
+    # Now, attempt to get settlement results with the valid client type; this should succeed
+    resp = client.get_settlement_results(SettlementQuery(), 1, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    verify_settlement_results(
+        resp,
+        [
+            settlementfile_verifier(
+                "A000_B111_FAKE-FILE.xml",
+                participant="F100",
+                company="偽会社",
+                submission_time=DateTime(2024, 4, 10, 22, 34, 44, tzinfo=Timezone("Asia/Tokyo")),
+                settlement_date=Date(2024, 4, 11),
+                size=123456,
+            )
+        ],
+    )
+
+
+def test_put_bups_invalid_client(mock_certificate):
+    """Test that the put_bups method raises a ValueError when called by an invalid client type."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
+
+    # Next, create our test settlement results query
+    request = BalancingUnitPriceSubmit(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9),
+        end=DateTime(2024, 4, 12, 12),
+        patterns=[
+            Pattern(number=1, status=Status.ACTIVE),
+        ],
+    )
+
+    # Now, attempt to get settlement results with the invalid client type; this should fail
+    with pytest.raises(AudienceError) as ex_info:
+        _ = client.put_bups([request], Date(2024, 4, 12))
+
+    # Finvally, verify the details of the raised exception
+    assert str(ex_info.value) == "MarketSubmit_BupSubmit: Invalid client type, 'MO' provided. Only 'BSP' is supported."
+
+
+@responses.activate
+def test_put_bups_works(mock_certificate):
+    """Test that the put_bups method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test BUP requests
+    request = BalancingUnitPriceSubmit(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9),
+        end=DateTime(2024, 4, 12, 12),
+        patterns=[
+            Pattern(
+                number=1,
+                status=Status.ACTIVE,
+                remarks="Some patterned remarks",
+                balancing_unit_profile=BalancingUnitPrice(
+                    v4_unit_price=Decimal("100.00"),
+                    bands=[
+                        BalancingUnitPriceBand(
+                            number=1,
+                            from_capacity=9000,
+                            v1_unit_price=Decimal("200.00"),
+                            v2_unit_price=Decimal("300.00"),
+                        )
+                    ],
+                ),
+                abc=[
+                    AbcBand(
+                        number=1,
+                        from_capacity=9001,
+                        a=Decimal("400.1"),
+                        b=Decimal("400.2"),
+                        c=Decimal("400.3"),
+                    )
+                ],
+                startup_costs=[
+                    StartupCostBand(
+                        number=1,
+                        stop_time_hours=42,
+                        v3_unit_price=500,
+                        remarks="Some comment on startup",
+                    )
+                ],
+            ),
+        ],
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.MARKET,
+        (
+            "rsYtJGiffeeNRRSm1tHBtetM5DM91h6itsw6ADnKy03HUQ3xqsOo8wIhzTqt32m3iGibRbUv6MgkR82zJv+HQ1sShc0HYuy5SJYVHCQuQb"
+            "Ru1W7N/meYPMCnD2uleqDJAojm71f29lUiwddXAguoRz1Y2THo1Lrjp1xRHfdnX/c2Tz17nVg54VQy4+BJ61wYkP1K/RnHDrWZbdzdil3H"
+            "w+nU9JD/QE3pmTBjLW5p8JBl89472NAo+tDYFkIFe/bq7VgOidW6jnIShh1Fh+l3AsP8zXEhugBNqZCnyef/J30MeOPB4/NHIYP8veaf5u"
+            "j/Ku6oDmK7XOVGJrrjHcrZb5vjIkCUyQB/UX/9fO96gBDj4prziZOfNzGy0b5OLevhLEdpi2Qgbjqcjd1Y+1eaWHWrASXEDF7/PrqM+jlI"
+            "AU+RTUTleItfR7V1nFPgOPpKiWIrEM0PsPZF7EC9soJJVOiwd8jfmS5D1TCQBHURRq459mn6iYUDgUz3nbc85eKYN4cpEOf2E9yG+U9g//"
+            "oGFBjwAxphsCWQ4nP7Rw8scUHL4WZ4O8+wp97NhjTC+tAxMraJi+FLr3NNGVZCyQoqCiDwo3ybBA/KqzlmPAmWiqRI9vUAosS3RstIYQMY"
+            "TjTHAA+nsRYOlUWKtoPdnO08x0BZSs3/NG+di8c0gIiKWM8="
+        ),
+        read_request_file("put_bup_request.xml"),
+        read_file("put_bup_response.xml"),
+        warnings=True,
+        multipart=True,
+    )
+
+    # Now, attempt to put BUPs with the valid client type; this should succeed
+    resp = client.put_bups([request], Date(2024, 4, 12))
+
+    # Finally, verify the response
+    assert len(resp) == 1
+    verify_bup_submit(
+        resp[0],
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9, tzinfo=Timezone("Asia/Tokyo")),
+        end=DateTime(2024, 4, 12, 12, tzinfo=Timezone("Asia/Tokyo")),
+        participant_name="F100",
+        company="偽会社",
+        area=AreaCode.TOKYO,
+        resource_name="偽電力",
+        system_code="FSYS0",
+        pattern_verifiers=[
+            pattern_data_verifier(
+                1,
+                Status.ACTIVE,
+                "Some patterned remarks",
+                bup_verifier(Decimal("100.00"), [bup_band_verifier(1, 9000, Decimal("200.00"), Decimal("300.00"))]),
+                [abc_band_verifier(1, 9001, Decimal("400.1"), Decimal("400.2"), Decimal("400.3"))],
+                [startup_cost_band_verifier(1, 42, 500, "Some comment on startup")],
+            )
+        ],
+    )
+
+
+def test_put_bup_invalid_client(mock_certificate):
+    """Test that the put_bup method raises a ValueError when called by an invalid client type."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
+
+    # Next, create our test settlement results query
+    request = BalancingUnitPriceSubmit(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9),
+        end=DateTime(2024, 4, 12, 12),
+        patterns=[
+            Pattern(number=1, status=Status.ACTIVE),
+        ],
+    )
+
+    # Now, attempt to get settlement results with the invalid client type; this should fail
+    with pytest.raises(AudienceError) as ex_info:
+        _ = client.put_bup(request, Date(2024, 4, 12))
+
+    # Finvally, verify the details of the raised exception
+    assert str(ex_info.value) == "MarketSubmit_BupSubmit: Invalid client type, 'MO' provided. Only 'BSP' is supported."
+
+
+@responses.activate
+def test_put_bup_works(mock_certificate):
+    """Test that the put_bup method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test BUP requests
+    request = BalancingUnitPriceSubmit(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9),
+        end=DateTime(2024, 4, 12, 12),
+        patterns=[
+            Pattern(
+                number=1,
+                status=Status.ACTIVE,
+                remarks="Some patterned remarks",
+                balancing_unit_profile=BalancingUnitPrice(
+                    v4_unit_price=Decimal("100.00"),
+                    bands=[
+                        BalancingUnitPriceBand(
+                            number=1,
+                            from_capacity=9000,
+                            v1_unit_price=Decimal("200.00"),
+                            v2_unit_price=Decimal("300.00"),
+                        )
+                    ],
+                ),
+                abc=[
+                    AbcBand(
+                        number=1,
+                        from_capacity=9001,
+                        a=Decimal("400.1"),
+                        b=Decimal("400.2"),
+                        c=Decimal("400.3"),
+                    )
+                ],
+                startup_costs=[
+                    StartupCostBand(
+                        number=1,
+                        stop_time_hours=42,
+                        v3_unit_price=Decimal("500.00"),
+                        remarks="Some comment on startup",
+                    )
+                ],
+            ),
+        ],
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.MARKET,
+        (
+            "rsYtJGiffeeNRRSm1tHBtetM5DM91h6itsw6ADnKy03HUQ3xqsOo8wIhzTqt32m3iGibRbUv6MgkR82zJv+HQ1sShc0HYuy5SJYVHCQuQb"
+            "Ru1W7N/meYPMCnD2uleqDJAojm71f29lUiwddXAguoRz1Y2THo1Lrjp1xRHfdnX/c2Tz17nVg54VQy4+BJ61wYkP1K/RnHDrWZbdzdil3H"
+            "w+nU9JD/QE3pmTBjLW5p8JBl89472NAo+tDYFkIFe/bq7VgOidW6jnIShh1Fh+l3AsP8zXEhugBNqZCnyef/J30MeOPB4/NHIYP8veaf5u"
+            "j/Ku6oDmK7XOVGJrrjHcrZb5vjIkCUyQB/UX/9fO96gBDj4prziZOfNzGy0b5OLevhLEdpi2Qgbjqcjd1Y+1eaWHWrASXEDF7/PrqM+jlI"
+            "AU+RTUTleItfR7V1nFPgOPpKiWIrEM0PsPZF7EC9soJJVOiwd8jfmS5D1TCQBHURRq459mn6iYUDgUz3nbc85eKYN4cpEOf2E9yG+U9g//"
+            "oGFBjwAxphsCWQ4nP7Rw8scUHL4WZ4O8+wp97NhjTC+tAxMraJi+FLr3NNGVZCyQoqCiDwo3ybBA/KqzlmPAmWiqRI9vUAosS3RstIYQMY"
+            "TjTHAA+nsRYOlUWKtoPdnO08x0BZSs3/NG+di8c0gIiKWM8="
+        ),
+        read_request_file("put_bup_request.xml"),
+        read_file("put_bup_response.xml"),
+        warnings=True,
+        multipart=True,
+    )
+
+    # Now, attempt to put BUPs with the valid client type; this should succeed
+    resp = client.put_bup(request, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    verify_bup_submit(
+        resp,
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9, tzinfo=Timezone("Asia/Tokyo")),
+        end=DateTime(2024, 4, 12, 12, tzinfo=Timezone("Asia/Tokyo")),
+        participant_name="F100",
+        company="偽会社",
+        area=AreaCode.TOKYO,
+        resource_name="偽電力",
+        system_code="FSYS0",
+        pattern_verifiers=[
+            pattern_data_verifier(
+                1,
+                Status.ACTIVE,
+                "Some patterned remarks",
+                bup_verifier(Decimal("100.00"), [bup_band_verifier(1, 9000, Decimal("200.00"), Decimal("300.00"))]),
+                [abc_band_verifier(1, 9001, Decimal("400.1"), Decimal("400.2"), Decimal("400.3"))],
+                [startup_cost_band_verifier(1, 42, 500, "Some comment on startup")],
+            )
+        ],
+    )
+
+
+@responses.activate
+def test_query_bups_works(mock_certificate):
+    """Test that the query_bups method works as expected."""
+    # First, create our test MMS client
+    client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
+
+    # Next, create our test bup query
+    request = BalancingUnitPriceQuery(
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 15),
+        end=DateTime(2024, 4, 12, 18),
+    )
+
+    # Register our test response with the responses library
+    register_mms_request(
+        RequestType.MARKET,
+        (
+            "LhwxZ4I1mJfd8ew0gERS5TP0ZPFxlzyN+RpLhe17AK/itZzDigPCMJRiUfpsNxv/kKx4EqNcN5jOpIzcWp1ZHWmAOaD31dbx2irlfiHQ4P"
+            "6o5xlCmQciRKycgEEgkFyXuHJon7hRVyACXh9Mq5kLzAxsLgvmWahQ7isF0knCBlhhUnmZtzZldWEw+huSUJnJ7rmYKEu9a0Vw36JJnSCf"
+            "C4Q0x0Am0uyvk7EMKBzwLiTz6h4GjA+nOAHYhKflu1vUECOxYhr6Mw48uyZsjZXJUBJqIfI3hnSfjEBV/VPMq6wuwZQu9T49uLIPIvq85i"
+            "Qv4xKnBjp5s/j0TdQZnt/Uznl5pICnDCtR17ImmlNbkyrnE407RMxa4UjCxOATyLZLPCNhj0kZFZpH9p130JVie8esh6U6+/UnH9yUWgOm"
+            "3k3byxom/al8A5XUK32tcKSBeaOeaOmg+Isqv1BAxcpkWXcrv4Kb3LSmq3QC7jxWAf4uIKMMgbAM24CRm9j7CS7XM44RZ49t7id3uk2BVn"
+            "9TCJJigk/esR4AWU6RVcccEv9DFOBmdbX0LX7bWxxvnhAm9af1/gKiojx31rgKk63/rtTSFidjdC6I2ahXRbxvdWyEY+J2c7IvA1QE0M8C"
+            "zg2epv3ajT+jfJsepU01rJpb5nN9ck+x5d3Q0QvDDKOlmTw="
+        ),
+        read_request_file("query_bups_request.xml"),
+        read_file("put_bup_response.xml"),
+        warnings=True,
+        multipart=True,
+    )
+
+    # Now, attempt to get BUPs with the valid client type; this should succeed
+    resp = client.query_bups(request, Date(2024, 4, 12))
+
+    # Finally, verify the response
+    assert len(resp) == 1
+    verify_bup_submit(
+        resp[0],
+        resource_code="FAKE_RESO",
+        start=DateTime(2024, 4, 12, 9, tzinfo=Timezone("Asia/Tokyo")),
+        end=DateTime(2024, 4, 12, 12, tzinfo=Timezone("Asia/Tokyo")),
+        participant_name="F100",
+        company="偽会社",
+        area=AreaCode.TOKYO,
+        resource_name="偽電力",
+        system_code="FSYS0",
+        pattern_verifiers=[
+            pattern_data_verifier(
+                1,
+                Status.ACTIVE,
+                "Some patterned remarks",
+                bup_verifier(Decimal("100.00"), [bup_band_verifier(1, 9000, Decimal("200.00"), Decimal("300.00"))]),
+                [abc_band_verifier(1, 9001, Decimal("400.1"), Decimal("400.2"), Decimal("400.3"))],
+                [startup_cost_band_verifier(1, 42, 500, "Some comment on startup")],
+            )
         ],
     )

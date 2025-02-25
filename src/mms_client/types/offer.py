@@ -72,6 +72,12 @@ class OfferStack(Payload):
     # The unit price of the power, in JPY/kW/segment
     unit_price: Decimal = price("OfferUnitPrice", 10000.00)
 
+    # The unit price charged for the start up cost of the power, in JPY/kW/segment
+    start_up_unit_price: Annotated[Decimal, price("StartUpUnitPrice", 10000.00, True)]
+
+    # The unit price charged for the ramp down cost of the power, in JPY/kW/segment
+    ramp_down_unit_price: Annotated[Decimal, price("RampDownUnitPrice", 10000.00, True)]
+
     # The ID of the offer to which this stack belongs
     id: Optional[str] = offer_id("OfferId", True)
 

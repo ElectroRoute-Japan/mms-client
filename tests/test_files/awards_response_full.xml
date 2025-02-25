@@ -19,6 +19,8 @@
                  CommandOperationMethodSec2Ter1Ter2="2"
                  OfferPrice="42.15"
                  ContractPrice="69.44"
+                 StartUpUnitPrice="99.99"
+                 RampDownUnitPrice="99.99"
                  PerfEvalCoeff="35.79"
                  CorrectedUnitPrice="199.99"
                  SubRequirementType="PRI-SEC1-SEC2"

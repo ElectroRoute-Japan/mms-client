@@ -1,0 +1,99 @@
+<MarketData>
+    <ProcessingStatistics Received="1" Valid="1" Invalid="0" Successful="1" Unsuccessful="0" ProcessingTimeMs="187" TransactionId="derpderp" TimeStamp="Tue Mar 15 11:43:37 JST 2024" XmlTimeStamp="2024-03-15T11:43:37" />
+    <Messages>
+        <Warning Code="Warning1">Warning1</Warning>
+        <Warning Code="Warning2">Warning2</Warning>
+        <Information Code="Info1">Info1</Information>
+        <Information Code="Info2">Info2</Information>
+    </Messages>
+    <MarketSubmit Date="2024-04-12" ParticipantName="F100" UserName="FAKEUSER" Validation="PASSED" Success="true">
+        <Messages>
+            <Warning Code="Warning1">Warning1</Warning>
+            <Warning Code="Warning2">Warning2</Warning>
+            <Information Code="Info1">Info1</Information>
+            <Information Code="Info2">Info2</Information>
+        </Messages>
+        <StandingData StandingFlag="false">
+            <Messages>
+                <Warning Code="Warning1">Warning1</Warning>
+                <Warning Code="Warning2">Warning2</Warning>
+                <Information Code="Info1">Info1</Information>
+                <Information Code="Info2">Info2</Information>
+            </Messages>
+        </StandingData>
+        <BupSubmit
+             BspParticipantName="F100"
+             CompanyShortName="偽会社"
+             Area="03"
+             ResourceShortName="偽電力"
+             SystemCode="FSYS0"
+             EndTime="2024-04-12T12:00:00"
+             ResourceName="FAKE_RESO"
+             StartTime="2024-04-12T09:00:00"
+             Validation="PASSED"
+             Success="true">
+            <Messages>
+                <Warning Code="Warning1">Warning1</Warning>
+                <Warning Code="Warning2">Warning2</Warning>
+                <Information Code="Info1">Info1</Information>
+                <Information Code="Info2">Info2</Information>
+            </Messages>
+            <PatternData PatternNo="1" PatternRemark="Some patterned remarks" PatternStatus="1">
+                <Messages>
+                    <Warning Code="Warning1">Warning1</Warning>
+                    <Warning Code="Warning2">Warning2</Warning>
+                    <Information Code="Info1">Info1</Information>
+                    <Information Code="Info2">Info2</Information>
+                </Messages>
+                <Bup V4="100.00">
+                    <Messages>
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
+                    </Messages>
+                    <BandBup Band="1" FromCap="9000" V1="200.00" V2="300.00">
+                        <Messages>
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
+                        </Messages>
+                    </BandBup>
+                </Bup>
+                <Abc>
+                    <Messages>
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
+                    </Messages>
+                    <BandAbc Band="1" FromCap="9001" a="400.1" b="400.2" c="400.3">
+                        <Messages>
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
+                        </Messages>
+                    </BandAbc>
+                </Abc>
+                <StartupCost>
+                    <Messages>
+                        <Warning Code="Warning1">Warning1</Warning>
+                        <Warning Code="Warning2">Warning2</Warning>
+                        <Information Code="Info1">Info1</Information>
+                        <Information Code="Info2">Info2</Information>
+                    </Messages>
+                    <BandStartup CaseNo="1" StopTime="42" V3="500" Remark="Some comment on startup">
+                        <Messages>
+                            <Warning Code="Warning1">Warning1</Warning>
+                            <Warning Code="Warning2">Warning2</Warning>
+                            <Information Code="Info1">Info1</Information>
+                            <Information Code="Info2">Info2</Information>
+                        </Messages>
+                    </BandStartup>
+                </StartupCost>
+            </PatternData>
+        </BupSubmit>
+    </MarketSubmit>
+</MarketData>
