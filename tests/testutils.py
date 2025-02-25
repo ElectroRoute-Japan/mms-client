@@ -28,10 +28,10 @@ from mms_client.types.base import Messages
 from mms_client.types.base import ResponseCommon
 from mms_client.types.base import ValidationStatus
 from mms_client.types.bup import AbcBand
-from mms_client.types.bup import Bup
-from mms_client.types.bup import BupBand
-from mms_client.types.bup import BupQuery
-from mms_client.types.bup import BupSubmit
+from mms_client.types.bup import BalancingUnitPrice
+from mms_client.types.bup import BalancingUnitPriceBand
+from mms_client.types.bup import BalancingUnitPriceQuery
+from mms_client.types.bup import BalancingUnitPriceSubmit
 from mms_client.types.bup import Pattern
 from mms_client.types.bup import StartupCostBand
 from mms_client.types.bup import Status as BupStatus
@@ -632,9 +632,9 @@ def requirement_verifier(
 
 
 def verify_bup_query(
-    req: BupQuery, resource_code: str, start: DateTime, end: DateTime, is_default: Optional[bool] = None
+    req: BalancingUnitPriceQuery, resource_code: str, start: DateTime, end: DateTime, is_default: Optional[bool] = None
 ):
-    """Verify that the given BupQuery was created with the correct parameters."""
+    """Verify that the given BalancingUnitPriceQuery was created with the correct parameters."""
     assert req.resource_code == resource_code
     assert req.start == start
     assert req.end == end
@@ -642,9 +642,9 @@ def verify_bup_query(
 
 
 def verify_bup_submit(
-    req: BupSubmit, resource_code: str, start: DateTime, end: DateTime, pattern_verifiers: list, **kwargs
+    req: BalancingUnitPriceSubmit, resource_code: str, start: DateTime, end: DateTime, pattern_verifiers: list, **kwargs
 ):
-    """Verify that the given BupSubmit was created with the correct parameters."""
+    """Verify that the given BalancingUnitPriceSubmit was created with the correct parameters."""
     assert req.resource_code == resource_code
     assert req.start == start
     assert req.end == end
@@ -687,9 +687,9 @@ def pattern_data_verifier(
 
 
 def bup_verifier(v4_unit_price: Decimal, bands: list = None):
-    """Verify that the Bup was created with the correct parameters."""
+    """Verify that the BalancingUnitPrice was created with the correct parameters."""
 
-    def inner(bup: Bup):
+    def inner(bup: BalancingUnitPrice):
         assert bup.v4_unit_price == v4_unit_price
         verify_list(bup.bands, bands)
 
@@ -697,9 +697,9 @@ def bup_verifier(v4_unit_price: Decimal, bands: list = None):
 
 
 def bup_band_verifier(number: int, from_capacity: Decimal, v1_unit_price: Decimal, v2_unit_price: Decimal):
-    """Verify that the BupBand was created with the correct parameters."""
+    """Verify that the BalancingUnitPriceBand was created with the correct parameters."""
 
-    def inner(band: BupBand):
+    def inner(band: BalancingUnitPriceBand):
         assert band.number == number
         assert band.from_capacity == from_capacity
         assert band.v1_unit_price == v1_unit_price

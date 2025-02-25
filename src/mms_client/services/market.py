@@ -12,8 +12,8 @@ from mms_client.services.base import mms_endpoint
 from mms_client.services.base import mms_multi_endpoint
 from mms_client.types.award import AwardQuery
 from mms_client.types.award import AwardResponse
-from mms_client.types.bup import BupQuery
-from mms_client.types.bup import BupSubmit
+from mms_client.types.bup import BalancingUnitPriceQuery
+from mms_client.types.bup import BalancingUnitPriceSubmit
 from mms_client.types.market import Defaults
 from mms_client.types.market import MarketCancel
 from mms_client.types.market import MarketQuery
@@ -255,21 +255,21 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     )
     def put_bups(
         self: ClientProto,
-        requests: List[BupSubmit],
+        requests: List[BalancingUnitPriceSubmit],
         date: Optional[Date] = None,
         default: bool = False,
-    ) -> List[BupSubmit]:
-        """Submit multiple bups to the MMS server.
+    ) -> List[BalancingUnitPriceSubmit]:
+        """Submit multiple balancing unit prices to the MMS server.
 
         This endpoint is only accessible to BSPs.
 
         Arguments:
-        requests (List[BupSubmit]): The bups to submit to the MMS server.
-        date (Date):                The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
-                                    current date.
-        default (bool):             Whether or not the bups are the default.
+        requests (List[BalancingUnitPriceSubmit]):  The balancing unit prices to submit to the MMS server.
+        date (Date):                                The date of the transaction in the format "YYYY-MM-DD". This value
+                                                    defaults to the current date.
+        default (bool):                             Whether or not the balancing unit prices are the default.
 
-        Returns:    A list of bups that have been registered with the MMS server.
+        Returns:    A list of balancing unit prices that have been registered with the MMS server.
         """
         # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketSubmit(  # type: ignore[return-value]
@@ -284,21 +284,21 @@ class MarketClientMixin:  # pylint: disable=unused-argument
     )
     def put_bup(
         self: ClientProto,
-        request: BupSubmit,
+        request: BalancingUnitPriceSubmit,
         date: Optional[Date] = None,
         default: bool = False,
-    ) -> BupSubmit:
-        """Submit a bup to the MMS server.
+    ) -> BalancingUnitPriceSubmit:
+        """Submit a balancing unit price to the MMS server.
 
         This endpoint is only accessible to BSPs.
 
         Arguments:
-        request (BupSubmit):    The bup to submit to the MMS server.
-        date (Date):            The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
-                                current date.
-        default (bool):         Whether or not the bup is the default.
+        request (BalancingUnitPriceSubmit): The balancing unit price to submit to the MMS server.
+        date (Date):                        The date of the transaction in the format "YYYY-MM-DD". This value defaults
+                                            to the current date.
+        default (bool):                     Whether or not the balancing unit price is the default.
 
-        Returns:    The bup that has been registered with the MMS server.
+        Returns:    The balancing unit price that has been registered with the MMS server.
         """
         # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketSubmit(  # type: ignore[return-value]
@@ -313,19 +313,21 @@ class MarketClientMixin:  # pylint: disable=unused-argument
         service=config,
         request_type=RequestType.MARKET,
         response_envelope_type=MarketSubmit,
-        response_data_type=BupSubmit,
+        response_data_type=BalancingUnitPriceSubmit,
     )
-    def query_bups(self: ClientProto, request: BupQuery, date: Optional[Date] = None) -> List[BupSubmit]:
-        """Query the MMS server for bups.
+    def query_bups(
+        self: ClientProto, request: BalancingUnitPriceQuery, date: Optional[Date] = None
+    ) -> List[BalancingUnitPriceSubmit]:
+        """Query the MMS server for balancing unit prices.
 
         This endpoint is accessible to all client types.
 
         Arguments:
-        request (BupQuery):       The query to submit to the MMS server.
-        date (Date):              The date of the transaction in the format "YYYY-MM-DD". This value defaults to the
-                                  current date.
+        request (BalancingUnitPriceSubmit): The query to submit to the MMS server.
+        date (Date):                        The date of the transaction in the format "YYYY-MM-DD". This value defaults
+                                            to the current date.
 
-        Returns:    A list of bups that match the query.
+        Returns:    A list of balancing unit prices that match the query.
         """
         # NOTE: The return type does not match the method definition but the decorator will return the correct type
         return MarketQuery(  # type: ignore[return-value]

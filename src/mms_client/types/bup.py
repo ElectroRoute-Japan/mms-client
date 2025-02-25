@@ -85,10 +85,10 @@ class AbcBand(Payload, tag="BandAbc"):
     c: Decimal = abc_price("c")
 
 
-class BupBand(Payload):
-    """Represents a band of a BUP."""
+class BalancingUnitPriceBand(Payload):
+    """Represents a band of a balancing unit price."""
 
-    # The band number which must be unique within the BUP and will identify this band in sequence.
+    # The band number which must be unique within the balancing unit price and will identify this band in sequence.
     number: int = attr(name="Band", ge=1, le=20)
 
     # The capacity from which the band is allowed to operate. If the resource_type on the associated resource is set to
@@ -104,7 +104,7 @@ class BupBand(Payload):
     v2_unit_price: Annotated[Decimal, price("V2", 10000.00, True)]
 
 
-class Bup(Payload):
+class BalancingUnitPrice(Payload):
     """Represents a balancing unit profile."""
 
     # The V4 unit price charged for this pattern. This value is only valid when the contract_type on the associated
@@ -112,7 +112,7 @@ class Bup(Payload):
     v4_unit_price: Annotated[Decimal, price("V4", 10000.00, True)]
 
     # The bands associated with this BUP.
-    bands: Annotated[List[BupBand], element(tag="BandBup", min_length=1, max_length=20)]
+    bands: Annotated[List[BalancingUnitPriceBand], element(tag="BandBup", min_length=1, max_length=20)]
 
 
 class Pattern(Payload):
@@ -128,7 +128,7 @@ class Pattern(Payload):
     remarks: Optional[str] = attr(default=None, name="PatternRemark", min_length=1, max_length=50)
 
     # The balancing unit profile associated with this pattern
-    balancing_unit_profile: Optional[Bup] = element(default=None, tag="Bup")
+    balancing_unit_profile: Optional[BalancingUnitPrice] = element(default=None, tag="Bup")
 
     # The quadratic pricing bands associated with this pattern
     abc: Annotated[Optional[List[AbcBand]], wrapped(default=None, path="Abc", min_length=1, max_length=5)]
@@ -139,7 +139,7 @@ class Pattern(Payload):
     ]
 
 
-class BupSubmit(Payload):
+class BalancingUnitPriceSubmit(Payload, tag="BupSubmit"):
     """Represents the data included with a BUP."""
 
     # The resource with which the BUP is associated
@@ -181,7 +181,7 @@ class BupSubmit(Payload):
         return value.replace(tzinfo=Timezone("Asia/Tokyo"))
 
 
-class BupQuery(Payload):
+class BalancingUnitPriceQuery(Payload, tag="BupQuery"):
     """Represents the data included with a BUP query."""
 
     # Whether or not the BUP is the default

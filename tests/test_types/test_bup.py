@@ -6,10 +6,10 @@ from pendulum import DateTime
 from pendulum import Timezone
 
 from mms_client.types.bup import AbcBand
-from mms_client.types.bup import Bup
-from mms_client.types.bup import BupBand
-from mms_client.types.bup import BupQuery
-from mms_client.types.bup import BupSubmit
+from mms_client.types.bup import BalancingUnitPrice
+from mms_client.types.bup import BalancingUnitPriceBand
+from mms_client.types.bup import BalancingUnitPriceQuery
+from mms_client.types.bup import BalancingUnitPriceSubmit
 from mms_client.types.bup import Pattern
 from mms_client.types.bup import StartupCostBand
 from mms_client.types.bup import Status
@@ -25,9 +25,9 @@ from tests.testutils import verify_bup_submit
 
 
 def test_bup_submit_defaults():
-    """Test that the BupSubmit class serializes and converts to XML as we expect."""
+    """Test that the BalancingUnitPriceSubmit class serializes and converts to XML as we expect."""
     # First, create a new BUP submit request
-    request = BupSubmit(
+    request = BalancingUnitPriceSubmit(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 8, 15, 9),
         end=DateTime(2024, 8, 15, 12),
@@ -57,9 +57,9 @@ def test_bup_submit_defaults():
 
 
 def test_bup_submit_full():
-    """Test that the BupSubmit class serializes and converts to XML as we expect."""
+    """Test that the BalancingUnitPriceSubmit class serializes and converts to XML as we expect."""
     # First, create a new BUP submit request
-    request = BupSubmit(
+    request = BalancingUnitPriceSubmit(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 8, 15, 9),
         end=DateTime(2024, 8, 15, 12),
@@ -73,10 +73,10 @@ def test_bup_submit_full():
                 number=1,
                 status=Status.ACTIVE,
                 remarks="Some remarks",
-                balancing_unit_profile=Bup(
+                balancing_unit_profile=BalancingUnitPrice(
                     v4_unit_price=Decimal("95.95"),
                     bands=[
-                        BupBand(
+                        BalancingUnitPriceBand(
                             number=2,
                             from_capacity=Decimal("100"),
                             v1_unit_price=Decimal("200"),
@@ -134,9 +134,9 @@ def test_bup_submit_full():
 
 
 def test_bup_query_defaults():
-    """Test that the BupQuery class serializes and converts to XML as we expect."""
+    """Test that the BalancingUnitPriceQuery class serializes and converts to XML as we expect."""
     # First, create a new BUP query
-    request = BupQuery(
+    request = BalancingUnitPriceQuery(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 8, 15, 9),
         end=DateTime(2024, 8, 15, 12),
@@ -159,9 +159,9 @@ def test_bup_query_defaults():
 
 
 def test_bup_query_full():
-    """Test that the BupQuery class serializes and converts to XML as we expect."""
+    """Test that the BalancingUnitPriceQuery class serializes and converts to XML as we expect."""
     # First, create a new BUP query
-    request = BupQuery(
+    request = BalancingUnitPriceQuery(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 8, 15, 9),
         end=DateTime(2024, 8, 15, 12),

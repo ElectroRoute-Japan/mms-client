@@ -13,10 +13,10 @@ from mms_client.types.award import AwardQuery
 from mms_client.types.award import ContractSource
 from mms_client.types.award import SubRequirement
 from mms_client.types.bup import AbcBand
-from mms_client.types.bup import Bup
-from mms_client.types.bup import BupBand
-from mms_client.types.bup import BupQuery
-from mms_client.types.bup import BupSubmit
+from mms_client.types.bup import BalancingUnitPrice
+from mms_client.types.bup import BalancingUnitPriceBand
+from mms_client.types.bup import BalancingUnitPriceQuery
+from mms_client.types.bup import BalancingUnitPriceSubmit
 from mms_client.types.bup import Pattern
 from mms_client.types.bup import StartupCostBand
 from mms_client.types.bup import Status
@@ -573,7 +573,7 @@ def test_put_bups_invalid_client(mock_certificate):
     client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
 
     # Next, create our test settlement results query
-    request = BupSubmit(
+    request = BalancingUnitPriceSubmit(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 4, 12, 9),
         end=DateTime(2024, 4, 12, 12),
@@ -597,7 +597,7 @@ def test_put_bups_works(mock_certificate):
     client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test BUP requests
-    request = BupSubmit(
+    request = BalancingUnitPriceSubmit(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 4, 12, 9),
         end=DateTime(2024, 4, 12, 12),
@@ -606,10 +606,10 @@ def test_put_bups_works(mock_certificate):
                 number=1,
                 status=Status.ACTIVE,
                 remarks="Some patterned remarks",
-                balancing_unit_profile=Bup(
+                balancing_unit_profile=BalancingUnitPrice(
                     v4_unit_price=Decimal("100.00"),
                     bands=[
-                        BupBand(
+                        BalancingUnitPriceBand(
                             number=1,
                             from_capacity=9000,
                             v1_unit_price=Decimal("200.00"),
@@ -690,7 +690,7 @@ def test_put_bup_invalid_client(mock_certificate):
     client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.MO, mock_certificate, test=True)
 
     # Next, create our test settlement results query
-    request = BupSubmit(
+    request = BalancingUnitPriceSubmit(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 4, 12, 9),
         end=DateTime(2024, 4, 12, 12),
@@ -714,7 +714,7 @@ def test_put_bup_works(mock_certificate):
     client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test BUP requests
-    request = BupSubmit(
+    request = BalancingUnitPriceSubmit(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 4, 12, 9),
         end=DateTime(2024, 4, 12, 12),
@@ -723,10 +723,10 @@ def test_put_bup_works(mock_certificate):
                 number=1,
                 status=Status.ACTIVE,
                 remarks="Some patterned remarks",
-                balancing_unit_profile=Bup(
+                balancing_unit_profile=BalancingUnitPrice(
                     v4_unit_price=Decimal("100.00"),
                     bands=[
-                        BupBand(
+                        BalancingUnitPriceBand(
                             number=1,
                             from_capacity=9000,
                             v1_unit_price=Decimal("200.00"),
@@ -807,7 +807,7 @@ def test_query_bups_works(mock_certificate):
     client = MmsClient("fake.com", "F100", "FAKEUSER", ClientType.BSP, mock_certificate)
 
     # Next, create our test bup query
-    request = BupQuery(
+    request = BalancingUnitPriceQuery(
         resource_code="FAKE_RESO",
         start=DateTime(2024, 4, 12, 15),
         end=DateTime(2024, 4, 12, 18),
