@@ -1600,8 +1600,8 @@
       <xs:attribute name="CommandOperationMethodSec2Ter1Ter2" type="CommandOperationMethodSec2Ter1Ter2Type" use="optional"/>
       <xs:attribute name="OfferPrice" type="PriceValue6.2RoundedType" use="required"/>
       <xs:attribute name="ContractPrice" type="PriceValue6.2RoundedType" use="required"/>
-      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
-      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="required"/>
+      <xs:attribute name="RampDownUnitPrice" type="PriceValue6.2RoundedType" use="optional"/>
+      <xs:attribute name="StartUpUnitPrice" type="PriceValue6.2RoundedType" use="optional"/>
       <xs:attribute name="PerfEvalCoeff" type="PosValue4.2RoundedType" use="required"/>
       <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2RoundedType" use="required"/>
       <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>

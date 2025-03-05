@@ -1,0 +1,34 @@
+<AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" AfterGC="1">
+    <AwardResultsQueryResponse>
+        <AwardResults StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" Direction="1">
+            <AwardResultsData
+                 ContractId="156098uqt3qawldefjT"
+                 JbmsId="4235230998"
+                 Area="03"
+                 LinkedArea="02"
+                 ResourceName="FAKE_RESO"
+                 ResourceShortName="偽電力"
+                 SystemCode="FSYS0"
+                 ResourceType="01"
+                 DrPatternNumber="2"
+                 DrPatternName="偽パターン"
+                 BspParticipantName="F100"
+                 CompanyShortName="偽会社"
+                 OperatorCode="FAKE"
+                 CommandOperationMethodPriSec1="3"
+                 CommandOperationMethodSec2Ter1Ter2="2"
+                 OfferPrice="42.15"
+                 ContractPrice="69.44"
+                 PerfEvalCoeff="35.79"
+                 CorrectedUnitPrice="199.99"
+                 Tertiary2OfferQuantityInKw="9000"
+                 Tertiary2AwardQuantityInKw="5004"
+                 Tertiary2ContractQuantityInKw="1000"
+                 SubmissionTime="2024-04-10T22:34:44"
+                 OfferAwardedLevel="2"
+                 OfferId="FAKE_ID"
+                 ContractSource="2"
+                 AfterGC="1"/>
+        </AwardResults>
+    </AwardResultsQueryResponse>
+</AwardResultsQuery>
