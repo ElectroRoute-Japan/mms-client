@@ -46,7 +46,7 @@ class MarketQuery(BaseMarketRequest):
 
     # If the market type is specified as "DAM" (day-ahead market), the number of days should be specified as "1".
     # Otherwise, this field indicates the number of days ahead for which the data is being queried.
-    days: Optional[int] = attr(default=None, name="NumOfDays", ge=1, le=7)
+    days: Optional[int] = attr(default=None, name="NumOfDays", ge=1, le=31)
 
 
 class MarketSubmit(BaseMarketRequest):
