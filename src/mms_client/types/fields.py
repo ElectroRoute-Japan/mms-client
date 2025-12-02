@@ -158,7 +158,7 @@ def dr_patter_number(alias: str, optional: bool = False):
 
     Returns:    A Pydantic Field object for the DR pattern number.
     """
-    return attr(default=None if optional else PydanticUndefined, name=alias, ge=1, le=20)
+    return attr(default=None if optional else PydanticUndefined, name=alias, ge=1, le=500)
 
 
 def dr_pattern_name(alias: str, optional: bool = False):

@@ -71,7 +71,7 @@ def test_market_submit_full():
         date=Date(2019, 8, 30),
         participant="F100",
         user="FAKEUSER",
-        market_type=MarketType.WEEK_AHEAD,
+        market_type=MarketType.COMPOUND,
         days=4,
         defaults=Defaults(is_default=True),
     )
@@ -80,10 +80,10 @@ def test_market_submit_full():
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_market_submit(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.WEEK_AHEAD, 4)
+    verify_market_submit(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.COMPOUND, 4)
     assert (
         data
-        == b"""<MarketSubmit Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"><StandingData StandingFlag="true"/></MarketSubmit>"""
+        == b"""<MarketSubmit Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="DCM" NumOfDays="4"><StandingData StandingFlag="true"/></MarketSubmit>"""
     )
 
 
@@ -115,7 +115,7 @@ def test_market_cancel_full():
         date=Date(2019, 8, 30),
         participant="F100",
         user="FAKEUSER",
-        market_type=MarketType.WEEK_AHEAD,
+        market_type=MarketType.COMPOUND,
         days=4,
     )
 
@@ -123,8 +123,8 @@ def test_market_cancel_full():
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_market_cancel(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.WEEK_AHEAD, 4)
+    verify_market_cancel(request, Date(2019, 8, 30), "F100", "FAKEUSER", MarketType.COMPOUND, 4)
     assert (
         data
-        == b"""<MarketCancel Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="WAM" NumOfDays="4"/>"""
+        == b"""<MarketCancel Date="2019-08-30" ParticipantName="F100" UserName="FAKEUSER" MarketType="DCM" NumOfDays="4"/>"""
     )

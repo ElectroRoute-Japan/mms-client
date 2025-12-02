@@ -465,7 +465,6 @@ def award_verifier(
     corrected_price: Decimal,
     result: ContractResult,
     source: ContractSource,
-    gate_closed: BooleanFlag,
     **kwargs,
 ):
     """Return a function that verifies the award result has the expected parameters."""
@@ -487,7 +486,6 @@ def award_verifier(
         resp.corrected_unit_price == corrected_price
         resp.offer_award_level == result
         resp.contract_source == source
-        resp.gate_closed == gate_closed
         for field, info in resp.model_fields.items():
             if not info.is_required():
                 if field in kwargs:

@@ -109,8 +109,6 @@ class ReportName(StrEnum):
     BSP_AWARDS = "BSP_ContractResult"
     TSO_BASELINE_AWARDS = "MeasureBaseContractResult"
     BSP_BASELINE_AWARDS = "BSP_MeasureBaseContractResult"
-    TSO_AWARDS_AFTER_GC = "ContractResultAfterGC"
-    BSP_AWARDS_AFTER_GC = "BSP_ContractResultAfterGC"
     TSO_SWITCH_REQUEST = "SwitchRequest"
     TSO_ACCESS_LOG = "AccessLog"
 
