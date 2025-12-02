@@ -113,7 +113,7 @@ def test_offer_cancel():
         resource="FAKE_RESO",
         start=DateTime(2019, 8, 30, 3, 24, 15),
         end=DateTime(2019, 9, 30, 3, 24, 15),
-        market_type=MarketType.WEEK_AHEAD,
+        market_type=MarketType.COMPOUND,
     )
 
     # Next, convert the request to XML
@@ -125,35 +125,35 @@ def test_offer_cancel():
         "FAKE_RESO",
         DateTime(2019, 8, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
         DateTime(2019, 9, 30, 3, 24, 15, tzinfo=Timezone("Asia/Tokyo")),
-        MarketType.WEEK_AHEAD,
+        MarketType.COMPOUND,
     )
     assert data == (
         b"""<OfferCancel ResourceName="FAKE_RESO" StartTime="2019-08-30T03:24:15" EndTime="2019-09-30T03:24:15" """
-        b"""MarketType="WAM"/>"""
+        b"""MarketType="DCM"/>"""
     )
 
 
 def test_offer_query_defaults():
     """Test that the OfferQuery class initializes and converts to XML as we expect."""
     # First, create a new offer query request
-    request = OfferQuery(market_type=MarketType.WEEK_AHEAD)
+    request = OfferQuery(market_type=MarketType.COMPOUND)
 
     # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_offer_query(request, MarketType.WEEK_AHEAD)
-    assert data == b"""<OfferQuery MarketType="WAM"/>"""
+    verify_offer_query(request, MarketType.COMPOUND)
+    assert data == b"""<OfferQuery MarketType="DCM"/>"""
 
 
 def test_offer_query_full():
     """Test that the OfferQuery class initializes and converts to XML as we expect."""
     # First, create a new offer query request
-    request = OfferQuery(market_type=MarketType.WEEK_AHEAD, area=AreaCode.CHUBU, resource="FAKE_RESO")
+    request = OfferQuery(market_type=MarketType.COMPOUND, area=AreaCode.CHUBU, resource="FAKE_RESO")
 
     # Next, convert the request to XML
     data = request.to_xml(skip_empty=True, encoding="utf-8")
 
     # Finally, verify that the request was created with the correct parameters
-    verify_offer_query(request, MarketType.WEEK_AHEAD, AreaCode.CHUBU, "FAKE_RESO")
-    assert data == b"""<OfferQuery MarketType="WAM" ResourceName="FAKE_RESO" Area="04"/>"""
+    verify_offer_query(request, MarketType.COMPOUND, AreaCode.CHUBU, "FAKE_RESO")
+    assert data == b"""<OfferQuery MarketType="DCM" ResourceName="FAKE_RESO" Area="04"/>"""

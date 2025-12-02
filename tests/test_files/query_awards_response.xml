@@ -14,7 +14,7 @@
             <Information Code="Info1">Info1</Information>
             <Information Code="Info2">Info2</Information>
         </Messages>
-        <AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" AfterGC="1" Validation="PASSED" Success="true">
+        <AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" BspParticipantName="F100" Validation="PASSED" Success="true">
             <Messages>
                 <Warning Code="Warning1">Warning1</Warning>
                 <Warning Code="Warning2">Warning2</Warning>
@@ -84,11 +84,11 @@
                         Tertiary1InvalidQuantityInKw="4004"
                         BaselineLoadFileNameNeg="W9_3010_20240411_15_AS490_FAKE_NEG.xml"
                         BaselineLoadFileNamePos="W9_3010_20240411_15_AS490_FAKE_POS.xml"
+                        EquipmentPointPlanFileName="W9_3010_20240411_15_AS490_FAKE_EQUIP.xml"
                         SubmissionTime="2024-04-10T22:34:44"
                         OfferAwardedLevel="2"
                         OfferId="FAKE_ID"
-                        ContractSource="2"
-                        AfterGC="1">
+                        ContractSource="2">
                         <Messages>
                             <Warning Code="Warning1">Warning1</Warning>
                             <Warning Code="Warning2">Warning2</Warning>

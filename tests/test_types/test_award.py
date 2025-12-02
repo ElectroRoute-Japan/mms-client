@@ -59,7 +59,7 @@ def test_award_results_query_full():
         resource="FAKE_RESO",
         start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
         end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
-        gate_closed=BooleanFlag.YES,
+        bsp_participant="F100",
     )
 
     # Next, convert the request to XML
@@ -68,7 +68,7 @@ def test_award_results_query_full():
     # Finally, verify that the request was created with the correct parameters
     assert data == (
         b"""<AwardResultsQuery MarketType="DAM" Area="03" LinkedArea="02" ResourceName="FAKE_RESO" """
-        b"""StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" AfterGC="1"/>"""
+        b"""StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00" BspParticipantName="F100"/>"""
     )
     verify_award_query(
         request,
@@ -78,7 +78,7 @@ def test_award_results_query_full():
         area=AreaCode.TOKYO,
         linked_area=AreaCode.TOHOKU,
         resource="FAKE_RESO",
-        gate_closed=BooleanFlag.YES,
+        bsp_participant="F100",
     )
 
 
@@ -116,7 +116,7 @@ def test_award_results_response_full():
         resource="FAKE_RESO",
         start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
         end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
-        gate_closed=BooleanFlag.YES,
+        bsp_participant="F100",
         results=[
             AwardResult(
                 start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
@@ -172,11 +172,11 @@ def test_award_results_response_full():
                         tertiary_1_invalid_qty=4004,
                         negative_baseload_file="W9_3010_20240411_15_AS490_FAKE_NEG.xml",
                         positive_baseload_file="W9_3010_20240411_15_AS490_FAKE_POS.xml",
+                        equipment_point_plan_file="W9_3010_20240411_15_AS490_FAKE_EPP.xml",
                         submission_time=DateTime(2024, 4, 10, 22, 34, 44, tzinfo=Timezone("Asia/Tokyo")),
                         offer_award_level=ContractResult.PARTIAL,
                         offer_id="FAKE_ID",
                         contract_source=ContractSource.SWITCHING,
-                        gate_closed=BooleanFlag.YES,
                     )
                 ],
             )
@@ -196,7 +196,7 @@ def test_award_results_response_full():
         area=AreaCode.TOKYO,
         linked_area=AreaCode.TOHOKU,
         resource="FAKE_RESO",
-        gate_closed=BooleanFlag.YES,
+        bsp_participant="F100",
         result_verifiers=[
             award_result_verifier(
                 start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
@@ -222,7 +222,6 @@ def test_award_results_response_full():
                         corrected_price=Decimal("199.99"),
                         result=ContractResult.PARTIAL,
                         source=ContractSource.SWITCHING,
-                        gate_closed=BooleanFlag.YES,
                         linked_area=AreaCode.TOHOKU,
                         pattern_number=2,
                         pattern_name="偽パターン",
@@ -255,6 +254,7 @@ def test_award_results_response_full():
                         tertiary_1_invalid_qty=4004,
                         negative_baseload_file="W9_3010_20240411_15_AS490_FAKE_NEG.xml",
                         positive_baseload_file="W9_3010_20240411_15_AS490_FAKE_POS.xml",
+                        equipment_point_plan_file="W9_3010_20240411_15_AS490_FAKE_EPP.xml",
                         submission_time=DateTime(2024, 4, 10, 22, 34, 44, tzinfo=Timezone("Asia/Tokyo")),
                         offer_id="FAKE_ID",
                     )
