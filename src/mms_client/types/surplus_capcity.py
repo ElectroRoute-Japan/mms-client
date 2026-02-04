@@ -46,7 +46,7 @@ class SurplusCapacitySubmit(Payload, tag="RemainingReserveData"):
     resource_code: str = resource_name("ResourceName")
 
     # The DR pattern number for which the surplus capacity is being submitted
-    pattern_number: int = attr(name="DrPatternNumber", ge=1, le=20)
+    pattern_number: Optional[int] = attr(default=None, name="DrPatternNumber", ge=1, le=20)
 
     # The start block from when the surplus capacity should apply
     start: DateTime = attr(name="StartTime")

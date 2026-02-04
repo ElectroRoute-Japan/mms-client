@@ -20,7 +20,6 @@ def test_surplus_capacity_submit_defaults():
     # First, create a new surplus capacity submit request
     request = SurplusCapacitySubmit(
         resource_code="FAKE_RESO",
-        pattern_number=1,
         start=DateTime(2024, 4, 12, 15),
         end=DateTime(2024, 4, 12, 18),
     )
@@ -30,12 +29,11 @@ def test_surplus_capacity_submit_defaults():
 
     # Finally, verify that the request was created with the correct parameters
     assert data == (
-        b"""<RemainingReserveData ResourceName="FAKE_RESO" DrPatternNumber="1" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00"/>"""
+        b"""<RemainingReserveData ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00"/>"""
     )
     verify_surplus_capacity_submit(
         request,
         "FAKE_RESO",
-        1,
         DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
         DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
     )
@@ -77,9 +75,9 @@ def test_surplus_capacity_submit_full():
     verify_surplus_capacity_submit(
         request,
         "FAKE_RESO",
-        1,
         DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
         DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
+        pattern_number=1,
         upward_capacity=100,
         upward_capacity_rejected=RejectCategory.FUEL_RESTRICTION,
         upward_capacity_rejection_reason="Not enough fuel",
@@ -106,7 +104,6 @@ def test_surplus_capacity_data_defaults():
     # First, create a new surplus capacity data request
     request = SurplusCapacityData(
         resource_code="FAKE_RESO",
-        pattern_number=1,
         start=DateTime(2024, 4, 12, 15),
         end=DateTime(2024, 4, 12, 18),
     )
@@ -117,12 +114,11 @@ def test_surplus_capacity_data_defaults():
     # Finally, verify that the request was created with the correct parameters
     assert (
         data
-        == b"""<RemainingReserveData ResourceName="FAKE_RESO" DrPatternNumber="1" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00"/>"""
+        == b"""<RemainingReserveData ResourceName="FAKE_RESO" StartTime="2024-04-12T15:00:00" EndTime="2024-04-12T18:00:00"/>"""
     )
     verify_surplus_capacity_data(
         request,
         resource_code="FAKE_RESO",
-        pattern_number=1,
         start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
         end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
     )

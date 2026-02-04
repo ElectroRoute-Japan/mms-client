@@ -880,11 +880,10 @@ def verify_list(items: Optional[list] = None, verifiers: Optional[list] = None):
 
 
 def verify_surplus_capacity_submit(
-    req: SurplusCapacitySubmit, resource_code: str, pattern_number: int, start: DateTime, end: DateTime, **kwargs
+    req: SurplusCapacitySubmit, resource_code: str, start: DateTime, end: DateTime, **kwargs
 ):
     """Verify that the SurplusCapacitySubmit was created with the correct parameters."""
     assert req.resource_code == resource_code
-    assert req.pattern_number == pattern_number
     assert req.start == start
     assert req.end == end
     for field, info in req.model_fields.items():
@@ -896,11 +895,10 @@ def verify_surplus_capacity_submit(
 
 
 def verify_surplus_capacity_data(
-    req: SurplusCapacityData, resource_code: str, pattern_number: int, start: DateTime, end: DateTime, **kwargs
+    req: SurplusCapacityData, resource_code: str, start: DateTime, end: DateTime, **kwargs
 ):
     """Verify that the SurplusCapacityData was created with the correct parameters."""
     assert req.resource_code == resource_code
-    assert req.pattern_number == pattern_number
     assert req.start == start
     assert req.end == end
     for field, info in req.model_fields.items():
