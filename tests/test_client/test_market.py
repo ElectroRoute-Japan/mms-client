@@ -400,20 +400,14 @@ def test_query_awards_works(mock_certificate):
         resource="FAKE_RESO",
         start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
         end=DateTime(2024, 4, 12, 18, tzinfo=Timezone("Asia/Tokyo")),
-        gate_closed=BooleanFlag.YES,
+        bsp_participant="F100",
     )
 
     # Register our test response with the responses library
     register_mms_request(
         RequestType.MARKET,
         (
-            "8JZ4ecLOMVtm30sjaxVsk6WL/A08yhDsidfgX4tYenxZeLyN0TDC8RTQVUNBlOc6zXP4eE6rYXu4SJ2OBTMdbVud8CrC0Yy9uD+R40gZ+H"
-            "SfLf5bDPjdHXMrFbXBhA8pY5J5HFs3zhMZNuhGyUtvTqPbs6q6nWkuXdPqyftO/MX4ZjCqq3R3ZFpldM5lS5dLYRFX/CEQ9mnxISM9cQUb"
-            "qeVawQZNo+PsFOylG91jGNlw4ZL7CDEC+BFqJk7BL8l5b3cCvTwGknFg4IM55MzYQgtfnisn73cN69a1LJbabAOr2NFuj98n8PaLhpxled"
-            "wyVM3gN4oCFlA8SnzviMY/iPAzN81pxHg69aUJAJbLyqwmUqPb7/E/qiC6dY9ty/8eFdvoN+APFYAnY8sWQyQUENFBas8Osij9i50J2n/x"
-            "3muQ8zzcmWIXW+mmp0KnxzyO/HKPqxoadfqAPQgzhh/4KyGZxa6jhYYV6rfs7BwiJH47pSQ+AXPasOJOdwMK4K9a8yQoEQloaxr/dLcwPW"
-            "FccsShXFtMSZxCRVl2tJA0KtK7B1n6LXf3YkmqHS0tfUb7dh2dpXbQCfSGRaZgzAd5DZrYh5XTX99Up38m+qeESsxMmHzBnA5UED6n77yP"
-            "7ufN4j5P2mCOwrVf0mxJJUa/b2gtJT5xKTRN30kzfrYrSFc="
+            "2DcT6ksYNOUIs4/ucdf3V1Zo+/Dopv6+eIAbVHzGswIIKbm4by8lghN8BhGvx06rc41H7RPz6ThAwxQPwMKs/7HWKHanvVwxSued7bgSioEcAN485py05qnrcTO7rj3J9cZaUPZkmEPnsRKinzzNlmy3CJECtdOaZRbLrRimd95oOZ5odB7+7XviHzGPHV6bwWgw5DEiAXf76FXRbIjb8sK4F8aV5fnnZ+zhyKKhIHAr7lvQBfSiubjSAFs/zB9FzHM9PYPY782dqU+SRyHxulJMpXsaMplEY9zdezmFx+2oWgXUbaeBT1f7ytacPMPeDF+OAVynb2GtnZomqzGbd5LxNSjzBot5Mk3H0Q3Lc0VvtpFMZ1+tq117JhkyESTGCO8yIF7gULOSQ8FzrLP0Y0JRZTM+UIT7kfoE+X1jJDTSvYokyKcOdl3pyF/XST/vvIMK9wTg0FmCYQdBcdAeMKBkAWgeQKxtNGXcZUc0+8/DMgIWiemCL4y28PZ3Dkg3N7MSnsQ4cVUv6uqi+/uQ2PrXIUavebo68CjGv6fcGryLvMHejUEjnSD/vQ+UXSs853a2NMxUoHA+udyFwTxJuEjMWdu0TamMLTwMcNOUlp1mLz8MlQM0GPh28N7sYlomm5w4hr7ZQ4O0hQFSMQ2E4NKsnPgxhuBYWuBifj2ykYY="
         ),
         read_request_file("query_awards_request.xml"),
         read_file("query_awards_response.xml"),
@@ -433,7 +427,7 @@ def test_query_awards_works(mock_certificate):
         area=AreaCode.TOKYO,
         linked_area=AreaCode.TOHOKU,
         resource="FAKE_RESO",
-        gate_closed=BooleanFlag.YES,
+        bsp_participant="F100",
         result_verifiers=[
             award_result_verifier(
                 start=DateTime(2024, 4, 12, 15, tzinfo=Timezone("Asia/Tokyo")),
@@ -459,7 +453,6 @@ def test_query_awards_works(mock_certificate):
                         corrected_price=Decimal("199.99"),
                         result=ContractResult.PARTIAL,
                         source=ContractSource.SWITCHING,
-                        gate_closed=BooleanFlag.YES,
                         linked_area=AreaCode.TOHOKU,
                         pattern_number=2,
                         pattern_name="偽パターン",
@@ -492,6 +485,7 @@ def test_query_awards_works(mock_certificate):
                         tertiary_1_invalid_qty=4004,
                         negative_baseload_file="W9_3010_20240411_15_AS490_FAKE_NEG.xml",
                         positive_baseload_file="W9_3010_20240411_15_AS490_FAKE_POS.xml",
+                        equipment_point_plan_file="W9_3010_20240411_15_AS490_FAKE_EQUIP.xml",
                         submission_time=DateTime(2024, 4, 10, 22, 34, 44, tzinfo=Timezone("Asia/Tokyo")),
                         offer_id="FAKE_ID",
                     )

@@ -52,6 +52,7 @@
       015  03-May-2023  DM        Updated for CR-0010
       016  15-May-2024  DM        Updated for Phase 4 requirements
       017  04-Sep-2024  DM        Change OfflineFrameSubmit element max occurances to unbounded
+      018  10-Feb-2025  DM        Updated for Phase 5 requirements
 
       </xs:documentation>
     </xs:annotation>
@@ -283,7 +284,7 @@
     <xs:simpleType name="DrPatternNumberType">
       <xs:restriction base="xs:int">
         <xs:minInclusive value="1"/>
-        <xs:maxInclusive value="20"/>
+        <xs:maxInclusive value="500"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -498,7 +499,7 @@
     <xs:simpleType name="MarketTypeType">
       <xs:restriction base="xs:string">
         <xs:enumeration value="DAM"/>
-        <xs:enumeration value="WAM"/>
+        <xs:enumeration value="DCM"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -509,7 +510,8 @@
         <xs:enumeration value="2200"/>  <!-- Secondary 2          -->
         <xs:enumeration value="3100"/>  <!-- Tertiary 1           -->
         <xs:enumeration value="3200"/>  <!-- Tertiary 2           -->
-        <xs:enumeration value="4000"/>  <!-- Compound / Whole WAM -->
+        <xs:enumeration value="4000"/>  <!-- Compound / Whole DCM -->
+        <xs:enumeration value="5000"/>  <!-- Total Reserve        -->
       </xs:restriction>
     </xs:simpleType>
 
@@ -520,13 +522,6 @@
     </xs:simpleType>
 
     <xs:simpleType name="DirectionFwdBkwdType">
-      <xs:restriction base="xs:string">
-        <xs:enumeration value="0" />
-        <xs:enumeration value="1" />
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="AfterGCType">
       <xs:restriction base="xs:string">
         <xs:enumeration value="0" />
         <xs:enumeration value="1" />
@@ -599,17 +594,11 @@
       </xs:restriction>
     </xs:simpleType>
 
-    <xs:simpleType name="NPFlag">
+    <xs:simpleType name="FTFlag">
       <xs:restriction base="xs:string">
         <xs:enumeration value="1" />
         <xs:enumeration value="2" />
-      </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="AwardTypeType">
-      <xs:restriction base="xs:string">
-        <xs:enumeration value="MA"/>
-        <xs:enumeration value="Switching"/>
+        <xs:enumeration value="3" />
       </xs:restriction>
     </xs:simpleType>
 
@@ -1116,9 +1105,8 @@
       <xs:sequence>
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="StartDate" type="xs:date" use="required"/>
-      <xs:attribute name="EndDate" type="xs:date" use="required"/>
-      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
+      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
+      <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
       <xs:attribute name="Direction" type="DirectionFwdBkwdType" use="required"/>
       <xs:attribute name="FringeQuantityInMW" type="MwValue7.3Type" use="required"/>
     </xs:complexType>
@@ -1135,6 +1123,7 @@
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
         <xs:element name="Fringe" type="FringeDataType" minOccurs="1" maxOccurs="unbounded"/>
       </xs:sequence>
+      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
 
@@ -1149,8 +1138,6 @@
       <xs:sequence>
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="StartDate" type="xs:date" use="optional"/>
-      <xs:attribute name="EndDate" type="xs:date" use="optional"/>
       <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
@@ -1440,8 +1427,8 @@
       </xs:sequence>
       <xs:attribute name="Name" type="BaselineLoadFileNameType" use="required"/>
       <xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
-      <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
-      <xs:attribute name="NegawattPosiwattFlag" type="NPFlag" use="required"/>
+      <xs:attribute name="StartDate" type="xs:date" use="required"/>
+      <xs:attribute name="FileTypeFlag" type="FTFlag" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="BaselineLoadSubmitType">
@@ -1636,11 +1623,11 @@
       <xs:attribute name="Tertiary1InvalidQuantityInKw" type="KwPosValue7.0Type" use="optional"/>
       <xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
       <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+      <xs:attribute name="EquipmentPointPlanFileName" type="BaselineLoadFileNameType" use="optional"/>
       <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
       <xs:attribute name="OfferAwardedLevel" type="OfferAwardedLevelType" use="required"/>
       <xs:attribute name="OfferId" type="OfferIdType" use="required"/>
       <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
-      <xs:attribute name="AfterGC" type="AfterGCType" use="required"/>
     </xs:complexType>
 
     <xs:complexType name="AwardResultsType">
@@ -1690,9 +1677,9 @@
       <xs:attribute name="Area" type="AreaType" use="optional"/>
       <xs:attribute name="LinkedArea" type="AreaType" use="optional"/>
       <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
+      <xs:attribute name="BspParticipantName" type="ParticipantNameType" use="optional"/>
       <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
       <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
-      <xs:attribute name="AfterGC" type="AfterGCType" use="optional"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
 
@@ -1862,8 +1849,6 @@
       <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
       <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
       <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
-      <xs:attribute name="AwardType" type="AwardTypeType" use="optional"/>
-      <xs:attribute name="ModifiedTime" type="xs:dateTime" use="optional"/>
     </xs:complexType>
 
     <xs:complexType name="AllocatedTielineCapacityQueryResponseType">
@@ -1892,8 +1877,6 @@
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
         <xs:element name="AllocatedTielineCapacityQueryResponse" type="AllocatedTielineCapacityQueryResponseType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
-      <xs:attribute name="AwardType" type="AwardTypeType" use="optional"/>
       <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
@@ -1972,7 +1955,6 @@
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
         <xs:element name="TielineQueryResponse" type="TielineQueryResponseType" minOccurs="0" maxOccurs="1"/>
       </xs:sequence>
-      <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
       <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="optional"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
@@ -2021,7 +2003,6 @@
       <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>
       <xs:attribute name="Status" type="AwardStatusType" use="required"/>
       <xs:attribute name="RequestStatus" type="RequestStatusType" use="optional"/>
-      <xs:attribute name="AfterGC" type="AfterGCType" use="required"/>
       <xs:attribute name="SourceJbmsId" type="Id18Type" use="optional"/>
       <xs:attribute name="SourceParticipantName" type="ParticipantNameType" use="optional"/>
       <xs:attribute name="SourceCompanyShortName" type="CompanyShortNameType" use="optional"/>
@@ -2082,21 +2063,6 @@
       <xs:attribute name="Area" type="AreaType" use="required"/>
     </xs:complexType>
 
-    <xs:complexType name="AcknowledgeTsoRequestType">
-      <xs:annotation>
-        <xs:documentation xml:lang="en">
-
-          TSO Request Data: Ack type
-
-        </xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
-      </xs:sequence>
-      <xs:attribute name="JbmsId" type="Id18Type" use="required"/>
-      <xs:attribute name="AcknowledgeRequest" type="xs:boolean" use="required"/>
-    </xs:complexType>
-
     <xs:complexType name="DestinationType">
       <xs:annotation>
         <xs:documentation xml:lang="en">
@@ -2136,71 +2102,6 @@
       <xs:attribute name="JbmsId" type="Id18Type"/>
     </xs:complexType>
 
-    <xs:complexType name="TielineChangeDataType">
-      <xs:annotation>
-        <xs:documentation xml:lang="en">
-
-          Switch Data: Tieline Change Data type
-
-        </xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
-      </xs:sequence>
-      <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
-      <!-- ATC Values -->
-      <xs:attribute name="AtcForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="AtcBackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc1ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc1BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc2ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc2BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc3ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc3BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc4ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceAtc4BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <!-- Delta kW Values -->
-      <xs:attribute name="DkwForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="DkwBackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw1ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw1BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw2ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw2BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw3ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw3BackwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw4ForwardDelta" type="MwValue7.3Type" use="optional"/>
-      <xs:attribute name="FenceDkw4BackwardDelta" type="MwValue7.3Type" use="optional"/>
-    </xs:complexType>
-
-    <xs:complexType name="TielineChangeType">
-      <xs:annotation>
-        <xs:documentation xml:lang="en">
-
-          Switch Data: Tieline Change type
-
-        </xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="TielineChangeData" type="TielineChangeDataType" minOccurs="1" maxOccurs="unbounded"/>
-      </xs:sequence>
-      <xs:attribute name="InterconEquipment" type="InterconEquipmentType" use="required"/>
-    </xs:complexType>
-
-    <xs:complexType name="TielineDatalistType">
-      <xs:annotation>
-        <xs:documentation xml:lang="en">
-
-          Switch Data: Tieline Datalist type
-
-        </xs:documentation>
-      </xs:annotation>
-      <xs:sequence>
-        <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="TielineChange" type="TielineChangeType" minOccurs="1" maxOccurs="unbounded"/>
-      </xs:sequence>
-    </xs:complexType>
-
     <xs:complexType name="SwitchSubmitType">
       <xs:annotation>
         <xs:documentation xml:lang="en">
@@ -2211,11 +2112,7 @@
       </xs:annotation>
       <xs:sequence>
         <xs:element name="Messages" type="MessagesType" minOccurs="0" maxOccurs="1"/>
-        <xs:element name="TielineDatalist" type="TielineDatalistType" minOccurs="0" maxOccurs="1"/>
-        <xs:choice>
           <xs:element name="Source" type="SourceType" minOccurs="1" maxOccurs="unbounded"/>
-          <xs:element name="AcknowledgeTsoRequest" type="AcknowledgeTsoRequestType" minOccurs="1"/>
-        </xs:choice>
       </xs:sequence>
       <xs:attribute name="StartTime" type="xs:dateTime" use="required"/>
       <xs:attribute name="EndTime" type="xs:dateTime" use="required"/>
@@ -2242,7 +2139,6 @@
       <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
       <xs:attribute name="SourceJbmsId" type="Id18Type" use="optional"/>
       <xs:attribute name="Status" type="AwardStatusType" use="optional"/>
-      <xs:attribute name="AfterGC" type="AfterGCType" use="optional"/>
       <xs:attributeGroup ref="CommonAttributes"/>
     </xs:complexType>
 
@@ -2295,7 +2191,7 @@
           <xs:element name="UpperLimitTieline" type="UpperLimitTielineSubmitType" minOccurs="0" maxOccurs="unbounded"/>
           <xs:element name="SettlementResults" type="SettlementResultsSubmitType" minOccurs="0" maxOccurs="1"/>
           <xs:element name="OfflineFrameSubmit" type="OfflineFrameSubmitType" minOccurs="0" maxOccurs="unbounded"/>
-          <xs:element name="FringeSubmit" type="FringeSubmitType" minOccurs="0" maxOccurs="1"/>
+          <xs:element name="FringeSubmit" type="FringeSubmitType" minOccurs="0" maxOccurs="unbounded"/>
 
           <!-- Market Data Submit types -->
           <xs:element name="OfferData" type="OfferDataSubmitType" minOccurs="0" maxOccurs="unbounded" />

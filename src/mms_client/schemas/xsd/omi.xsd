@@ -168,7 +168,7 @@
     <xs:simpleType name="DrPatternNumberType">
       <xs:restriction base="xs:int">
         <xs:minInclusive value="1"/>
-        <xs:maxInclusive value="20"/>
+        <xs:maxInclusive value="500"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -176,15 +176,14 @@
       <xs:restriction base="xs:string">
         <xs:enumeration value="01"/>
         <xs:enumeration value="02"/>
-        <xs:enumeration value="07"/>
-        <xs:enumeration value="08"/>
         <xs:enumeration value="09"/>
         <xs:enumeration value="10"/>
         <xs:enumeration value="11"/>
-        <xs:enumeration value="12"/>
         <xs:enumeration value="13"/>
         <xs:enumeration value="15"/>
         <xs:enumeration value="21"/>
+        <xs:enumeration value="24"/>
+        <xs:enumeration value="25"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -249,10 +248,10 @@
 
     <xs:simpleType name="BaselineTypeType">
       <xs:restriction base="xs:string">
-        <xs:enumeration value="0131"/>
         <xs:enumeration value="0132"/>
         <xs:enumeration value="0331"/>
         <xs:enumeration value="0431"/>
+        <xs:enumeration value="0532"/>
       </xs:restriction>
     </xs:simpleType>
 
@@ -323,7 +322,7 @@
 
     <xs:simpleType name="MarketTypeType">
       <xs:restriction base="xs:string">
-        <xs:enumeration value="WAM"/>
+        <xs:enumeration value="DCM"/>
         <xs:enumeration value="DAM"/>
       </xs:restriction>
     </xs:simpleType>
@@ -536,7 +535,7 @@
       <xs:attribute name="ResourceName" type="ResourceNameType" use="optional"/>
       <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="optional"/>
       <xs:attribute name="SystemCode" type="SystemCodeType" use="optional"/>
-      <xs:attribute name="StartTime" type="xs:dateTime" use="optional"/>
+      <xs:attribute name="StartDate" type="xs:date" use="optional"/>
       <xs:attribute name="Area" type="AreaType" use="optional"/>
       <xs:attribute name="SubmissionTime" type="xs:dateTime" use="optional"/>
     </xs:complexType>
@@ -709,7 +708,7 @@
       <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="optional"/>
       <xs:attribute name="OperatorCode" type="OperatorCodeType" use="optional"/>
       <xs:attribute name="Direction" type="DirectionUpDownType" use="required"/>
-      <xs:attribute name="LinkedArea" type="OffMarketContractAreaType" use="required"/>
+      <xs:attribute name="LinkedArea" type="OffMarketContractAreaType" use="optional"/>
       <xs:attribute name="Area" type="OffMarketContractAreaType" use="optional"/>
       <xs:attribute name="SubRequirementType" type="SubRequirementTypeType" use="optional"/>
       <xs:attribute name="PrimaryContractQuantityInKw" type="KwPosValue7.0Type" use="optional"/>

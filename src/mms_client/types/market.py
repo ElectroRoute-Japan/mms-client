@@ -16,7 +16,7 @@ class MarketType(Enum):
     """Represents the type of market for which the data is being submitted."""
 
     DAY_AHEAD = "DAM"
-    WEEK_AHEAD = "WAM"
+    COMPOUND = "DCM"
 
 
 class BaseMarketRequest(Envelope):

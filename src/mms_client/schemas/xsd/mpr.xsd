@@ -393,9 +393,9 @@
 
   <xs:simpleType name="DrCustomerListFileNameType">
     <xs:restriction base="xs:string">
-      <xs:minLength value="31"/>
-      <xs:maxLength value="40"/>
-      <xs:pattern value="W9_023[1-2]_[0-9]{8}_[A-Z0-9]{5}_(0[1-9]|1[0-9]|20)_[A-Z0-9_\-]{1,10}.xml"/>
+      <xs:minLength value="32"/>
+      <xs:maxLength value="41"/>
+      <xs:pattern value="W9_023[1-2]_[0-9]{8}_[A-Z0-9]{5}_(00[1-9]|0[1-9][0-9]|[1-4][0-9][0-9]|500)_[A-Z0-9_\-]{1,10}.(xml|zip)"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -699,7 +699,7 @@
   <xs:simpleType name="PatternNumberType">
     <xs:restriction base="xs:int">
       <xs:minInclusive value="1"/>
-      <xs:maxInclusive value="20"/>
+      <xs:maxInclusive value="500"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -1438,6 +1438,10 @@
                   use="optional"/>
     <xs:attribute name="PatternName" type="DrPatternNameType"
                   use="required"/>
+    <xs:attribute name="SkipPerformanceCheck" type="xs:boolean"
+                  use="required"/>
+    <xs:attribute name="StandardPatternNumber" type="PatternNumberType"
+                  use="optional"/>
     <xs:attribute name="PriPossibleSupplyQuantity" type="PsqType"
                   use="optional"/>
     <xs:attribute name="PriRemResvPossibleSupplyQuantity" type="CapacityType"
@@ -1457,8 +1461,6 @@
     <xs:attribute name="Ter2PossibleSupplyQuantity" type="PsqType"
                   use="optional"/>
     <xs:attribute name="Ter2RemResvPossibleSupplyQuantity" type="CapacityType"
-                  use="optional"/>
-    <xs:attribute name="OverrideOption" type="OverrideOptionType"
                   use="optional"/>
     <xs:attribute name="RecordStatus" type="DrRecordStatusType"
                   default="SUBMITTED"/>
@@ -1659,6 +1661,8 @@
                   use="optional"/>
     <xs:attribute name="PatternNumber" type="PatternNumberType"
                   use="optional"/>
+    <xs:attribute name="SkipPerformanceCheck" type="xs:boolean"
+                  use="optional"/>
     <xs:attribute name="RecordStatus" type="DrRecordStatusType"
                   use="optional"/>
     <xs:attribute name="DocumentId" type="xs:long"
@@ -1722,8 +1726,6 @@
     <xs:attribute name="ResourceName" type="ResourceNameType"
                   use="required"/>
     <xs:attributeGroup ref="CommonApprovalAttributes"/>
-    <xs:attribute name="OverrideOption" type="OverrideOptionType"
-                  use="optional"/>
     <xs:attributeGroup ref="CommonAttributes"/>
   </xs:complexType>
 
@@ -1741,8 +1743,6 @@
     <xs:attribute name="PatternNumber" type="PatternNumberType"
                   use="required"/>
     <xs:attributeGroup ref="CommonApprovalAttributes"/>
-    <xs:attribute name="OverrideOption" type="OverrideOptionType"
-                  use="optional"/>
     <xs:attributeGroup ref="CommonAttributes"/>
   </xs:complexType>
 

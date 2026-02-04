@@ -53,8 +53,6 @@
       <xs:enumeration value="BSP_ContractResult"/>
       <xs:enumeration value="MeasureBaseContractResult"/>
       <xs:enumeration value="BSP_MeasureBaseContractResult"/>
-      <xs:enumeration value="ContractResultAfterGC"/>
-      <xs:enumeration value="BSP_ContractResultAfterGC"/>
       <xs:enumeration value="SwitchRequest"/>
       <xs:enumeration value="AccessLog"/>
     </xs:restriction>
@@ -283,7 +281,7 @@
   <xs:simpleType name="MarketTypeType">
     <xs:restriction base="xs:string">
       <xs:enumeration value="DAM"/>
-      <xs:enumeration value="WAM"/>
+      <xs:enumeration value="DCM"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -478,8 +476,8 @@
 
   <xs:simpleType name="FileNameType">
     <xs:restriction base="xs:string">
-      <xs:minLength value="31"/>
-      <xs:maxLength value="40"/>
+      <xs:minLength value="32"/>
+      <xs:maxLength value="41"/>
     </xs:restriction>
   </xs:simpleType>
 
@@ -533,7 +531,7 @@
 
   <xs:simpleType name="DRPatternNumberType">
     <xs:restriction base="xs:integer">
-      <xs:maxInclusive value="20"/>
+      <xs:maxInclusive value="500"/>
       <xs:minInclusive value="1"/>
     </xs:restriction>
   </xs:simpleType>
@@ -870,6 +868,8 @@
     <xs:attribute name="PhaseModifyingOp" type="AvailNotAvailType" use="optional"/>
     <xs:attribute name="PatternName" type="DRPatternNameType" use="optional"/>
     <xs:attribute name="PatternNumber" type="DRPatternNumberType" use="optional"/>
+    <xs:attribute name="SkipPerformanceCheck" type="xs:boolean" use="optional"/>
+    <xs:attribute name="StandardPatternNumber" type="DRPatternNumberType" use="optional"/>
     <xs:attribute name="DRPatternStartDate" type="DateStampType" use="optional"/>
     <xs:attribute name="DRPatternEndDate" type="DateStampType" use="optional"/>
     <xs:attribute name="FileName" type="FileNameType" use="optional"/>
@@ -1167,6 +1167,7 @@
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="EquipmentPointPlanFileName" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdType" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1211,6 +1212,7 @@
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="EquipmentPointPlanFileName" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdOnd16Type" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
@@ -1260,13 +1262,13 @@
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="EquipmentPointPlanFileName" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdType" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
     <xs:attribute name="ContractResult" type="ContractResultValueType" use="required"/>
     <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
   </xs:complexType>
-
 
 <!-- 3.2.3.2.4	OND_0016a: Measurement Base Power Source Contract Result for BSP -->
   <xs:complexType name="BSP_MeasureBaseContractResultType">
@@ -1304,105 +1306,12 @@
     <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
 	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
+    <xs:attribute name="EquipmentPointPlanFileName" type="BaselineLoadFileNameType" use="optional"/>
     <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
     <xs:attribute name="SourceJBMSId" type="JBMSIdOnd16Type" use="optional"/>
     <xs:attribute name="Status" type="ContractStatusType" use="required"/>
     <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
   </xs:complexType>
-
-<!-- 3.2.3.2.5	OND_0015b: Power Source Contract Results After GC for TSO -->
-  <xs:complexType name="ContractResultAfterGCType">
-    <xs:attribute name="ROW" type="RowType" use="optional"/>
-    <xs:attribute name="TradeDate" type="DateStampType" use="required"/>
-    <xs:attribute name="StartTime" type="TimeStampType" use="required"/>
-    <xs:attribute name="EndTime" type="TimeStampType" use="required"/>
-    <xs:attribute name="OfferID" type="OfferIDType" use="required"/>
-    <xs:attribute name="ContractNumber" type="ContractNumberType" use="required"/>
-	<xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
-	<xs:attribute name="SystemCode" type="SystemCodeType" use="required"/>
-    <xs:attribute name="ParticipantName" type="ParticipantNameType" use="required"/>
-    <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="required"/>
-    <xs:attribute name="OperatorCode" type="OCCTOCodeType" use="required"/>
-    <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="required"/>
-    <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
-    <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
-    <xs:attribute name="Direction" type="DirectionType" use="required"/>
-    <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
-    <xs:attribute name="OfferPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="LinkedArea" type="AreaType" use="required"/>
-    <xs:attribute name="Area" type="AreaType" use="required"/>
-    <xs:attribute name="PriSec1CommandOperationMethod" type="PriSec1CommandOperationMethodType" use="optional"/>
-    <xs:attribute name="Sec2Ter1Ter2CommandOperationMethod" type="Sec2Ter1Ter2CommandOperationMethodType" use="optional"/>
-    <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="CorrectedUnitPrice" type="PriceValue8.2Type" use="required"/>
-    <xs:attribute name="CoefficientTR2" type="PercentageType2" use="optional"/>
-    <xs:attribute name="UpdateTime" type="TimeStampType" use="required"/>
-    <xs:attribute name="PrimaryOfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Tertiary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Tertiary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="PrimaryValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary1ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary2ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Tertiary1ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="CompoundSufficientQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
-	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
-    <xs:attribute name="SourceJBMSId" type="JBMSIdType" use="optional"/>
-    <xs:attribute name="Status" type="ContractStatusType" use="required"/>
-    <xs:attribute name="ContractResult" type="ContractResultValueType" use="required"/>
-    <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
-  </xs:complexType>
-
-
-<!-- 3.2.3.2.6	OND_0016b: Power Source Contract Results After GC for BSP -->
-  <xs:complexType name="BSP_ContractResultAfterGCType">
-    <xs:attribute name="ROW" type="RowType" use="optional"/>
-    <xs:attribute name="TradeDate" type="DateStampType" use="required"/>
-    <xs:attribute name="StartTime" type="TimeStampType" use="required"/>
-    <xs:attribute name="EndTime" type="TimeStampType" use="required"/>
-    <xs:attribute name="ContractNumber" type="ContractNumberType" use="optional"/>
-	<xs:attribute name="ResourceName" type="ResourceNameType" use="required"/>
-	<xs:attribute name="SystemCode" type="SystemCodeType" use="required"/>
-    <xs:attribute name="ParticipantName" type="ParticipantNameType" use="required"/>
-    <xs:attribute name="CompanyShortName" type="CompanyShortNameType" use="required"/>
-    <xs:attribute name="ResourceShortName" type="ResourceShortNameType" use="required"/>
-    <xs:attribute name="CommodityCategory" type="CommodityCategoryType" use="required"/>
-    <xs:attribute name="MarketType" type="MarketTypeType" use="required"/>
-    <xs:attribute name="Direction" type="DirectionType" use="required"/>
-    <xs:attribute name="Area" type="AreaType" use="required"/>
-    <xs:attribute name="Tertiary2ContractQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="ContractPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="RampDownUnitPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="StartUpUnitPrice" type="PriceValue7.2Type" use="required"/>
-    <xs:attribute name="PrimaryOfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Tertiary1OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Tertiary2OfferQuantity" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="PrimaryValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary1ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Secondary2ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="Tertiary1ValidContractQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="CompoundSufficientQty" type="kWPosValue7Type0Min" use="optional"/>
-    <xs:attribute name="UpdateTime" type="TimeStampType" use="optional"/>
-    <xs:attribute name="ContractResult" type="ContractResultValueType" use="optional"/>
-    <xs:attribute name="ResourceType" type="ResourceTypeType" use="required"/>
-    <xs:attribute name="DRPatternNumber" type="DRPatternNumberType" use="optional"/>
-	<xs:attribute name="BaselineLoadFileNameNeg" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="BaselineLoadFileNamePos" type="BaselineLoadFileNameType" use="optional"/>
-    <xs:attribute name="JBMSId" type="JBMSIdType" use="required"/>
-    <xs:attribute name="SourceJBMSId" type="JBMSIdOnd16Type" use="optional"/>
-    <xs:attribute name="Status" type="ContractStatusType" use="required"/>
-    <xs:attribute name="ContractSource" type="ContractSourceType" use="required"/>
-  </xs:complexType>
-
 
 <!-- 3.2.3.3	OND_0036: TSO Switching Request -->
   <xs:complexType name="SwitchRequestType">
@@ -1523,14 +1432,6 @@
 
         <!-- 3.2.3.2.4	OND_0016a: Measurement Base Power Source Contract Result for BSP -->
         <xs:element name="BSP_MeasureBaseContractResult" type="BSP_MeasureBaseContractResultType"
-            minOccurs="0" maxOccurs="unbounded"/>
-
-        <!-- 3.2.3.2.1	OND_0015b: Power Source Contract Results After GC for TSO -->
-        <xs:element name="ContractResultAfterGC" type="ContractResultAfterGCType"
-            minOccurs="0" maxOccurs="unbounded"/>
-
-        <!-- 3.2.3.2.2	OND_0016b: Power Source Contract Results After GC for BSP -->
-        <xs:element name="BSP_ContractResultAfterGC" type="BSP_ContractResultAfterGCType"
             minOccurs="0" maxOccurs="unbounded"/>
 
         <!-- 3.2.3.3	OND_0036: TSO Switching Request -->
