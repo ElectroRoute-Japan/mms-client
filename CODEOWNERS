@@ -5,6 +5,6 @@
 .gitignore @ElectroRoute-Japan/Admins
 CODEOWNERS @ElectroRoute-Japan/Admins
 LICENSE @ElectroRoute-Japan/Admins
-*.yaml @ElectroRoute-Japan/Admins
-*.yml @ElectroRoute-Japan/Admins
+.pre-commit-config.yaml @ElectroRoute-Japan/Admins
+/.github/ @ElectroRoute-Japan/Admins
 *.sh @ElectroRoute-Japan/Admins
