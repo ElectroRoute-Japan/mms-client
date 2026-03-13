@@ -21,12 +21,12 @@ from tests.testutils import verify_mms_response
 @pytest.mark.parametrize(
     "interface, error, test, expected",
     [
-        (Interface.MI, False, False, "https://www2.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.MI, True, False, "https://www3.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.MI, False, True, "https://www4.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.OMI, False, False, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
-        (Interface.OMI, True, False, "https://www6.tdgc.jp/axis2/services/OmiWebService"),
-        (Interface.OMI, False, True, "https://www7.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.MI, False, False, "https://www2.eprx.or.jp/axis2/services/MiWebService"),
+        (Interface.MI, True, False, "https://www3.eprx.or.jp/axis2/services/MiWebService"),
+        (Interface.MI, False, True, "https://www4.eprx.or.jp/axis2/services/MiWebService"),
+        (Interface.OMI, False, False, "https://www5.eprx.or.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, True, False, "https://www6.eprx.or.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, False, True, "https://www7.eprx.or.jp/axis2/services/OmiWebService"),
     ],
 )
 def test_bsp_mo_service_endpoint_select_works(interface: Interface, error: bool, test: bool, expected: str):
@@ -39,12 +39,12 @@ def test_bsp_mo_service_endpoint_select_works(interface: Interface, error: bool,
 @pytest.mark.parametrize(
     "interface, error, test, expected",
     [
-        (Interface.MI, False, False, "https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.MI, True, False, "https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.MI, False, True, "https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService"),
-        (Interface.OMI, False, False, "https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
-        (Interface.OMI, True, False, "https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
-        (Interface.OMI, False, True, "https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService"),
+        (Interface.MI, False, False, "https://maiwlba103v03.eprx.or.jp/axis2/services/MiWebService"),
+        (Interface.MI, True, False, "https://mbiwlba103v03.eprx.or.jp/axis2/services/MiWebService"),
+        (Interface.MI, False, True, "https://mbiwlba103v06.eprx.or.jp/axis2/services/MiWebService"),
+        (Interface.OMI, False, False, "https://maiwlba103v07.eprx.or.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, True, False, "https://mbiwlba103v07.eprx.or.jp/axis2/services/OmiWebService"),
+        (Interface.OMI, False, True, "https://mbiwlba103v08.eprx.or.jp/axis2/services/OmiWebService"),
     ],
 )
 def test_tso_service_endpoint_select_works(interface: Interface, error: bool, test: bool, expected: str):
@@ -71,12 +71,12 @@ def test_zwrapper_interface_invalid(mocker):
 @pytest.mark.parametrize(
     "client_type, interface, addr",
     [
-        (ClientType.BSP, Interface.MI, "https://www2.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.BSP, Interface.OMI, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.MO, Interface.MI, "https://www2.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.MO, Interface.OMI, "https://www5.tdgc.jp/axis2/services/OmiWebService"),
-        (ClientType.TSO, Interface.MI, "https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService"),
-        (ClientType.TSO, Interface.OMI, "https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService"),
+        (ClientType.BSP, Interface.MI, "https://www2.eprx.or.jp/axis2/services/MiWebService"),
+        (ClientType.BSP, Interface.OMI, "https://www5.eprx.or.jp/axis2/services/OmiWebService"),
+        (ClientType.MO, Interface.MI, "https://www2.eprx.or.jp/axis2/services/MiWebService"),
+        (ClientType.MO, Interface.OMI, "https://www5.eprx.or.jp/axis2/services/OmiWebService"),
+        (ClientType.TSO, Interface.MI, "https://maiwlba103v03.eprx.or.jp/axis2/services/MiWebService"),
+        (ClientType.TSO, Interface.OMI, "https://maiwlba103v07.eprx.or.jp/axis2/services/OmiWebService"),
     ],
 )
 def test_zwrapper_client_interface_valid(mocker, client_type: ClientType, interface: Interface, addr: str):
@@ -89,8 +89,8 @@ def test_zwrapper_client_interface_valid(mocker, client_type: ClientType, interf
 @pytest.mark.parametrize(
     "test, expected",
     [
-        (False, "https://www2.tdgc.jp/axis2/services/MiWebService"),
-        (True, "https://www4.tdgc.jp/axis2/services/MiWebService"),
+        (False, "https://www2.eprx.or.jp/axis2/services/MiWebService"),
+        (True, "https://www4.eprx.or.jp/axis2/services/MiWebService"),
     ],
 )
 def test_zwrapper_client_instantiation(mocker, test: bool, expected: str):
@@ -106,7 +106,7 @@ def test_zwrapper_submit_server_error(mock_certificate: Certificate):
     # First, register our test responses with the responses library
     register_mms_request(RequestType.INFO, "test", "derp", b"", 500)
     register_mms_request(
-        RequestType.INFO, "test", "derp", b"derp", url="https://www3.tdgc.jp/axis2/services/MiWebService"
+        RequestType.INFO, "test", "derp", b"derp", url="https://www3.eprx.or.jp/axis2/services/MiWebService"
     )
 
     # Next, create our Zeep client

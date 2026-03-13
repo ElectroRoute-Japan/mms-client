@@ -84,26 +84,26 @@ class ServiceEndpoint:
 # Defines the service endpoints for the BSP, MO and TSO clients for the OMI and MI web services, respectively.
 BSP_MO_URLS = {
     Interface.OMI: ServiceEndpoint(
-        main="https://www5.tdgc.jp/axis2/services/OmiWebService",
-        backup="https://www6.tdgc.jp/axis2/services/OmiWebService",
-        test="https://www7.tdgc.jp/axis2/services/OmiWebService",
+        main="https://www5.eprx.or.jp/axis2/services/OmiWebService",
+        backup="https://www6.eprx.or.jp/axis2/services/OmiWebService",
+        test="https://www7.eprx.or.jp/axis2/services/OmiWebService",
     ),
     Interface.MI: ServiceEndpoint(
-        main="https://www2.tdgc.jp/axis2/services/MiWebService",
-        backup="https://www3.tdgc.jp/axis2/services/MiWebService",
-        test="https://www4.tdgc.jp/axis2/services/MiWebService",
+        main="https://www2.eprx.or.jp/axis2/services/MiWebService",
+        backup="https://www3.eprx.or.jp/axis2/services/MiWebService",
+        test="https://www4.eprx.or.jp/axis2/services/MiWebService",
     ),
 }
 TSO_URLS = {
     Interface.OMI: ServiceEndpoint(
-        main="https://maiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
-        backup="https://mbiwlba103v07.tdgc.jp/axis2/services/OmiWebService",
-        test="https://mbiwlba103v08.tdgc.jp/axis2/services/OmiWebService",
+        main="https://maiwlba103v07.eprx.or.jp/axis2/services/OmiWebService",
+        backup="https://mbiwlba103v07.eprx.or.jp/axis2/services/OmiWebService",
+        test="https://mbiwlba103v08.eprx.or.jp/axis2/services/OmiWebService",
     ),
     Interface.MI: ServiceEndpoint(
-        main="https://maiwlba103v03.tdgc.jp/axis2/services/MiWebService",
-        backup="https://mbiwlba103v03.tdgc.jp/axis2/services/MiWebService",
-        test="https://mbiwlba103v06.tdgc.jp/axis2/services/MiWebService",
+        main="https://maiwlba103v03.eprx.or.jp/axis2/services/MiWebService",
+        backup="https://mbiwlba103v03.eprx.or.jp/axis2/services/MiWebService",
+        test="https://mbiwlba103v06.eprx.or.jp/axis2/services/MiWebService",
     ),
 }
 

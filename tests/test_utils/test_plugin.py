@@ -77,4 +77,4 @@ def test_auditer_works(mock_certificate: Certificate):
         f"""</responseCompressed><responseDataType>XML</responseDataType><responseData>{data}</responseData>"""
         """</ns0:ResponseAttInfo></soap-env:Body></soap-env:Envelope>"""
     ).encode("UTF-8")
-    assert auditor.name == "https://www2.tdgc.jp/axis2/services/MiWebService"
+    assert auditor.name == "https://www2.eprx.or.jp/axis2/services/MiWebService"

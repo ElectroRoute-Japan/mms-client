@@ -90,7 +90,7 @@ def test_put_surplus_capacity_works(mock_certificate):
         ),
         read_request_file("put_surplus_capacity_request.xml"),
         read_file("surplus_capacity_response.xml"),
-        url="https://www5.tdgc.jp/axis2/services/OmiWebService",
+        url="https://www5.eprx.or.jp/axis2/services/OmiWebService",
         warnings=True,
         multipart=True,
     )
@@ -196,7 +196,7 @@ def test_put_surplus_capacities_works(mock_certificate):
         ),
         read_request_file("put_surplus_capacity_request.xml"),
         read_file("surplus_capacity_response.xml"),
-        url="https://www5.tdgc.jp/axis2/services/OmiWebService",
+        url="https://www5.eprx.or.jp/axis2/services/OmiWebService",
         warnings=True,
         multipart=True,
     )
@@ -285,7 +285,7 @@ def test_query_surplus_capacity_works(mock_certificate):
         ),
         read_request_file("query_surplus_capacity_request.xml"),
         read_file("surplus_capacity_response.xml"),
-        url="https://www5.tdgc.jp/axis2/services/OmiWebService",
+        url="https://www5.eprx.or.jp/axis2/services/OmiWebService",
         warnings=True,
         multipart=True,
     )

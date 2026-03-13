@@ -927,7 +927,7 @@ def register_mms_request(
     data: str,
     response: bytes,
     status: int = 200,
-    url: str = "https://www2.tdgc.jp/axis2/services/MiWebService",
+    url: str = "https://www2.eprx.or.jp/axis2/services/MiWebService",
     multipart: bool = False,
     encoded: bool = False,
     **kwargs,
