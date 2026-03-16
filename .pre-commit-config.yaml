@@ -48,7 +48,7 @@ repos:
 
   # Code (doc) formatter
   - repo: https://github.com/myint/docformatter
-    rev: v1.3.1
+    rev: v1.5.1
     hooks:
       - id: docformatter
         name: docformatter
