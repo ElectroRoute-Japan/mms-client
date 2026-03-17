@@ -170,6 +170,8 @@ class ZWrapper:
 
         # We need to determine the service port and location of the WSDL file based on the given interface. If the
         # interface is neither "omi" nor "mi", we raise a ValueError.
+        self._adapter = adapter
+        self._test = test
         self._interface = interface
         if self._interface == Interface.MI:
             location = Path(__file__).parent.parent / "schemas" / "wsdl" / "mi-web-service-jbms.wsdl"
@@ -186,10 +188,7 @@ class ZWrapper:
         # authenticating with the MMS server. Note, that if we are not in test mode, we also need to mount the
         # PKCS12 adapter to the backup endpoint to make sure we can switch between the main and backup endpoints in
         # case of an error.
-        sess = Session()
-        sess.mount(self._endpoint.selected, adapter)
-        if not test:
-            sess.mount(self._endpoint.backup, adapter)
+        sess = self._create_session()
 
         # Finally, we create the Zeep client with the given WSDL file location, session, and cache settings and then,
         # from that client, we create the SOAP service with the given service binding and selected endpoint.
@@ -201,6 +200,24 @@ class ZWrapper:
             transport=self._transport,
         )
         self._create_service()
+
+    def _create_session(self) -> Session:
+        """Create a fresh requests session with the PKCS12 adapter mounted.
+
+        Recreating sessions avoids reuse of upstream connection state that may cause intermittent token-auth failures on
+        subsequent requests.
+        """
+        sess = Session()
+        sess.mount(self._endpoint.selected, self._adapter)
+        if not self._test:
+            sess.mount(self._endpoint.backup, self._adapter)
+        return sess
+
+    def _refresh_transport_session(self) -> None:
+        """Replace the transport session with a new one and close the previous one."""
+        current = self._transport.session
+        self._transport.session = self._create_session()
+        current.close()
 
     def register_attachment(self, operation: str, name: str, attachment: bytes) -> str:
         """Register a multipart attachment.
@@ -225,6 +242,9 @@ class ZWrapper:
         """
         try:
             logger.debug(f"Submitting MMS request request to {self._interface.name} service")
+
+            # Refresh the HTTP session per request to prevent sticky upstream auth state.
+            self._refresh_transport_session()
 
             # Submit the request to the MMS server and retrieve the response
             resp: CompoundValue = self._service["submitAttachment"](**req.to_arguments())
